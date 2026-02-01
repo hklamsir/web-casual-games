@@ -1,0 +1,20 @@
+<!-- Coffee Lv2: Espresso Machine -->
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Base -->
+    <rect x="20" y="30" width="60" height="60" rx="5" fill="#C0392B"/>
+    <!-- Top Panel -->
+    <rect x="20" y="20" width="60" height="15" fill="#E74C3C"/>
+    <!-- Buttons -->
+    <circle cx="30" cy="27" r="3" fill="#FFF"/>
+    <circle cx="40" cy="27" r="3" fill="#FFF"/>
+    <circle cx="50" cy="27" r="3" fill="#FFF"/>
+    <!-- Group Head -->
+    <rect x="40" y="40" width="20" height="10" fill="#7F8C8D"/>
+    <!-- Spouts -->
+    <rect x="45" y="50" width="3" height="5" fill="#333"/>
+    <rect x="52" y="50" width="3" height="5" fill="#333"/>
+    <!-- Cup -->
+    <path d="M42,70 L58,70 L56,80 L44,80 Z" fill="#FFF"/>
+    <!-- Drip Tray -->
+    <rect x="25" y="80" width="50" height="5" fill="#7F8C8D"/>
+</svg>

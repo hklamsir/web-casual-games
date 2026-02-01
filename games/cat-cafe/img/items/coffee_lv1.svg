@@ -1,0 +1,11 @@
+<!-- Coffee Lv1: Simple Pot -->
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Pot Body -->
+    <path d="M30,80 L70,80 L75,40 L25,40 Z" fill="#95A5A6" stroke="#7F8C8D" stroke-width="2"/>
+    <!-- Lid -->
+    <path d="M28,40 L72,40 L65,30 L35,30 Z" fill="#34495E"/>
+    <!-- Handle -->
+    <path d="M72,45 C90,45 90,70 70,75" stroke="#34495E" stroke-width="4" fill="none"/>
+    <!-- Spout -->
+    <path d="M28,45 L15,50 L20,60" fill="#95A5A6"/>
+</svg>

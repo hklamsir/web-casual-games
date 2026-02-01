@@ -195,7 +195,7 @@
         .cat {
             position: absolute;
             bottom: 30px;
-            font-size: 3rem;
+            width: 64px;
             animation: bounce 3s infinite ease-in-out;
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
         }
@@ -220,6 +220,10 @@
             <div class="cat-area" id="catArea">
                 <!-- Cats will appear here -->
             </div>
+            
+            <!-- Upgradable Items Display -->
+            <img id="coffee-display" src="" style="position:absolute; bottom:200px; left:80px; width:100px; display:none;" alt="Coffee Machine">
+            <img id="scratcher-display" src="" style="position:absolute; bottom:40px; left:20px; width:80px; display:none;" alt="Cat Scratcher">
 
             <!-- Changed href to javascript to ensure save before redirect -->
             <a href="javascript:void(0)" onclick="exitGame()" class="back-link">← 回到大廳</a>
@@ -277,6 +281,7 @@
         loadGame();
         renderShop(); // Only render once at start
         updateShopState(); // Initial state check
+        updateSceneItems(); // Restore visual items from save
         requestAnimationFrame(gameLoop);
         
         // Auto-save mechanisms
@@ -326,10 +331,32 @@
 
                 // Visual Feedback
                 if (id === 'stray_cat') spawnCat();
+                updateSceneItems(); // Check if we need to show/update items
 
                 updateUI();
                 renderShop(); // Re-render to update price text
                 updateShopState();
+            }
+        }
+
+        function updateSceneItems() {
+            // Coffee Machine
+            const coffeeLevel = game.owned['coffee_machine'];
+            const coffeeImg = document.getElementById('coffee-display');
+            if (coffeeLevel > 0) {
+                // Cap visual level at 3
+                const visLvl = Math.min(coffeeLevel, 3);
+                coffeeImg.src = `img/items/coffee_lv${visLvl}.svg`;
+                coffeeImg.style.display = 'block';
+            }
+
+            // Scratcher
+            const scratcherLevel = game.owned['cat_toy'];
+            const scratcherImg = document.getElementById('scratcher-display');
+            if (scratcherLevel > 0) {
+                const visLvl = Math.min(scratcherLevel, 3);
+                scratcherImg.src = `img/items/scratcher_lv${visLvl}.svg`;
+                scratcherImg.style.display = 'block';
             }
         }
 
@@ -375,9 +402,13 @@
         }
 
         function spawnCat() {
-            const cat = document.createElement('div');
+            const cat = document.createElement('img');
             cat.className = 'cat';
-            cat.innerText = ['🐱', '🐈', '🐈‍⬛'][Math.floor(Math.random() * 3)];
+            
+            // Randomly select one of our cat SVGs
+            const types = ['cat_orange.svg', 'cat_black.svg', 'cat_white.svg'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            cat.src = `img/cats/${type}`;
             
             // Random position but keep within container width
             const leftPos = 10 + Math.random() * 80; 

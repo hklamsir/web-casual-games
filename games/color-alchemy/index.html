@@ -22,6 +22,7 @@
             --c-purple: #9b59b6;
             --c-brown: #5d4037;
             --c-white: #ffffff;
+            --c-black: #000000;
         }
 
         body {
@@ -204,7 +205,6 @@
 
     <div class="controls">
         <button onclick="resetLevel()">Reset</button>
-        <button onclick="checkSolution()" id="check-btn" style="display:none;">Transmute</button> <!-- Debug/Manual check -->
     </div>
 
     <div id="win-modal" class="modal">
@@ -262,32 +262,30 @@
         // Pipe Types: 1:Straight, 2:Corner, 3:T-Shape, 4:Cross
         const LEVELS = [
             {
+                // Level 1: Simple Connection
                 w: 3, h: 3,
                 grid: [
                     {x:0,y:1, t:'S', c:'R', d:1}, // Source Red pointing Right
-                    {x:1,y:1, t:'P', type:1, r:90}, // Pipe Straight Horiz
+                    {x:1,y:1, t:'P', type:1, r:0}, // Pipe Straight Vertical (Needs rotation to 90)
                     {x:2,y:1, t:'T', c:'R'}  // Target Red
                 ]
             },
             {
-                w: 4, h: 4,
+                // Level 2: The First Mix (Yellow + Blue = Green)
+                w: 3, h: 3,
                 grid: [
                     {x:0,y:0, t:'S', c:'Y', d:2}, // Source Yellow Down
-                    {x:3,y:0, t:'S', c:'B', d:2}, // Source Blue Down
-                    {x:0,y:2, t:'P', type:2, r:0}, // Corner
-                    {x:3,y:2, t:'P', type:2, r:270}, // Corner
-                    {x:1,y:2, t:'P', type:1, r:90}, 
-                    {x:2,y:2, t:'P', type:1, r:90},
-                    {x:1,y:3, t:'T', c:'G'}, // Target Green
-                    {x:2,y:3, t:'T', c:'G'}
+                    {x:2,y:0, t:'S', c:'B', d:2}, // Source Blue Down
+                    
+                    {x:0,y:1, t:'P', type:2, r:180}, // Corner (Needs adj)
+                    {x:1,y:1, t:'P', type:3, r:0},   // T-Shape (The Mixer!)
+                    {x:2,y:1, t:'P', type:2, r:270}, // Corner (Needs adj)
+                    
+                    {x:1,y:2, t:'T', c:'G'}       // Target Green
                 ]
             }
         ];
         
-        // This prototype will use a simpler logic:
-        // Clicking a cell rotates the pipe if it exists.
-        // We calculate flow every time a rotation happens.
-
         let currentLevelIdx = 0;
         let boardState = []; // 2D array of cell objects
         let width = 5;
@@ -343,7 +341,7 @@
                 renderCell(item.x, item.y);
             });
 
-            calculateFlow();
+            calculateFlow(true); // true = silent check (don't win immediately on load)
         }
 
         function renderCell(x, y) {
@@ -422,7 +420,7 @@
             calculateFlow();
         }
 
-        function calculateFlow() {
+        function calculateFlow(silent = false) {
             // Reset flow
             for(let y=0; y<height; y++) {
                 for(let x=0; x<width; x++) {
@@ -481,7 +479,7 @@
                 }
             }
 
-            checkWin();
+            if(!silent) checkWin();
         }
 
         // Helper: Does cell have an opening in direction 'dir' (0,90,180,270)?

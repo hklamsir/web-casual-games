@@ -302,6 +302,9 @@
     </div>
 
     <script>
+        // Constants
+        const INCOME_INTERVAL = 15; // Seconds
+
         // Game State
         let game = {
             money: 0,
@@ -504,7 +507,6 @@
         // Game Loop (Modified for 15s interval)
         let lastTime = Date.now();
         let accumulator = 0;
-        const INCOME_INTERVAL = 15; // Seconds
 
         function gameLoop() {
             const now = Date.now();
@@ -561,7 +563,7 @@
                     const now = Date.now();
                     const secondsOffline = (now - game.lastSaveTime) / 1000;
                     if (secondsOffline > INCOME_INTERVAL && game.autoIncome > 0) { 
-                        // Income is now \"per 15s\", so divide seconds by 15
+                        // Income is now "per 15s", so divide seconds by 15
                         const cycles = Math.floor(secondsOffline / INCOME_INTERVAL);
                         const earnings = cycles * game.autoIncome;
                         

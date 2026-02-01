@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>色彩鍊金術 | Color Alchemy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --grid-bg: #2a2a2a;
+            --cell-border: #333;
+            --text-color: #eee;
+            --accent: #d4af37; /* Gold */
+            
+            /* Colors */
+            --c-red: #ff4d4d;
+            --c-yellow: #ffdd59;
+            --c-blue: #3498db;
+            --c-orange: #ff9f43;
+            --c-green: #2ecc71;
+            --c-purple: #9b59b6;
+            --c-brown: #5d4037;
+            --c-white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .level-info {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #888;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 80px); /* Default 5x5 */
+            grid-template-rows: repeat(5, 80px);
+            gap: 5px;
+            background: var(--grid-bg);
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent);
+            position: relative;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: #222;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .cell:hover {
+            background: #2c2c2c;
+        }
+
+        /* Pipe / Flow Styles */
+        .pipe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        
+        .pipe path {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke 0.5s ease;
+        }
+
+        .source-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: 30px; left: 30px;
+            box-shadow: 0 0 10px currentColor;
+            z-index: 10;
+        }
+
+        .target-flask {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #666;
+            border-radius: 50% 50% 5px 5px;
+            position: absolute;
+            top: 15px; left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .target-flask::after {
+            content: '';
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--target-color);
+            opacity: 0.3;
+            transition: opacity 0.5s, background 0.5s;
+        }
+
+        .target-flask.filled::after {
+            opacity: 1;
+            box-shadow: 0 0 15px var(--target-color);
+        }
+        
+        .target-flask.filled {
+            border-color: #fff;
+        }
+
+        /* UI Controls */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 25px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .modal {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+        
+        .modal h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    </style>
+</head>
+<body>
+
+    <a href="../../index.html" class="back-link">← EXIT</a>
+
+    <h1>Color Alchemy</h1>
+    <div class="level-info">Level <span id="level-num">1</span></div>
+
+    <div id="game-board">
+        <!-- Cells generated by JS -->
+    </div>
+
+    <div class="controls">
+        <button onclick="resetLevel()">Reset</button>
+        <button onclick="checkSolution()" id="check-btn" style="display:none;">Transmute</button> <!-- Debug/Manual check -->
+    </div>
+
+    <div id="win-modal" class="modal">
+        <h2>Transmuted!</h2>
+        <button onclick="nextLevel()">Next Level</button>
+    </div>
+
+    <script>
+        // --- Color Logic (RYB approximation) ---
+        const COLORS = {
+            'R': { r: 255, g: 77, b: 77, name: 'Red' },     // Red
+            'Y': { r: 255, g: 221, b: 89, name: 'Yellow' }, // Yellow
+            'B': { r: 52, g: 152, b: 219, name: 'Blue' },   // Blue
+            'O': { r: 255, g: 159, b: 67, name: 'Orange' }, // R+Y
+            'G': { r: 46, g: 204, b: 113, name: 'Green' },  // Y+B
+            'P': { r: 155, g: 89, b: 182, name: 'Purple' }, // R+B
+            'W': { r: 255, g: 255, b: 255, name: 'White' }, // Empty/Light
+            'K': { r: 93, g: 64, b: 55, name: 'Brown' }     // Mixed all
+        };
+
+        // Simple mixing table
+        const MIX_TABLE = {
+            'R': 'R', 'Y': 'Y', 'B': 'B',
+            'RY': 'O', 'YR': 'O',
+            'YB': 'G', 'BY': 'G',
+            'RB': 'P', 'BR': 'P',
+            'RYB': 'K', // Complex...
+            'O': 'O', 'G': 'G', 'P': 'P' // Secondary don't change if single
+        };
+
+        function mixColors(c1, c2) {
+            if (!c1) return c2;
+            if (!c2) return c1;
+            if (c1 === c2) return c1;
+            
+            // Sort to match key
+            const key = [c1, c2].sort().join('');
+            
+            // Primary mixes
+            if (MIX_TABLE[key]) return MIX_TABLE[key];
+            
+            // If mixing secondary with primary... simplified logic for now
+            // E.g., Orange (RY) + Blue (B) = Brown (RYB)
+            // Let's just say anything complex becomes Brown
+            return 'K'; 
+        }
+
+        function getHex(code) {
+            const c = COLORS[code];
+            return c ? `rgb(${c.r},${c.g},${c.b})` : '#333';
+        }
+
+        // --- Game Levels ---
+        // 0: Empty, S: Source(Color, Dir), T: Target(Color), P: Pipe(Type, Rot)
+        // Pipe Types: 1:Straight, 2:Corner, 3:T-Shape, 4:Cross
+        const LEVELS = [
+            {
+                w: 3, h: 3,
+                grid: [
+                    {x:0,y:1, t:'S', c:'R', d:1}, // Source Red pointing Right
+                    {x:1,y:1, t:'P', type:1, r:90}, // Pipe Straight Horiz
+                    {x:2,y:1, t:'T', c:'R'}  // Target Red
+                ]
+            },
+            {
+                w: 4, h: 4,
+                grid: [
+                    {x:0,y:0, t:'S', c:'Y', d:2}, // Source Yellow Down
+                    {x:3,y:0, t:'S', c:'B', d:2}, // Source Blue Down
+                    {x:0,y:2, t:'P', type:2, r:0}, // Corner
+                    {x:3,y:2, t:'P', type:2, r:270}, // Corner
+                    {x:1,y:2, t:'P', type:1, r:90}, 
+                    {x:2,y:2, t:'P', type:1, r:90},
+                    {x:1,y:3, t:'T', c:'G'}, // Target Green
+                    {x:2,y:3, t:'T', c:'G'}
+                ]
+            }
+        ];
+        
+        // This prototype will use a simpler logic:
+        // Clicking a cell rotates the pipe if it exists.
+        // We calculate flow every time a rotation happens.
+
+        let currentLevelIdx = 0;
+        let boardState = []; // 2D array of cell objects
+        let width = 5;
+        let height = 5;
+
+        const boardEl = document.getElementById('game-board');
+
+        function loadLevel(idx) {
+            const level = LEVELS[idx];
+            width = level.w;
+            height = level.h;
+            currentLevelIdx = idx;
+            document.getElementById('level-num').innerText = idx + 1;
+
+            // Reset Board UI
+            boardEl.style.gridTemplateColumns = `repeat(${width}, 80px)`;
+            boardEl.style.gridTemplateRows = `repeat(${height}, 80px)`;
+            boardEl.innerHTML = '';
+            
+            // Init State
+            boardState = Array(height).fill().map(() => Array(width).fill(null));
+
+            // Create Grid
+            for(let y=0; y<height; y++) {
+                for(let x=0; x<width; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.onclick = () => rotateCell(x, y);
+                    
+                    // Create internal SVG structure for pipes
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.setAttribute('viewBox', '0 0 100 100');
+                    svg.className = 'pipe';
+                    // We will add paths dynamically
+                    cell.appendChild(svg);
+
+                    boardEl.appendChild(cell);
+                    boardState[y][x] = { el: cell, type: 'E', rotation: 0, flow: null };
+                }
+            }
+
+            // Load Level Data
+            level.grid.forEach(item => {
+                const cell = boardState[item.y][item.x];
+                cell.type = item.t;
+                if(item.c) cell.color = item.c;
+                if(item.d !== undefined) cell.rotation = item.d * 90; // 0=Up, 1=Right, 2=Down, 3=Left
+                if(item.type) cell.pType = item.type;
+                if(item.r !== undefined) cell.rotation = item.r;
+
+                renderCell(item.x, item.y);
+            });
+
+            calculateFlow();
+        }
+
+        function renderCell(x, y) {
+            const data = boardState[y][x];
+            const cell = data.el;
+            const svg = cell.querySelector('svg');
+            svg.innerHTML = ''; // Clear
+
+            if(data.type === 'S') {
+                // Source
+                const dot = document.createElement('div');
+                dot.className = 'source-dot';
+                dot.style.backgroundColor = getHex(data.color);
+                cell.appendChild(dot);
+                
+                // Direction Arrow (Simplified as a short pipe)
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute('d', 'M50,50 L50,0'); // Up default
+                path.setAttribute('stroke', getHex(data.color));
+                path.setAttribute('transform', `rotate(${data.rotation}, 50, 50)`);
+                svg.appendChild(path);
+                
+                cell.style.cursor = 'default';
+                cell.onclick = null; // Sources don't rotate
+            } 
+            else if (data.type === 'T') {
+                // Target
+                const flask = document.createElement('div');
+                flask.className = 'target-flask';
+                flask.style.setProperty('--target-color', getHex(data.color));
+                cell.appendChild(flask);
+                
+                // If it has flow, fill it
+                if(data.flow === data.color) {
+                    flask.classList.add('filled');
+                } else {
+                    flask.classList.remove('filled');
+                }
+                
+                cell.style.cursor = 'default';
+                cell.onclick = null;
+            }
+            else if (data.type === 'P') {
+                // Pipe
+                // Define paths based on type (Up is default entrance)
+                let d = '';
+                if(data.pType === 1) d = 'M50,0 L50,100'; // Straight
+                if(data.pType === 2) d = 'M50,0 Q50,50 100,50'; // Corner (Top to Right)
+                if(data.pType === 3) d = 'M50,0 L50,50 L100,50 M50,50 L0,50'; // T-Shape
+                if(data.pType === 4) d = 'M50,0 L50,100 M0,50 L100,50'; // Cross
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute('d', d);
+                // Color depends on flow
+                const flowColor = data.flow ? getHex(data.flow) : '#444';
+                path.setAttribute('stroke', flowColor);
+                path.setAttribute('transform', `rotate(${data.rotation}, 50, 50)`);
+                
+                // Glow effect if flowing
+                if(data.flow) {
+                     path.style.filter = `drop-shadow(0 0 5px ${flowColor})`;
+                }
+
+                svg.appendChild(path);
+            }
+        }
+
+        function rotateCell(x, y) {
+            const data = boardState[y][x];
+            if(data.type !== 'P') return;
+
+            data.rotation = (data.rotation + 90) % 360;
+            // Re-render immediately for feedback
+            renderCell(x, y); 
+            // Recalc flow
+            calculateFlow();
+        }
+
+        function calculateFlow() {
+            // Reset flow
+            for(let y=0; y<height; y++) {
+                for(let x=0; x<width; x++) {
+                    if(boardState[y][x].type !== 'S') {
+                        boardState[y][x].flow = null;
+                    }
+                }
+            }
+
+            let changed = true;
+            while(changed) {
+                changed = false;
+                for(let y=0; y<height; y++) {
+                    for(let x=0; x<width; x++) {
+                        const cell = boardState[y][x];
+                        // If cell has color (Source or filled Pipe), try to spread
+                        const color = cell.type === 'S' ? cell.color : cell.flow;
+                        
+                        if(color) {
+                            // Spread to neighbors
+                            // Logic: Does this cell connect to neighbor? Does neighbor connect back?
+                            const neighbors = [
+                                {dx:0, dy:-1, dir:0}, // Up
+                                {dx:1, dy:0, dir:90}, // Right
+                                {dx:0, dy:1, dir:180},// Down
+                                {dx:-1, dy:0, dir:270}// Left
+                            ];
+
+                            neighbors.forEach(n => {
+                                const nx = x + n.dx;
+                                const ny = y + n.dy;
+                                
+                                if(nx >=0 && nx < width && ny >=0 && ny < height) {
+                                    const nextCell = boardState[ny][nx];
+                                    
+                                    // Check connection (This is the tricky part)
+                                    if(isConnected(cell, n.dir) && isConnected(nextCell, (n.dir+180)%360)) {
+                                        // Mix logic
+                                        const newColor = mixColors(nextCell.flow, color);
+                                        if(nextCell.flow !== newColor) {
+                                            nextCell.flow = newColor;
+                                            changed = true;
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Re-render all to show flow
+            for(let y=0; y<height; y++) {
+                for(let x=0; x<width; x++) {
+                    renderCell(x, y);
+                }
+            }
+
+            checkWin();
+        }
+
+        // Helper: Does cell have an opening in direction 'dir' (0,90,180,270)?
+        function isConnected(cell, dir) {
+            if(cell.type === 'E') return false;
+            
+            // Normalize dir relative to rotation
+            // e.g. If cell is rotated 90deg, its "Top" (0) is actually facing Right (90)
+            // So we need to check internal port at (dir - rotation)
+            const relDir = (dir - cell.rotation + 360) % 360;
+
+            if(cell.type === 'S') {
+                // Source only outputs in one direction (usually 0 relative to itself, but let's check level data)
+                // Actually in my data, S rotation points the output.
+                // So if S rotation is 90, it outputs at 90.
+                // relDir should be 0 (Top of the arrow shape)
+                return relDir === 0; // The "top" of the source arrow is the output
+            }
+            
+            if(cell.type === 'T') {
+                return true; // Targets accept from all sides? Let's say yes for ease
+            }
+
+            if(cell.type === 'P') {
+                // Pipe connections
+                // Straight (Type 1): Top(0) and Bottom(180)
+                if(cell.pType === 1) return relDir === 0 || relDir === 180;
+                // Corner (Type 2): Top(0) and Right(90)
+                if(cell.pType === 2) return relDir === 0 || relDir === 90;
+                // T-Shape (Type 3): Top(0), Right(90), Bottom(180)
+                if(cell.pType === 3) return relDir === 0 || relDir === 90 || relDir === 180;
+                // Cross (Type 4): All
+                if(cell.pType === 4) return true;
+            }
+            return false;
+        }
+
+        function checkWin() {
+            let allFilled = true;
+            let hasTargets = false;
+
+            for(let y=0; y<height; y++) {
+                for(let x=0; x<width; x++) {
+                    const c = boardState[y][x];
+                    if(c.type === 'T') {
+                        hasTargets = true;
+                        if(c.flow !== c.color) allFilled = false;
+                    }
+                }
+            }
+
+            if(hasTargets && allFilled) {
+                setTimeout(() => {
+                    document.getElementById('win-modal').style.display = 'flex';
+                }, 500);
+            }
+        }
+
+        function nextLevel() {
+            document.getElementById('win-modal').style.display = 'none';
+            const nextIdx = currentLevelIdx + 1;
+            if(nextIdx < LEVELS.length) {
+                loadLevel(nextIdx);
+            } else {
+                alert("You are a Master Alchemist! More levels coming soon.");
+                loadLevel(0);
+            }
+        }
+
+        function resetLevel() {
+            loadLevel(currentLevelIdx);
+        }
+
+        // Start
+        loadLevel(0);
+
+    </script>
+</body>
+</html>

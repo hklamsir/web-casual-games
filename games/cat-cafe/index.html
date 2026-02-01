@@ -250,7 +250,8 @@
 
         // Init
         loadGame();
-        renderShop();
+        renderShop(); // Only render once at start
+        updateShopState(); // Initial state check
         requestAnimationFrame(gameLoop);
         setInterval(saveGame, 10000); // Auto-save every 10s
 
@@ -260,6 +261,7 @@
             createFloatingText(e.clientX, e.clientY, `+$${game.clickValue}`);
             clickBtn.style.transform = 'scale(0.95)';
             setTimeout(() => clickBtn.style.transform = 'scale(1)', 50);
+            updateShopState(); // Check upgrades on manual click
         });
 
         function addMoney(amount) {
@@ -293,10 +295,12 @@
                 if (id === 'stray_cat') spawnCat();
 
                 updateUI();
-                renderShop(); // Update prices
+                renderShop(); // Re-render to update price text
+                updateShopState();
             }
         }
 
+        // Create the DOM elements for the shop
         function renderShop() {
             shopList.innerHTML = '';
             for (const [id, item] of Object.entries(game.items)) {
@@ -304,7 +308,8 @@
                 const currentCost = Math.floor(item.cost * Math.pow(1.15, count));
                 
                 const div = document.createElement('div');
-                div.className = `upgrade-item ${game.money < currentCost ? 'disabled' : ''}`;
+                div.className = 'upgrade-item';
+                div.id = `shop-item-${id}`; // Add ID for easier updates
                 div.onclick = () => buyItem(id);
                 div.innerHTML = `
                     <div style="font-size: 1.5rem; margin-right: 15px;">${item.icon}</div>
@@ -316,13 +321,35 @@
                 `;
                 shopList.appendChild(div);
             }
+            updateShopState();
+        }
+
+        // Light/Darken buttons based on money (Performance optimized)
+        function updateShopState() {
+            for (const [id, item] of Object.entries(game.items)) {
+                const count = game.owned[id];
+                const currentCost = Math.floor(item.cost * Math.pow(1.15, count));
+                const el = document.getElementById(`shop-item-${id}`);
+                
+                if (el) {
+                    if (game.money >= currentCost) {
+                        el.classList.remove('disabled');
+                    } else {
+                        el.classList.add('disabled');
+                    }
+                }
+            }
         }
 
         function spawnCat() {
             const cat = document.createElement('div');
             cat.className = 'cat';
             cat.innerText = ['🐱', '🐈', '🐈‍⬛'][Math.floor(Math.random() * 3)];
-            cat.style.left = `${Math.random() * 80 + 10}%`;
+            
+            // Random position but keep within container width
+            const leftPos = 10 + Math.random() * 80; 
+            cat.style.left = `${leftPos}%`;
+            
             cat.style.animationDelay = `${Math.random() * 2}s`;
             catArea.appendChild(cat);
         }
@@ -342,11 +369,9 @@
                     const gain = Math.floor(accumulator);
                     addMoney(gain);
                     accumulator -= gain;
+                    updateShopState(); // Check upgrades on auto income
                 }
             }
-            
-            // Re-check shop availability visually
-            renderShop();
             
             requestAnimationFrame(gameLoop);
         }

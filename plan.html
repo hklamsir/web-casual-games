@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>休閒網頁遊戲平台開發企劃書</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px; }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; border-left: 5px solid #3498db; padding-left: 10px; }
+        h3 { color: #16a085; margin-top: 20px; }
+        p { margin-bottom: 15px; }
+        ul { margin-bottom: 15px; }
+        .highlight { background-color: #f1f8ff; padding: 15px; border-radius: 5px; border: 1px solid #c8e1ff; }
+        .footer { margin-top: 50px; text-align: center; font-size: 0.8em; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <h1>休閒網頁遊戲平台 - 開發企劃書</h1>
+    <p style="text-align: center;"><strong>提案人：小信 (OpenClaw Agent) &nbsp;|&nbsp; 日期：2026年2月1日</strong></p>
+
+    <h2>1. 專案概述 (Executive Summary)</h2>
+    <p>本計畫旨在開發一個整合型的休閒網頁遊戲平台 (Web Game Portal)。平台將包含三款不同風格的輕量級遊戲，並透過一個現代化的 Landing Page 進行整合。目標是提供使用者「隨開隨玩、輕鬆療癒」的娛樂體驗。</p>
+
+    <h2>2. 平台架構 (Platform Architecture)</h2>
+    <p>專案將採用單一儲存庫 (Monorepo) 結構管理，包含以下核心組件：</p>
+    <ul>
+        <li><strong>Landing Page (入口網站)</strong>：負責展示遊戲、引導流量及使用者導航。</li>
+        <li><strong>Game 1: 貓咪咖啡廳大亨</strong> (放置經營)</li>
+        <li><strong>Game 2: 霓虹貪吃蛇 2077</strong> (動作反應)</li>
+        <li><strong>Game 3: 色彩鍊金術</strong> (益智解謎)</li>
+    </ul>
+
+    <h2>3. 遊戲詳細設計</h2>
+
+    <div class="highlight">
+        <h3>🐱 Game 1: 貓咪咖啡廳大亨 (Cat Café Tycoon)</h3>
+        <p><strong>類型：</strong>放置經營 (Idle Game)</p>
+        <p><strong>核心玩法：</strong></p>
+        <ul>
+            <li>玩家扮演店長，透過點擊招攬客人賺取金幣。</li>
+            <li>使用金幣解鎖不同品種的貓咪（每隻貓咪提供被動收入加成）。</li>
+            <li>升級店內設施（咖啡機、貓抓板）以提高點擊效率。</li>
+            <li><strong>技術重點：</strong> LocalStorage 資料保存系統，確保玩家關閉瀏覽器後進度不丟失。</li>
+        </ul>
+    </div>
+
+    <div class="highlight">
+        <h3>🐍 Game 2: 霓虹貪吃蛇 2077 (Neon Snake 2077)</h3>
+        <p><strong>類型：</strong>動作技巧 (Arcade)</p>
+        <p><strong>核心玩法：</strong></p>
+        <ul>
+            <li>經典貪吃蛇玩法的現代詮釋，採用 Cyberpunk 霓虹視覺風格。</li>
+            <li>加入「技能系統」：如短暫時光暫停、穿牆衝刺。</li>
+            <li>動態地圖與多樣化道具（加速、加分、縮短長度）。</li>
+            <li><strong>技術重點：</strong> HTML5 Canvas 繪圖優化、高刷新率遊戲迴圈 (Game Loop)。</li>
+        </ul>
+    </div>
+
+    <div class="highlight">
+        <h3>🎨 Game 3: 色彩鍊金術 (Color Alchemy)</h3>
+        <p><strong>類型：</strong>益智解謎 (Puzzle)</p>
+        <p><strong>核心玩法：</strong></p>
+        <ul>
+            <li>基於色彩混合原理（紅+黃=橘、藍+黃=綠）的解謎遊戲。</li>
+            <li>玩家需在有限步數內，將原色混合成目標顏色填滿區域。</li>
+            <li>極簡主義 UI 設計，搭配優雅的轉場動畫。</li>
+            <li><strong>技術重點：</strong> 複雜邏輯判斷、SVG/CSS3 動畫交互。</li>
+        </ul>
+    </div>
+
+    <h2>4. 入口網站設計 (Landing Page)</h2>
+    <ul>
+        <li><strong>視覺風格</strong>：採用現代簡約設計，強調遊戲的繽紛色彩。</li>
+        <li><strong>功能模組</strong>：
+            <ul>
+                <li><strong>Hero Section</strong>：輪播展示三款遊戲的精華畫面。</li>
+                <li><strong>遊戲選擇區</strong>：卡片式設計 (Card Layout)，顯示遊戲圖示與簡介，點擊即玩。</li>
+                <li><strong>關於我們</strong>：專案開發背景介紹。</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>5. 技術棧 (Tech Stack)</h2>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>技術選型</th>
+        </tr>
+        <tr>
+            <td>前端核心</td>
+            <td>HTML5, CSS3, JavaScript (ES6+)</td>
+        </tr>
+        <tr>
+            <td>遊戲引擎</td>
+            <td>原生 Canvas API (貪吃蛇), DOM 操作 (經營/解謎) 或 Phaser.js (視需求引入)</td>
+        </tr>
+        <tr>
+            <td>版本控制</td>
+            <td>Git & GitHub</td>
+        </tr>
+        <tr>
+            <td>部署</td>
+            <td>GitHub Pages</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <p>Produced by OpenClaw Agent for Mr. Lin</p>
+    </div>
+
+</body>
+</html>

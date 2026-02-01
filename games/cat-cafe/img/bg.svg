@@ -1,0 +1,68 @@
+<svg width="900" height="600" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Gradients -->
+        <linearGradient id="wallGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFF9E6"/> <!-- Creamy white -->
+            <stop offset="100%" stop-color="#FFE8D6"/> <!-- Warm beige -->
+        </linearGradient>
+        <linearGradient id="floorGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#DDB892"/> 
+            <stop offset="100%" stop-color="#B08968"/>
+        </linearGradient>
+        <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#A2D2FF"/>
+            <stop offset="100%" stop-color="#CDB4DB"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Wall -->
+    <rect x="0" y="0" width="900" height="450" fill="url(#wallGradient)"/>
+
+    <!-- Floor -->
+    <rect x="0" y="450" width="900" height="150" fill="url(#floorGradient)"/>
+
+    <!-- Baseboard -->
+    <rect x="0" y="440" width="900" height="10" fill="#FFF"/>
+    <rect x="0" y="440" width="900" height="1" fill="#DDD"/>
+
+    <!-- Window (Big Arch Window) -->
+    <g transform="translate(250, 50)">
+        <path d="M0,200 L400,200 L400,100 C400,-50 0,-50 0,100 Z" fill="url(#skyGradient)" stroke="#FFF" stroke-width="10"/>
+        <!-- Window Frame -->
+        <path d="M0,200 L400,200 L400,100 C400,-50 0,-50 0,100 Z" fill="none" stroke="#8D6E63" stroke-width="15"/>
+        <rect x="195" y="20" width="10" height="180" fill="#8D6E63"/>
+        <rect x="0" y="100" width="400" height="10" fill="#8D6E63"/>
+        
+        <!-- Clouds -->
+        <circle cx="100" cy="80" r="30" fill="rgba(255,255,255,0.6)"/>
+        <circle cx="140" cy="90" r="40" fill="rgba(255,255,255,0.6)"/>
+        <circle cx="300" cy="60" r="25" fill="rgba(255,255,255,0.5)"/>
+        <circle cx="330" cy="70" r="35" fill="rgba(255,255,255,0.5)"/>
+    </g>
+
+    <!-- Hanging Plants -->
+    <g transform="translate(100, 0)">
+        <line x1="0" y1="0" x2="0" y2="100" stroke="#555" stroke-width="2"/>
+        <path d="M-20,100 Q0,140 20,100 Z" fill="#8D6E63"/> <!-- Pot -->
+        <!-- Leaves -->
+        <path d="M0,100 Q-30,150 -10,180" stroke="#6B705C" stroke-width="5" fill="none"/>
+        <path d="M0,100 Q30,150 10,180" stroke="#A5A58D" stroke-width="5" fill="none"/>
+        <path d="M0,100 Q0,160 0,190" stroke="#6B705C" stroke-width="5" fill="none"/>
+        <circle cx="0" cy="190" r="5" fill="#6B705C"/>
+        <circle cx="-10" cy="180" r="5" fill="#6B705C"/>
+    </g>
+
+    <g transform="translate(800, 0)">
+        <line x1="0" y1="0" x2="0" y2="120" stroke="#555" stroke-width="2"/>
+        <path d="M-25,120 Q0,170 25,120 Z" fill="#A1887F"/>
+        <path d="M0,120 Q-40,180 -20,220" stroke="#4A6fa5" stroke-width="5" fill="none"/> <!-- Different plant -->
+        <path d="M0,120 Q40,180 20,220" stroke="#4A6fa5" stroke-width="5" fill="none"/>
+    </g>
+
+    <!-- Rug -->
+    <ellipse cx="450" cy="520" rx="200" ry="40" fill="#A5A58D" opacity="0.6"/>
+
+    <!-- Light rays -->
+    <path d="M300,200 L200,600 L600,600 L500,200 Z" fill="url(#wallGradient)" opacity="0.1"/>
+
+</svg>

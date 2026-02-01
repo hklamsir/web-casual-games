@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微光遊戲 | Shimma Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F9F7F2; /* 米白 */
+            --card-bg: #FFFFFF;
+            --primary-color: #8E9DCC; /* 柔和紫藍 */
+            --secondary-color: #D4A373; /* 拿鐵色 */
+            --text-color: #4A4E69;
+            --accent-green: #A3B18A; /* 鼠尾草綠 */
+            --shadow: 0 4px 20px rgba(74, 78, 105, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 40px;
+        }
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        header p {
+            font-size: 1.2rem;
+            color: #8d99ae;
+            font-style: italic;
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Game Card */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(74, 78, 105, 0.15);
+        }
+
+        .icon-box {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .game-card p {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .game-card:hover .btn {
+            background-color: #6d7cb3;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background-color: #eee;
+            color: #777;
+        }
+
+        .status-badge.live { background-color: #e0f2f1; color: #26a69a; }
+        .status-badge.dev { background-color: #fff3e0; color: #ff9800; }
+
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Shimma Games</h1>
+            <p>在繁忙的日子裡，找回一片寧靜 🌿</p>
+        </header>
+
+        <div class="game-grid">
+            <!-- Game 1: 貓咪咖啡廳 -->
+            <a href="games/cat-cafe/index.html" class="game-card">
+                <div>
+                    <span class="status-badge live">現正營業中</span>
+                    <div class="icon-box">🐱</div>
+                    <h3>貓咪咖啡廳大亨</h3>
+                    <p>一杯熱咖啡，一隻慵懶的貓。<br>經營您的夢想小店，享受治癒時光。</p>
+                </div>
+                <div class="btn">進入店鋪</div>
+            </a>
+
+            <!-- Game 2: 霓虹貪吃蛇 (Coming Soon) -->
+            <div class="game-card" style="opacity: 0.7;">
+                <div>
+                    <span class="status-badge dev">開發籌備中</span>
+                    <div class="icon-box">🐍</div>
+                    <h3>霓虹貪吃蛇 2077</h3>
+                    <p>穿梭於賽博龐克的迷幻光影，<br>體驗速度與反應的極限。</p>
+                </div>
+                <div class="btn" style="background-color: #ccc;">即將推出</div>
+            </div>
+
+            <!-- Game 3: 色彩鍊金術 (Coming Soon) -->
+            <div class="game-card" style="opacity: 0.7;">
+                <div>
+                    <span class="status-badge dev">開發籌備中</span>
+                    <div class="icon-box">🎨</div>
+                    <h3>色彩鍊金術</h3>
+                    <p>混合原色，尋找完美的色調。<br>極簡主義的邏輯解謎之旅。</p>
+                </div>
+                <div class="btn" style="background-color: #ccc;">即將推出</div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2026 Shimma Games. Created with ❤️ by hklamsir & OpenClaw.
+        </footer>
+    </div>
+
+</body>
+</html>

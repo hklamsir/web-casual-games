@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貓咪咖啡廳大亨 | Cat Café Tycoon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDF6E3;
+            --panel-bg: #FFFFFF;
+            --accent: #D4A373; 
+            --text-main: #4A4E69;
+            --btn-color: #A5A58D;
+            --btn-hover: #6B705C;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        .game-container {
+            display: flex;
+            width: 900px;
+            height: 600px;
+            background: var(--panel-bg);
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Left Side: Café View */
+        .cafe-view {
+            flex: 2;
+            padding: 30px;
+            position: relative;
+            background-image: radial-gradient(#f0e6d2 10%, transparent 10%);
+            background-size: 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--accent);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+        }
+
+        .stats-bar {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .main-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 8px solid #EFEFEF;
+            font-size: 4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .main-btn:active {
+            transform: scale(0.95);
+            border-color: var(--accent);
+        }
+
+        .main-btn:hover {
+            box-shadow: 0 8px 25px rgba(212, 163, 115, 0.3);
+        }
+
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            color: var(--accent);
+            animation: floatUp 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+
+        /* Right Side: Upgrades */
+        .upgrade-panel {
+            flex: 1;
+            background-color: #FAFAFA;
+            border-left: 2px solid #F0F0F0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .upgrade-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .upgrade-item {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upgrade-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .upgrade-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .item-info h4 { margin: 0; font-size: 1rem; }
+        .item-info p { margin: 5px 0 0; font-size: 0.8rem; color: #999; }
+        .item-cost { font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+
+        .back-link {
+            position: absolute;
+            bottom: 20px;
+            left: 30px;
+            text-decoration: none;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .back-link:hover { color: var(--text-main); }
+
+        .cat-area {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 100%;
+            height: 100px;
+            pointer-events: none;
+        }
+        
+        .cat {
+            position: absolute;
+            bottom: 0;
+            font-size: 2rem;
+            animation: bounce 3s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Main Game Area -->
+        <div class="cafe-view">
+            <h1>Cat Café Tycoon</h1>
+            <div class="stats-bar">💰 $<span id="money">0</span></div>
+
+            <div class="main-btn" id="clickBtn">☕</div>
+            
+            <div class="cat-area" id="catArea">
+                <!-- Cats will appear here -->
+            </div>
+
+            <a href="../../index.html" class="back-link">← 回到大廳</a>
+        </div>
+
+        <!-- Right Sidebar: Shop -->
+        <div class="upgrade-panel">
+            <div class="panel-title">店鋪升級</div>
+            <div class="upgrade-list" id="shopList">
+                <!-- Shop items injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let game = {
+            money: 0,
+            clickValue: 1,
+            autoIncome: 0,
+            items: {
+                'coffee_machine': { name: '高級咖啡機', cost: 15, income: 0, clickBonus: 1, icon: '⚙️', desc: '點擊收益 +1' },
+                'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每秒收益 +2' },
+                'cat_toy': { name: '貓抓板', cost: 200, income: 5, clickBonus: 0, icon: '🧶', desc: '每秒收益 +5' },
+                'barista': { name: '雇用店員', cost: 1000, income: 20, clickBonus: 0, icon: '👱‍♀️', desc: '每秒收益 +20' }
+            },
+            owned: {
+                'coffee_machine': 0,
+                'stray_cat': 0,
+                'cat_toy': 0,
+                'barista': 0
+            }
+        };
+
+        // DOM Elements
+        const moneyEl = document.getElementById('money');
+        const clickBtn = document.getElementById('clickBtn');
+        const shopList = document.getElementById('shopList');
+        const catArea = document.getElementById('catArea');
+
+        // Init
+        loadGame();
+        renderShop();
+        requestAnimationFrame(gameLoop);
+        setInterval(saveGame, 10000); // Auto-save every 10s
+
+        // Click Event
+        clickBtn.addEventListener('click', (e) => {
+            addMoney(game.clickValue);
+            createFloatingText(e.clientX, e.clientY, `+$${game.clickValue}`);
+            clickBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => clickBtn.style.transform = 'scale(1)', 50);
+        });
+
+        function addMoney(amount) {
+            game.money += amount;
+            updateUI();
+        }
+
+        function createFloatingText(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = text;
+            el.style.left = `${x - 20}px`;
+            el.style.top = `${y - 40}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function buyItem(id) {
+            const item = game.items[id];
+            const currentCost = Math.floor(item.cost * Math.pow(1.15, game.owned[id]));
+
+            if (game.money >= currentCost) {
+                game.money -= currentCost;
+                game.owned[id]++;
+                
+                // Update stats
+                if (item.clickBonus > 0) game.clickValue += item.clickBonus;
+                if (item.income > 0) game.autoIncome += item.income;
+
+                // Visual Feedback
+                if (id === 'stray_cat') spawnCat();
+
+                updateUI();
+                renderShop(); // Update prices
+            }
+        }
+
+        function renderShop() {
+            shopList.innerHTML = '';
+            for (const [id, item] of Object.entries(game.items)) {
+                const count = game.owned[id];
+                const currentCost = Math.floor(item.cost * Math.pow(1.15, count));
+                
+                const div = document.createElement('div');
+                div.className = `upgrade-item ${game.money < currentCost ? 'disabled' : ''}`;
+                div.onclick = () => buyItem(id);
+                div.innerHTML = `
+                    <div style="font-size: 1.5rem; margin-right: 15px;">${item.icon}</div>
+                    <div class="item-info" style="flex:1">
+                        <h4>${item.name} <span style="font-size:0.8em; color:#bbb">Lv.${count}</span></h4>
+                        <p>${item.desc}</p>
+                    </div>
+                    <div class="item-cost">$${currentCost}</div>
+                `;
+                shopList.appendChild(div);
+            }
+        }
+
+        function spawnCat() {
+            const cat = document.createElement('div');
+            cat.className = 'cat';
+            cat.innerText = ['🐱', '🐈', '🐈‍⬛'][Math.floor(Math.random() * 3)];
+            cat.style.left = `${Math.random() * 80 + 10}%`;
+            cat.style.animationDelay = `${Math.random() * 2}s`;
+            catArea.appendChild(cat);
+        }
+
+        // Game Loop (for auto income)
+        let lastTime = Date.now();
+        let accumulator = 0;
+
+        function gameLoop() {
+            const now = Date.now();
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            if (game.autoIncome > 0) {
+                accumulator += game.autoIncome * dt;
+                if (accumulator >= 1) {
+                    const gain = Math.floor(accumulator);
+                    addMoney(gain);
+                    accumulator -= gain;
+                }
+            }
+            
+            // Re-check shop availability visually
+            renderShop();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateUI() {
+            moneyEl.innerText = Math.floor(game.money);
+        }
+
+        function saveGame() {
+            localStorage.setItem('catCafeSave', JSON.stringify(game));
+        }
+
+        function loadGame() {
+            const save = localStorage.getItem('catCafeSave');
+            if (save) {
+                const data = JSON.parse(save);
+                // Merge save with defaults to prevent errors if structure changes
+                game = { ...game, ...data, items: game.items }; 
+                
+                // Recalculate derived stats just in case
+                game.clickValue = 1;
+                game.autoIncome = 0;
+                
+                // Restore cats visual
+                for(let i=0; i<game.owned['stray_cat']; i++) {
+                     // Limit visual cats to 10 to prevent clutter
+                     if(i < 10) spawnCat();
+                }
+
+                for (const [id, count] of Object.entries(game.owned)) {
+                    if (game.items[id].clickBonus) game.clickValue += game.items[id].clickBonus * count;
+                    if (game.items[id].income) game.autoIncome += game.items[id].income * count;
+                }
+            }
+            updateUI();
+        }
+
+    </script>
+</body>
+</html>

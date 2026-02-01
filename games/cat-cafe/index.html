@@ -170,6 +170,7 @@
             text-decoration: none;
             color: #aaa;
             font-size: 0.9rem;
+            cursor: pointer;
         }
         .back-link:hover { color: var(--text-main); }
 
@@ -210,7 +211,8 @@
                 <!-- Cats will appear here -->
             </div>
 
-            <a href="../../index.html" class="back-link">← 回到大廳</a>
+            <!-- Changed href to javascript to ensure save before redirect -->
+            <a href="javascript:void(0)" onclick="exitGame()" class="back-link">← 回到大廳</a>
         </div>
 
         <!-- Right Sidebar: Shop -->
@@ -222,12 +224,23 @@
         </div>
     </div>
 
+    <!-- Offline Earnings Modal -->
+    <div id="offlineModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:20px; text-align:center; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="color:var(--accent); margin-top:0;">歡迎回來！</h2>
+            <p>貓咪們在您離開期間也很努力工作喔！</p>
+            <h1 style="font-size:2.5rem; margin:20px 0;">+$<span id="offlineEarnings">0</span></h1>
+            <button onclick="document.getElementById('offlineModal').style.display='none'" style="background:var(--accent); color:white; border:none; padding:10px 30px; border-radius:50px; font-size:1.1rem; cursor:pointer;">開心收下 💰</button>
+        </div>
+    </div>
+
     <script>
         // Game State
         let game = {
             money: 0,
             clickValue: 1,
             autoIncome: 0,
+            lastSaveTime: Date.now(), // Track time for offline earnings
             items: {
                 'coffee_machine': { name: '高級咖啡機', cost: 15, income: 0, clickBonus: 1, icon: '⚙️', desc: '點擊收益 +1' },
                 'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每秒收益 +2' },
@@ -247,13 +260,23 @@
         const clickBtn = document.getElementById('clickBtn');
         const shopList = document.getElementById('shopList');
         const catArea = document.getElementById('catArea');
+        const offlineModal = document.getElementById('offlineModal');
+        const offlineEarningsEl = document.getElementById('offlineEarnings');
 
         // Init
         loadGame();
         renderShop(); // Only render once at start
         updateShopState(); // Initial state check
         requestAnimationFrame(gameLoop);
+        
+        // Auto-save mechanisms
         setInterval(saveGame, 10000); // Auto-save every 10s
+        window.addEventListener('beforeunload', () => { saveGame(); }); // Save on close/refresh
+
+        function exitGame() {
+            saveGame();
+            window.location.href = '../../index.html';
+        }
 
         // Click Event
         clickBtn.addEventListener('click', (e) => {
@@ -381,6 +404,7 @@
         }
 
         function saveGame() {
+            game.lastSaveTime = Date.now(); // Record time
             localStorage.setItem('catCafeSave', JSON.stringify(game));
         }
 
@@ -388,22 +412,35 @@
             const save = localStorage.getItem('catCafeSave');
             if (save) {
                 const data = JSON.parse(save);
-                // Merge save with defaults to prevent errors if structure changes
+                // Merge save with defaults
                 game = { ...game, ...data, items: game.items }; 
                 
-                // Recalculate derived stats just in case
+                // Recalculate derived stats
                 game.clickValue = 1;
                 game.autoIncome = 0;
                 
                 // Restore cats visual
                 for(let i=0; i<game.owned['stray_cat']; i++) {
-                     // Limit visual cats to 10 to prevent clutter
                      if(i < 10) spawnCat();
                 }
 
                 for (const [id, count] of Object.entries(game.owned)) {
                     if (game.items[id].clickBonus) game.clickValue += game.items[id].clickBonus * count;
                     if (game.items[id].income) game.autoIncome += game.items[id].income * count;
+                }
+
+                // Calculate Offline Earnings
+                if (game.lastSaveTime) {
+                    const now = Date.now();
+                    const secondsOffline = (now - game.lastSaveTime) / 1000;
+                    if (secondsOffline > 10 && game.autoIncome > 0) { // Only show if away > 10s
+                        const earnings = Math.floor(secondsOffline * game.autoIncome);
+                        if (earnings > 0) {
+                            addMoney(earnings);
+                            offlineEarningsEl.innerText = earnings;
+                            offlineModal.style.display = 'flex';
+                        }
+                    }
                 }
             }
             updateUI();

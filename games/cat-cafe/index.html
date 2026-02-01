@@ -134,7 +134,21 @@
             color: #888;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid #ff9999;
+            color: #ff5555;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        .reset-btn:hover { background: #fff0f0; }
 
         .upgrade-list {
             flex: 1;
@@ -205,6 +219,38 @@
             50% { transform: translateY(-10px); }
         }
 
+        /* Staff Walking Animation */
+        .staff {
+            position: absolute;
+            bottom: 60px; /* Slightly higher than cats */
+            width: 64px;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+            animation: walk 10s infinite linear alternate;
+        }
+
+        @keyframes walk {
+            0% { transform: translateX(0) scaleX(1); }
+            45% { transform: translateX(300px) scaleX(1); }
+            50% { transform: translateX(300px) scaleX(-1); } /* Turn around */
+            95% { transform: translateX(0) scaleX(-1); }
+            100% { transform: translateX(0) scaleX(1); }
+        }
+
+        .level-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #D4A373;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
     </style>
 </head>
 <body>
@@ -222,7 +268,11 @@
             </div>
             
             <!-- Upgradable Items Display -->
-            <img id="coffee-display" src="" style="position:absolute; bottom:200px; left:80px; width:100px; display:none;" alt="Coffee Machine">
+            <div id="coffee-wrapper" style="position:absolute; bottom:200px; left:80px; width:100px; display:none;">
+                <div class="level-badge" id="coffee-badge">Lv. 1</div>
+                <img id="coffee-display" src="" style="width:100%;" alt="Coffee Machine">
+            </div>
+            
             <img id="scratcher-display" src="" style="position:absolute; bottom:40px; left:20px; width:80px; display:none;" alt="Cat Scratcher">
 
             <!-- Changed href to javascript to ensure save before redirect -->
@@ -231,7 +281,10 @@
 
         <!-- Right Sidebar: Shop -->
         <div class="upgrade-panel">
-            <div class="panel-title">店鋪升級</div>
+            <div class="panel-title">
+                店鋪升級
+                <button class="reset-btn" onclick="resetGame()">重置</button>
+            </div>
             <div class="upgrade-list" id="shopList">
                 <!-- Shop items injected by JS -->
             </div>
@@ -254,12 +307,13 @@
             money: 0,
             clickValue: 1,
             autoIncome: 0,
-            lastSaveTime: Date.now(), // Track time for offline earnings
+            lastSaveTime: Date.now(),
+            coffeeType: 1, // Store random coffee machine type
             items: {
                 'coffee_machine': { name: '高級咖啡機', cost: 15, income: 0, clickBonus: 1, icon: '⚙️', desc: '點擊收益 +1' },
-                'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每秒收益 +2' },
-                'cat_toy': { name: '貓抓板', cost: 200, income: 5, clickBonus: 0, icon: '🧶', desc: '每秒收益 +5' },
-                'barista': { name: '雇用店員', cost: 1000, income: 20, clickBonus: 0, icon: '👱‍♀️', desc: '每秒收益 +20' }
+                'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每15秒收益 +2' }, // Updated desc
+                'cat_toy': { name: '貓抓板', cost: 200, income: 5, clickBonus: 0, icon: '🧶', desc: '每15秒收益 +5' }, // Updated desc
+                'barista': { name: '雇用店員', cost: 1000, income: 20, clickBonus: 0, icon: '👱‍♀️', desc: '每15秒收益 +20' } // Updated desc
             },
             owned: {
                 'coffee_machine': 0,
@@ -276,21 +330,27 @@
         const catArea = document.getElementById('catArea');
         const offlineModal = document.getElementById('offlineModal');
         const offlineEarningsEl = document.getElementById('offlineEarnings');
-
+        
         // Init
         loadGame();
-        renderShop(); // Only render once at start
-        updateShopState(); // Initial state check
-        updateSceneItems(); // Restore visual items from save
+        renderShop();
+        updateShopState();
+        updateSceneItems();
         requestAnimationFrame(gameLoop);
         
-        // Auto-save mechanisms
-        setInterval(saveGame, 10000); // Auto-save every 10s
-        window.addEventListener('beforeunload', () => { saveGame(); }); // Save on close/refresh
+        setInterval(saveGame, 10000);
+        window.addEventListener('beforeunload', () => { saveGame(); });
 
         function exitGame() {
             saveGame();
             window.location.href = '../../index.html';
+        }
+
+        function resetGame() {
+            if(confirm("確定要重置遊戲進度嗎？所有貓咪和升級都會消失喔！")) {
+                localStorage.removeItem('catCafeSave');
+                location.reload();
+            }
         }
 
         // Click Event
@@ -325,16 +385,23 @@
                 game.money -= currentCost;
                 game.owned[id]++;
                 
+                // Special logic for first coffee machine purchase
+                if (id === 'coffee_machine' && game.owned[id] === 1) {
+                    // Randomly select type 1, 2, or 3 only on first purchase
+                    game.coffeeType = Math.floor(Math.random() * 3) + 1;
+                }
+                
                 // Update stats
                 if (item.clickBonus > 0) game.clickValue += item.clickBonus;
                 if (item.income > 0) game.autoIncome += item.income;
 
                 // Visual Feedback
                 if (id === 'stray_cat') spawnCat();
-                updateSceneItems(); // Check if we need to show/update items
+                if (id === 'barista') spawnStaff();
 
+                updateSceneItems();
                 updateUI();
-                renderShop(); // Re-render to update price text
+                renderShop(); 
                 updateShopState();
             }
         }
@@ -342,15 +409,20 @@
         function updateSceneItems() {
             // Coffee Machine
             const coffeeLevel = game.owned['coffee_machine'];
+            const coffeeWrapper = document.getElementById('coffee-wrapper');
             const coffeeImg = document.getElementById('coffee-display');
+            const coffeeBadge = document.getElementById('coffee-badge');
+
             if (coffeeLevel > 0) {
-                // Cap visual level at 3
-                const visLvl = Math.min(coffeeLevel, 3);
-                coffeeImg.src = `img/items/coffee_lv${visLvl}.svg`;
-                coffeeImg.style.display = 'block';
+                // Always use the stored random type
+                coffeeImg.src = `img/items/coffee_lv${game.coffeeType}.svg`;
+                coffeeBadge.innerText = `Lv. ${coffeeLevel}`;
+                coffeeWrapper.style.display = 'block';
+            } else {
+                coffeeWrapper.style.display = 'none';
             }
 
-            // Scratcher
+            // Scratcher logic remains...
             const scratcherLevel = game.owned['cat_toy'];
             const scratcherImg = document.getElementById('scratcher-display');
             if (scratcherLevel > 0) {
@@ -358,6 +430,17 @@
                 scratcherImg.src = `img/items/scratcher_lv${visLvl}.svg`;
                 scratcherImg.style.display = 'block';
             }
+        }
+
+        function spawnStaff() {
+            const staff = document.createElement('img');
+            staff.className = 'staff';
+            staff.src = 'img/items/barista.svg';
+            // Offset animation delay so they don't walk in perfect sync
+            staff.style.animationDelay = `-${Math.random() * 10}s`;
+            // Randomize starting position
+            staff.style.left = `${10 + Math.random() * 30}%`;
+            catArea.appendChild(staff);
         }
 
         // Create the DOM elements for the shop
@@ -418,9 +501,10 @@
             catArea.appendChild(cat);
         }
 
-        // Game Loop (for auto income)
+        // Game Loop (Modified for 15s interval)
         let lastTime = Date.now();
         let accumulator = 0;
+        const INCOME_INTERVAL = 15; // Seconds
 
         function gameLoop() {
             const now = Date.now();
@@ -428,12 +512,14 @@
             lastTime = now;
 
             if (game.autoIncome > 0) {
-                accumulator += game.autoIncome * dt;
-                if (accumulator >= 1) {
-                    const gain = Math.floor(accumulator);
-                    addMoney(gain);
-                    accumulator -= gain;
-                    updateShopState(); // Check upgrades on auto income
+                accumulator += dt;
+                if (accumulator >= INCOME_INTERVAL) {
+                    // Give income every 15 seconds
+                    const cycles = Math.floor(accumulator / INCOME_INTERVAL);
+                    addMoney(game.autoIncome * cycles);
+                    createFloatingText(450, 300, `+$${game.autoIncome * cycles}`); // Show center float text
+                    accumulator -= cycles * INCOME_INTERVAL;
+                    updateShopState();
                 }
             }
             
@@ -453,29 +539,32 @@
             const save = localStorage.getItem('catCafeSave');
             if (save) {
                 const data = JSON.parse(save);
-                // Merge save with defaults
                 game = { ...game, ...data, items: game.items }; 
                 
-                // Recalculate derived stats
+                // Ensure coffeeType exists for old saves
+                if (!game.coffeeType) game.coffeeType = 1;
+
                 game.clickValue = 1;
                 game.autoIncome = 0;
                 
-                // Restore cats visual
-                for(let i=0; i<game.owned['stray_cat']; i++) {
-                     if(i < 10) spawnCat();
-                }
+                // Restore visuals
+                for(let i=0; i<game.owned['stray_cat']; i++) if(i < 10) spawnCat();
+                for(let i=0; i<game.owned['barista']; i++) if(i < 5) spawnStaff(); // Limit visual staff
 
                 for (const [id, count] of Object.entries(game.owned)) {
                     if (game.items[id].clickBonus) game.clickValue += game.items[id].clickBonus * count;
                     if (game.items[id].income) game.autoIncome += game.items[id].income * count;
                 }
 
-                // Calculate Offline Earnings
+                // Calculate Offline Earnings (Adjusted for 15s interval)
                 if (game.lastSaveTime) {
                     const now = Date.now();
                     const secondsOffline = (now - game.lastSaveTime) / 1000;
-                    if (secondsOffline > 10 && game.autoIncome > 0) { // Only show if away > 10s
-                        const earnings = Math.floor(secondsOffline * game.autoIncome);
+                    if (secondsOffline > INCOME_INTERVAL && game.autoIncome > 0) { 
+                        // Income is now \"per 15s\", so divide seconds by 15
+                        const cycles = Math.floor(secondsOffline / INCOME_INTERVAL);
+                        const earnings = cycles * game.autoIncome;
+                        
                         if (earnings > 0) {
                             addMoney(earnings);
                             offlineEarningsEl.innerText = earnings;

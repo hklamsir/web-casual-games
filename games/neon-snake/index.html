@@ -279,7 +279,8 @@
     <h1>NEON SNAKE <span style="font-size:0.5em; vertical-align:super; color:var(--secondary);">2077</span></h1>
 
     <div id="game-container">
-        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        <!-- Remove fixed width/height attributes -->
+        <canvas id="gameCanvas"></canvas>
         
         <div class="hud">
             <div class="score-box">SCORE: <span id="score">0</span></div>
@@ -330,9 +331,20 @@
         
         // Constants
         const GRID_SIZE = 20;
-        const TILE_COUNT = canvas.width / GRID_SIZE;
+        let TILE_COUNT = 30; // Dynamic based on resize
         const SPEED_NORMAL = 100;
         const SPEED_DASH = 40;
+
+        function resizeCanvas() {
+            // Get container size (force square if possible or adapt)
+            // To prevent "food outside screen", we fix the logic resolution to 600x600
+            // and let CSS handle the visual scaling.
+            canvas.width = 600; 
+            canvas.height = 600;
+            TILE_COUNT = canvas.width / GRID_SIZE; // Always 30
+        }
+        
+        resizeCanvas();
 
         // Game State
         let snake = [];

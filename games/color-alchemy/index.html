@@ -54,8 +54,7 @@
 
         #game-board {
             display: grid;
-            grid-template-columns: repeat(5, 80px); /* Default 5x5 */
-            grid-template-rows: repeat(5, 80px);
+            grid-template-columns: repeat(5, 1fr); /* Responsive columns */
             gap: 5px;
             background: var(--grid-bg);
             padding: 10px;
@@ -63,16 +62,22 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid var(--accent);
             position: relative;
+            width: 95vw;
+            max-width: 450px;
+            aspect-ratio: 1; /* Keep aspect ratio square-ish if grid is square */
+            box-sizing: border-box;
         }
 
         .cell {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1;
             background: #222;
             border-radius: 4px;
             position: relative;
             cursor: pointer;
             transition: background 0.3s;
+            touch-action: manipulation;
         }
         
         .cell:hover {
@@ -301,8 +306,8 @@
             document.getElementById('level-num').innerText = idx + 1;
 
             // Reset Board UI
-            boardEl.style.gridTemplateColumns = `repeat(${width}, 80px)`;
-            boardEl.style.gridTemplateRows = `repeat(${height}, 80px)`;
+            boardEl.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+            boardEl.style.gridTemplateRows = `repeat(${height}, 1fr)`;
             boardEl.innerHTML = '';
             
             // Init State
@@ -509,8 +514,8 @@
                 if(cell.pType === 1) return relDir === 0 || relDir === 180;
                 // Corner (Type 2): Top(0) and Right(90)
                 if(cell.pType === 2) return relDir === 0 || relDir === 90;
-                // T-Shape (Type 3): Top(0), Right(90), Bottom(180)
-                if(cell.pType === 3) return relDir === 0 || relDir === 90 || relDir === 180;
+                // T-Shape (Type 3): Top(0), Right(90), Left(270) (Matches SVG)
+                if(cell.pType === 3) return relDir === 0 || relDir === 90 || relDir === 270;
                 // Cross (Type 4): All
                 if(cell.pType === 4) return true;
             }

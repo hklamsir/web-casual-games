@@ -92,6 +92,8 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             position: relative;
             z-index: 10;
+            touch-action: manipulation; /* Prevent double-tap zoom */
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
         }
         
         .main-btn:active {
@@ -381,6 +383,7 @@
         
         setInterval(saveGame, 10000);
         window.addEventListener('beforeunload', () => { saveGame(); });
+        window.addEventListener('pagehide', () => { saveGame(); }); // iOS support
 
         function exitGame() {
             saveGame();

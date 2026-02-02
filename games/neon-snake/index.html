@@ -313,12 +313,12 @@
 
     <div class="mobile-controls">
         <div class="d-pad">
-            <div class="d-btn d-up" ontouchstart="setDir(0, -1)" onmousedown="setDir(0, -1)">▲</div>
-            <div class="d-btn d-left" ontouchstart="setDir(-1, 0)" onmousedown="setDir(-1, 0)">◀</div>
-            <div class="d-btn d-right" ontouchstart="setDir(1, 0)" onmousedown="setDir(1, 0)">▶</div>
-            <div class="d-btn d-down" ontouchstart="setDir(0, 1)" onmousedown="setDir(0, 1)">▼</div>
+            <div class="d-btn d-up" id="btn-up">▲</div>
+            <div class="d-btn d-left" id="btn-left">◀</div>
+            <div class="d-btn d-right" id="btn-right">▶</div>
+            <div class="d-btn d-down" id="btn-down">▼</div>
         </div>
-        <div class="dash-btn" ontouchstart="startDash()" onmousedown="startDash()" ontouchend="endDash()" onmouseup="endDash()">DASH</div>
+        <div class="dash-btn" id="btn-dash">DASH</div>
     </div>
 
     <script>
@@ -434,8 +434,11 @@
         }
 
         function loop(timestamp) {
-            const dt = timestamp - lastTime;
+            let dt = timestamp - lastTime;
             lastTime = timestamp;
+            
+            // Prevent spiral of death on lag/tab switch
+            if (dt > 500) dt = 500;
             
             // Fixed update step for logic
             const updateRate = isDashing ? SPEED_DASH : SPEED_NORMAL;
@@ -626,6 +629,36 @@
 
         function startDash() { if(energy > 10) isDashing = true; }
         function endDash() { isDashing = false; }
+
+        // Setup Mobile Controls
+        function setupBtn(id, startFn, endFn) {
+            const btn = document.getElementById(id);
+            if(!btn) return;
+            
+            const handleStart = (e) => {
+                e.preventDefault(); // Prevent ghost clicks
+                startFn();
+            };
+            
+            btn.addEventListener('touchstart', handleStart, {passive: false});
+            btn.addEventListener('mousedown', handleStart);
+            
+            if (endFn) {
+                const handleEnd = (e) => {
+                    e.preventDefault();
+                    endFn();
+                };
+                btn.addEventListener('touchend', handleEnd, {passive: false});
+                btn.addEventListener('mouseup', handleEnd);
+                btn.addEventListener('mouseleave', handleEnd);
+            }
+        }
+
+        setupBtn('btn-up', () => setDir(0, -1));
+        setupBtn('btn-down', () => setDir(0, 1));
+        setupBtn('btn-left', () => setDir(-1, 0));
+        setupBtn('btn-right', () => setDir(1, 0));
+        setupBtn('btn-dash', startDash, endDash);
 
     </script>
 </body>

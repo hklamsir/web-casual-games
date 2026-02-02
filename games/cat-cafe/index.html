@@ -440,8 +440,13 @@
                 if (item.income > 0) game.autoIncome += item.income;
 
                 // Visual Feedback
-                if (id === 'stray_cat') spawnCat();
-                if (id === 'barista') spawnStaff();
+                if (id === 'stray_cat') {
+                    // Limit visual cats to avoid performance drop
+                    if (document.querySelectorAll('.cat').length < 15) spawnCat();
+                }
+                if (id === 'barista') {
+                    if (document.querySelectorAll('.staff').length < 5) spawnStaff();
+                }
 
                 updateSceneItems();
                 updateUI();

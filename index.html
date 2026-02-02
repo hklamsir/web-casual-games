@@ -60,6 +60,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
+            padding-bottom: 40px; /* Add bottom space for mobile scroll */
         }
 
         /* Game Card */
@@ -136,6 +137,30 @@
             margin-top: 80px;
             color: #aaa;
             font-size: 0.9rem;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            header {
+                padding-top: 20px;
+                margin-bottom: 40px;
+            }
+
+            header h1 {
+                font-size: 2.2rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .game-card {
+                padding: 25px 20px;
+            }
         }
     </style>
 </head>

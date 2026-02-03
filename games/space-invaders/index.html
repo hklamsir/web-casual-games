@@ -14,88 +14,78 @@
     }
     #gameContainer {
       position: relative;
-      width: 600px;
+      width: 100%;
+      max-width: 600px;
       margin: 0 auto;
     }
     #gameCanvas {
       display: block;
       background: black;
       border: 2px solid white;
+      width: 100%;
+      height: auto;
     }
     #info {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin: 10px 0;
-      font-size: 22px;
+      font-size: 16px; /* Slightly smaller for mobile */
       width: 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
     #info span {
       text-align: left;
       white-space: nowrap;
     }
-    #score {
-      width: 130px;
-    }
-    #bestScore {
-      width: 210px;
-    }
-    #level {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 80px;
-    }
-    #lives {
-      width: 180px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #lives img {
-      vertical-align: middle;
-      margin-left: 5px;
-    }
     .controls {
       display: flex;
       justify-content: space-between;
       width: 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
+      margin-top: 10px;
     }
     .movement-controls {
       display: flex;
-      gap: 5px;
+      gap: 10px;
+      width: 60%;
     }
     .controlButton {
       background-color: #333;
       border: 1px solid #fff;
       color: #fff;
-      font-size: 20px;
-      padding: 30px 20px;
-      margin: 8px 0;
-      border-radius: 5px;
-      width: 160px;
+      font-size: 18px;
+      padding: 20px 0; /* Vertical padding */
+      border-radius: 10px;
+      width: 100%; /* Fill flex space */
+      touch-action: manipulation; /* Disable double-tap zoom */
     }
     .controlButton:active {
       background-color: #555;
+    }
+    #btnFire {
+      width: 35%; /* Fire button width */
     }
   </style>
 </head>
 <body>
   <div id="gameContainer">
     <div id="info">
-      <span id="bestScore">最高分數：0</span>
       <span id="score">分數：0</span>
-      <span id="level">第 1 關</span>
-      <span id="lives">生命：</span>
+      <span id="level">關卡 1</span>
+      <span id="lives">生命：3</span>
     </div>
 
     <canvas id="gameCanvas" width="600" height="600"></canvas>
+    
     <div class="controls">
       <div class="movement-controls">
-        <button class="controlButton" id="btnLeft">左移</button>
-        <button class="controlButton" id="btnRight">右移</button>
+        <button class="controlButton" id="btnLeft">←</button>
+        <button class="controlButton" id="btnRight">→</button>
       </div>
-      <button class="controlButton" id="btnFire">發射子彈</button>
+      <button class="controlButton" id="btnFire">🔥</button>
     </div>
   </div>
 
@@ -113,18 +103,17 @@
 
     // 資訊顯示區
     const scoreDisplay = document.getElementById('score');
-    const bestScoreDisplay = document.getElementById('bestScore');
     const levelDisplay = document.getElementById('level');
     const livesDisplay = document.getElementById('lives');
 
     /* 遊戲狀態：
-         "start"          ：開始畫面（顯示操作說明）
+         "start"          ：開始畫面
          "playing"        ：遊戲進行中
-         "levelTransition": 關卡過渡，暫停 2 秒後進入下一關
-         "victoryWait"    ：完成第 10 關後先顯示「成功爆機」3秒
-         "victory"        ：勝利畫面，等待玩家返回開始畫面（點擊Canvas返回也有效）
-         "gameOverWait"   ：遊戲失敗時先顯示「Game Over」，等待 2 秒
-         "gameOver"       ：遊戲失敗狀態，等待玩家返回開始畫面（點擊Canvas返回也有效）
+         "levelTransition": 關卡過渡
+         "victoryWait"    ：勝利等待
+         "victory"        ：勝利畫面
+         "gameOverWait"   ：失敗等待
+         "gameOver"       ：失敗畫面
     */
     let gameState = "start";
     let score = 0;
@@ -181,7 +170,7 @@
       const explosionSound = document.getElementById('explosionSound');
       if (explosionSound) {
           explosionSound.currentTime = 0;
-          explosionSound.play().catch(e => console.log("Explosion sound failed", e));
+          explosionSound.play().catch(e => {});
       }
     }
     function updateExplosions() {
@@ -207,7 +196,6 @@
     }
 
     // ================= 圖片資源 =================
-    // 初始化為 Image 對象
     const titleImage = new Image();
     titleImage.src = 'title.png';
     const playerImage = new Image();
@@ -215,7 +203,6 @@
     const invaderImage = new Image();
     invaderImage.src = 'invader.png';
     
-    // 大飛碟圖片（動畫用兩張），更新後尺寸 80×40
     const ufoImage1 = new Image();
     ufoImage1.src = 'ufo1.png';
     const ufoImage2 = new Image();
@@ -239,16 +226,20 @@
     let invaders = [];
     const invaderRows = 4;
     const invaderCols = 10;
-    const invaderWidth = 30;
-    const invaderHeight = 20;
+    
+    // Updated Logic: Unified Size
+    const invaderWidth = 40; 
+    const invaderHeight = 30;
     const invaderPadding = 10;
-    const offsetX = 50;
+    const offsetX = 30; // Adjusted for wider invaders
     const offsetY = 50;
+    
     let invaderDirection = 1;
     const baseInvaderSpeed = 1;
     const baseInvaderShootingProbability = 0.005;
     let invaderSpeed = baseInvaderSpeed;
     let invaderShootingProbability = baseInvaderShootingProbability;
+
     function spawnInvaders() {
       invaders = [];
       invaderDirection = 1;
@@ -260,13 +251,13 @@
         }
       }
     }
+    
     let invaderBullets = [];
     const invaderBulletSpeed = 3;
     const invaderBulletWidth = 5;
     const invaderBulletHeight = 10;
     const bulletSpeed = 7;
 
-    // 大飛碟設定（尺寸 80×40）
     let ufo = null;
     const ufoWidth = 80;
     const ufoHeight = 40;
@@ -278,7 +269,7 @@
     const ufoBulletHeight = 10;
     const ufoShootInterval = 60;
 
-    // ================= 背景音樂 =================
+    // ================= 音樂 =================
     const bgMusicStart = document.getElementById('bgMusicStart');
     const bgMusicGame = document.getElementById('bgMusicGame');
     const hitSound = document.getElementById('hitSound');
@@ -287,20 +278,14 @@
     if (hitSound) hitSound.volume = 0.6;
     
     window.addEventListener('load', function() {
-        if(document.getElementById("bestScore"))
-            document.getElementById("bestScore").innerText = "最高分數：" + bestScore;
-        
         if (bgMusicStart) {
             bgMusicStart.currentTime = 0;
-            bgMusicStart.play().catch(() => {
-                console.log("自動播放背景音樂失敗，請點擊畫面啟動。");
-            });
+            bgMusicStart.play().catch(() => {});
         }
-        // Force start game loop regardless of image load state
         gameLoop();
     });
 
-    // ================= 發射子彈冷卻控制 =================
+    // ================= 發射控制 =================
     let lastBulletTime = 0;
     const bulletCooldown = 300;
     function tryFireBullet() {
@@ -315,122 +300,74 @@
         const shootSound = document.getElementById('shootSound');
         if (shootSound) {
           shootSound.currentTime = 0;
-          shootSound.play().catch(e => console.log("Shoot sound failed", e));
+          shootSound.play().catch(e => {});
         }
         lastBulletTime = now;
       }
     }
 
-    // ================= 手機按鈕操作 =================
+    // ================= 輸入控制 =================
     const btnLeft = document.getElementById('btnLeft');
     const btnRight = document.getElementById('btnRight');
     const btnFire = document.getElementById('btnFire');
     
-    if (btnLeft) {
-        btnLeft.addEventListener('touchstart', function(e) {
-          e.preventDefault();
-          keys['ArrowLeft'] = true;
-        });
-        btnLeft.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          keys['ArrowLeft'] = false;
-        });
-        btnLeft.addEventListener('mousedown', function(e) {
-          e.preventDefault();
-          keys['ArrowLeft'] = true;
-        });
-        btnLeft.addEventListener('mouseup', function(e) {
-          e.preventDefault();
-          keys['ArrowLeft'] = false;
-        });
-    }
-    
-    if (btnRight) {
-        btnRight.addEventListener('touchstart', function(e) {
-          e.preventDefault();
-          keys['ArrowRight'] = true;
-        });
-        btnRight.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          keys['ArrowRight'] = false;
-        });
-        btnRight.addEventListener('mousedown', function(e) {
-          e.preventDefault();
-          keys['ArrowRight'] = true;
-        });
-        btnRight.addEventListener('mouseup', function(e) {
-          e.preventDefault();
-          keys['ArrowRight'] = false;
-        });
-    }
-    
-    if (btnFire) {
-        btnFire.addEventListener('touchstart', function(e) {
-          e.preventDefault();
-          tryFireBullet();
-        });
-        btnFire.addEventListener('mousedown', function(e) {
-          e.preventDefault();
-          tryFireBullet();
-        });
+    const keys = {};
+
+    function setupTouchButton(btn, key) {
+        if (!btn) return;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+        btn.addEventListener('mousedown', (e) => { keys[key] = true; });
+        btn.addEventListener('mouseup', (e) => { keys[key] = false; });
+        btn.addEventListener('mouseleave', (e) => { keys[key] = false; });
     }
 
-    // ================= 鍵盤事件 =================
-    const keys = {};
+    setupTouchButton(btnLeft, 'ArrowLeft');
+    setupTouchButton(btnRight, 'ArrowRight');
+    
+    if (btnFire) {
+        const fire = (e) => { e.preventDefault(); tryFireBullet(); };
+        btnFire.addEventListener('touchstart', fire);
+        btnFire.addEventListener('mousedown', fire);
+    }
+
     document.addEventListener('keydown', function(e) {
       if (gameState === "start") {
         gameState = "playing";
         resetGameVariables();
         if (bgMusicStart) bgMusicStart.pause();
-        if (bgMusicGame) {
-            bgMusicGame.currentTime = 0;
-            bgMusicGame.play().catch(e => console.log("Game music failed", e));
-        }
+        if (bgMusicGame) { bgMusicGame.currentTime = 0; bgMusicGame.play().catch(() => {}); }
         return;
       }
       if (gameState === "victory" || gameState === "gameOver") {
         gameState = "start";
         if (bgMusicGame) bgMusicGame.pause();
-        if (bgMusicStart) {
-            bgMusicStart.currentTime = 0;
-            bgMusicStart.play().catch(e => console.log("Start music failed", e));
-        }
+        if (bgMusicStart) { bgMusicStart.currentTime = 0; bgMusicStart.play().catch(() => {}); }
         return;
       }
       if (gameState === "playing") {
         keys[e.key] = true;
-        if (e.key === " " || e.key === "Spacebar") {
-          tryFireBullet();
-        }
+        if (e.key === " " || e.key === "Spacebar") tryFireBullet();
       }
     });
-    document.addEventListener('keyup', function(e) {
-      keys[e.key] = false;
-    });
+    
+    document.addEventListener('keyup', function(e) { keys[e.key] = false; });
 
-    // 點擊Canvas返回開始畫面（適用於勝利與Game Over狀態）
     canvas.addEventListener('click', function() {
       if (gameState === "start") {
         gameState = "playing";
         resetGameVariables();
         if (bgMusicStart) bgMusicStart.pause();
-        if (bgMusicGame) {
-            bgMusicGame.currentTime = 0;
-            bgMusicGame.play().catch(e => console.log("Game music failed", e));
-        }
+        if (bgMusicGame) { bgMusicGame.currentTime = 0; bgMusicGame.play().catch(() => {}); }
         return;
       }
       if (gameState === "gameOver" || gameState === "victory") {
         gameState = "start";
         if (bgMusicGame) bgMusicGame.pause();
-        if (bgMusicStart) {
-            bgMusicStart.currentTime = 0;
-            bgMusicStart.play().catch(e => console.log("Start music failed", e));
-        }
+        if (bgMusicStart) { bgMusicStart.currentTime = 0; bgMusicStart.play().catch(() => {}); }
       }
     });
 
-    // ================= 遊戲初始與重置 =================
     function resetGameVariables() {
       score = 0;
       level = 1;
@@ -448,40 +385,27 @@
       updateInfo();
       initStars();
     }
+    
     function updateInfo() {
       if (scoreDisplay) scoreDisplay.textContent = `分數：${score}`;
-      if (bestScoreDisplay) bestScoreDisplay.textContent = `最高分數：${bestScore}`;
-      if (levelDisplay) levelDisplay.textContent = `第 ${level} 關`;
-      if (livesDisplay) {
-          let livesHTML = '生命：';
-          for (let i = 0; i < player.lives; i++) {
-            livesHTML += `<img src="player.png" width="20" height="20" alt="life">`;
-          }
-          livesDisplay.innerHTML = livesHTML;
-      }
+      if (levelDisplay) levelDisplay.textContent = `關卡 ${level}`;
+      if (livesDisplay) livesDisplay.textContent = `生命：${player.lives}`;
     }
 
-    // ================= 玩家被擊中處理 =================
     function playerHit() {
       if (player.hidden) return;
       addExplosion(player.x + player.width/2, player.y + player.height/2);
-      // 播放被擊中音效
-      if (hitSound) {
-          hitSound.currentTime = 0;
-          hitSound.play().catch(e => console.log("Hit sound failed", e));
-      }
+      if (hitSound) { hitSound.currentTime = 0; hitSound.play().catch(() => {}); }
       player.lives--;
+      updateInfo();
       if (player.lives <= 0) {
         triggerGameOver();
         return;
       }
       player.hidden = true;
-      setTimeout(() => {
-        player.hidden = false;
-      }, 1000);
+      setTimeout(() => { player.hidden = false; }, 1000);
     }
 
-    // ================= 關卡過關與勝利處理 =================
     function transitionToNextLevel() {
       gameState = "levelTransition";
       player.bullets = [];
@@ -497,40 +421,34 @@
         gameState = "playing";
       }, 2000);
     }
+    
     function gameVictory() {
       gameState = "victoryWait";
       if (bgMusicGame) bgMusicGame.pause();
-      setTimeout(() => {
-        gameState = "victory";
-      }, 3000);
+      setTimeout(() => { gameState = "victory"; }, 3000);
     }
+    
     function triggerGameOver() {
       addExplosion(player.x + player.width/2, player.y + player.height/2);
       gameState = "gameOverWait";
       if (bgMusicGame) bgMusicGame.pause();
-      setTimeout(() => {
-        gameState = "gameOver";
-      }, 2000);
+      setTimeout(() => { gameState = "gameOver"; }, 2000);
     }
 
-    // ================= 更新遊戲物件 =================
     function update() {
       updateStars();
       updateExplosions();
-      if (gameState !== "playing") {
-        return;
-      }
-      if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-        player.dx = -player.speed;
-      } else if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-        player.dx = player.speed;
-      } else {
-        player.dx = 0;
-      }
+      if (gameState !== "playing") return;
+
+      if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.dx = -player.speed;
+      else if (keys['ArrowRight'] || keys['d'] || keys['D']) player.dx = player.speed;
+      else player.dx = 0;
+
       player.x += player.dx;
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
+      // Player Bullets
       for (let i = player.bullets.length - 1; i >= 0; i--) {
         const bullet = player.bullets[i];
         bullet.y -= bulletSpeed;
@@ -538,15 +456,17 @@
           player.bullets.splice(i, 1);
           continue;
         }
+        
+        // Invader Collision
         for (let j = 0; j < invaders.length; j++) {
           const inv = invaders[j];
           if (inv.alive &&
-              bullet.x < inv.x + 45 &&
+              bullet.x < inv.x + inv.width &&
               bullet.x + bullet.width > inv.x &&
-              bullet.y < inv.y + 45 &&
+              bullet.y < inv.y + inv.height &&
               bullet.y + bullet.height > inv.y) {
             inv.alive = false;
-            addExplosion(inv.x + 45/2, inv.y + 45/2);
+            addExplosion(inv.x + inv.width/2, inv.y + inv.height/2);
             player.bullets.splice(i, 1);
             score += 10;
             if (score > bestScore) {
@@ -556,6 +476,8 @@
             break;
           }
         }
+        
+        // UFO Collision
         if (ufo &&
             bullet.x < ufo.x + ufoWidth &&
             bullet.x + bullet.width > ufo.x &&
@@ -573,11 +495,11 @@
         }
       }
 
+      // Invader Movement
       let moveDown = false;
-      for (let i = 0; i < invaders.length; i++) {
-        const inv = invaders[i];
+      for (let inv of invaders) {
         if (!inv.alive) continue;
-        if (inv.x + 45 >= canvas.width && invaderDirection > 0) {
+        if (inv.x + inv.width >= canvas.width && invaderDirection > 0) {
           moveDown = true;
           break;
         } else if (inv.x <= 0 && invaderDirection < 0) {
@@ -585,37 +507,34 @@
           break;
         }
       }
-      for (let i = 0; i < invaders.length; i++) {
-        const inv = invaders[i];
-        if (!inv.alive) continue;
-        if (moveDown) {
-          inv.y += invaderHeight;
-        } else {
-          inv.x += invaderSpeed * invaderDirection;
-        }
-      }
-      if (moveDown) {
-        invaderDirection *= -1;
-      }
+      
+      if (moveDown) invaderDirection *= -1;
+      
       for (let inv of invaders) {
-        if (inv.alive && inv.y + 45 > player.y + 25) {
+        if (!inv.alive) continue;
+        if (moveDown) inv.y += invaderHeight;
+        else inv.x += invaderSpeed * invaderDirection;
+        
+        if (inv.y + inv.height > player.y + 25) { // Game Over Line
           triggerGameOver();
           return;
         }
       }
 
+      // Invader Shooting
       if (Math.random() < invaderShootingProbability) {
         const aliveInvaders = invaders.filter(inv => inv.alive);
         if (aliveInvaders.length > 0) {
           const shooter = aliveInvaders[Math.floor(Math.random() * aliveInvaders.length)];
           invaderBullets.push({
-            x: shooter.x + 45/2 - invaderBulletWidth/2,
-            y: shooter.y + 45,
+            x: shooter.x + shooter.width/2 - invaderBulletWidth/2,
+            y: shooter.y + shooter.height,
             width: invaderBulletWidth,
             height: invaderBulletHeight
           });
         }
       }
+      
       for (let i = invaderBullets.length - 1; i >= 0; i--) {
         const bullet = invaderBullets[i];
         bullet.y += invaderBulletSpeed;
@@ -623,32 +542,23 @@
           invaderBullets.splice(i, 1);
           continue;
         }
-        if (
-          bullet.x < player.x + player.width &&
-          bullet.x + bullet.width > player.x &&
-          bullet.y < player.y + player.height &&
-          bullet.y + bullet.height > player.y
-        ) {
+        if (bullet.x < player.x + player.width &&
+            bullet.x + bullet.width > player.x &&
+            bullet.y < player.y + player.height &&
+            bullet.y + bullet.height > player.y) {
           invaderBullets.splice(i, 1);
           playerHit();
         }
       }
 
+      // UFO
       if (!ufo && Math.random() < ufoSpawnProbability) {
-        ufo = {
-          x: 0,
-          y: 20,
-          width: ufoWidth,
-          height: ufoHeight,
-          speed: ufoSpeed,
-          shootTimer: 0
-        };
+        ufo = { x: 0, y: 20, width: ufoWidth, height: ufoHeight, speed: ufoSpeed, shootTimer: 0 };
       }
       if (ufo) {
         ufo.x += ufo.speed;
-        if (ufo.x > canvas.width) {
-          ufo = null;
-        } else {
+        if (ufo.x > canvas.width) ufo = null;
+        else {
           ufo.shootTimer++;
           if (ufo.shootTimer >= ufoShootInterval) {
             for (let i = 0; i < 5; i++) {
@@ -671,24 +581,18 @@
           ufoBullets.splice(i, 1);
           continue;
         }
-        if (
-          bullet.x < player.x + player.width &&
-          bullet.x + bullet.width > player.x &&
-          bullet.y < player.y + player.height &&
-          bullet.y + bullet.height > player.y
-        ) {
+        if (bullet.x < player.x + player.width &&
+            bullet.x + bullet.width > player.x &&
+            bullet.y < player.y + player.height &&
+            bullet.y + bullet.height > player.y) {
           ufoBullets.splice(i, 1);
           playerHit();
         }
       }
 
       if (!invaders.some(inv => inv.alive)) {
-        if (level < maxLevel) {
-          transitionToNextLevel();
-        } else {
-          gameVictory();
-          return;
-        }
+        if (level < maxLevel) transitionToNextLevel();
+        else { gameVictory(); return; }
       }
       updateInfo();
     }
@@ -697,87 +601,80 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawStars();
       drawExplosions();
+      
+      // Start Screen
       if (gameState === "start") {
         ctx.fillStyle = 'white';
-        ctx.font = '30px Arial';
         ctx.textAlign = 'center';
         
-        // 只有當圖片加載完成時才繪製
         if (titleImage && titleImage.complete && titleImage.naturalWidth > 0) {
             ctx.drawImage(titleImage, canvas.width/2-150, canvas.height/2 - 200); 
+        } else {
+             ctx.font = '50px Arial';
+             ctx.fillText('太空入侵者', canvas.width/2, canvas.height/2 - 100);
         }
         
+        ctx.font = '30px Arial';
         ctx.fillText('操作說明', canvas.width/2, canvas.height/2 - 40);
         ctx.font = '20px Arial';
-        ctx.fillText('使用左側按鈕控制左右移動，右側按鈕發射子彈', canvas.width/2, canvas.height/2);
-        ctx.fillText('鍵盤操作亦可使用左右鍵和空白鍵發射', canvas.width/2, canvas.height/2 + 30);
-        ctx.fillText('完成 10 關即成功爆機', canvas.width/2, canvas.height/2 + 60);
-        ctx.fillText('按任意鍵或螢幕開始遊戲', canvas.width/2, canvas.height/2 + 100);
+        ctx.fillText('左/右移動：按鈕或鍵盤', canvas.width/2, canvas.height/2);
+        ctx.fillText('發射：按鈕或空白鍵', canvas.width/2, canvas.height/2 + 30);
+        ctx.fillText('點擊畫面開始遊戲', canvas.width/2, canvas.height/2 + 80);
       }
+      
+      // Playing
+      else if (gameState === "playing") {
+        if (!player.hidden && playerImage.complete) {
+          ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+        } else if (!player.hidden) {
+            // Fallback
+            ctx.fillStyle = 'cyan';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        ctx.fillStyle = '#ff3333';
+        for (let bullet of player.bullets) ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+
+        for (let inv of invaders) {
+          if (inv.alive) {
+              if (invaderImage.complete) ctx.drawImage(invaderImage, inv.x, inv.y, inv.width, inv.height);
+              else { ctx.fillStyle = 'green'; ctx.fillRect(inv.x, inv.y, inv.width, inv.height); }
+          }
+        }
+
+        ctx.fillStyle = 'yellow';
+        for (let bullet of invaderBullets) ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+
+        if (ufo) {
+          let img = (ufoAnimTimer % (ufoAnimInterval * 2) < ufoAnimInterval) ? ufoImage1 : ufoImage2;
+          if (img.complete) ctx.drawImage(img, ufo.x, ufo.y, ufoWidth, ufoHeight);
+          else { ctx.fillStyle = 'red'; ctx.fillRect(ufo.x, ufo.y, ufoWidth, ufoHeight); }
+        }
+
+        ctx.fillStyle = 'orange';
+        for (let bullet of ufoBullets) ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+      }
+      
+      // Other States
       else if (gameState === "levelTransition") {
-        ctx.fillStyle = 'white';
-        ctx.font = '50px Arial';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = 'white'; ctx.font = '50px Arial'; ctx.textAlign = 'center';
         ctx.fillText(`Level ${level + 1}`, canvas.width/2, canvas.height/2);
       }
-      else if (gameState === "victoryWait") {
-        ctx.fillStyle = 'red';
-        ctx.font = '60px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('成功爆機', canvas.width/2, canvas.height/2);
+      else if (gameState === "victory" || gameState === "victoryWait") {
+        ctx.fillStyle = 'red'; ctx.font = '60px Arial'; ctx.textAlign = 'center';
+        ctx.fillText('成功爆機!', canvas.width/2, canvas.height/2);
+        if(gameState === "victory") {
+            ctx.font = '25px Arial'; ctx.fillStyle = 'white';
+            ctx.fillText('點擊返回主畫面', canvas.width/2, canvas.height/2 + 50);
+        }
       }
-      else if (gameState === "victory") {
-        ctx.fillStyle = 'red';
-        ctx.font = '60px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('成功爆機', canvas.width/2, canvas.height/2);
-        ctx.font = '25px Arial';
-        ctx.fillStyle = 'white';
-        ctx.fillText('按任意鍵或點擊屏幕返回開始畫面', canvas.width/2, canvas.height/2 + 50);
-      }
-      else if (gameState === "gameOverWait") {
-        ctx.fillStyle = 'green';
-        ctx.font = '60px Arial';
-        ctx.textAlign = 'center';
+      else if (gameState === "gameOver" || gameState === "gameOverWait") {
+        ctx.fillStyle = 'green'; ctx.font = '60px Arial'; ctx.textAlign = 'center';
         ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
         ctx.font = '25px Arial';
-        ctx.fillText(`完成 ${level-1}關  分數：${score}`, canvas.width/2, canvas.height/2 + 20);
-      }
-      else if (gameState === "gameOver") {
-        ctx.fillStyle = 'green';
-        ctx.font = '60px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
-        ctx.font = '25px Arial';
-        ctx.fillText(`完成 ${level-1}關  分數：${score}`, canvas.width/2, canvas.height/2 + 20);
-        ctx.fillText('按任意鍵或點擊屏幕返回開始畫面', canvas.width/2, canvas.height/2 + 60);
-      }
-      else if (gameState === "playing") {
-        if (!player.hidden && playerImage && playerImage.complete && playerImage.naturalWidth > 0) {
-          ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
-        }
-        ctx.fillStyle = 'red';
-        for (let bullet of player.bullets) {
-          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        }
-        for (let inv of invaders) {
-          if (inv.alive && invaderImage && invaderImage.complete && invaderImage.naturalWidth > 0) {
-            ctx.drawImage(invaderImage, inv.x, inv.y, 45, 45);
-          }
-        }
-        ctx.fillStyle = 'yellow';
-        for (let bullet of invaderBullets) {
-          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        }
-        if (ufo) {
-          let currentUfoImage = (ufoAnimTimer % (ufoAnimInterval * 2) < ufoAnimInterval) ? ufoImage1 : ufoImage2;
-          if (currentUfoImage && currentUfoImage.complete && currentUfoImage.naturalWidth > 0) {
-              ctx.drawImage(currentUfoImage, ufo.x, ufo.y, ufoWidth, ufoHeight);
-          }
-        }
-        ctx.fillStyle = 'orange';
-        for (let bullet of ufoBullets) {
-          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        ctx.fillText(`分數：${score}`, canvas.width/2, canvas.height/2 + 20);
+        if(gameState === "gameOver") {
+            ctx.fillText('點擊返回主畫面', canvas.width/2, canvas.height/2 + 60);
         }
       }
     }
@@ -787,7 +684,6 @@
       draw();
       requestAnimationFrame(gameLoop);
     }
-    // 不再等待 playerImage.onload，直接在 window load 時啟動，draw 中有保護
   </script>
 </body>
 </html>

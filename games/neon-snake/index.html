@@ -415,13 +415,19 @@
         }
 
         function spawnFood() {
-            food = {
-                x: Math.floor(Math.random() * TILE_COUNT),
-                y: Math.floor(Math.random() * TILE_COUNT)
-            };
-            // Check collision with snake
-            for(let part of snake) {
-                if(part.x === food.x && part.y === food.y) spawnFood();
+            let valid = false;
+            while (!valid) {
+                food = {
+                    x: Math.floor(Math.random() * TILE_COUNT),
+                    y: Math.floor(Math.random() * TILE_COUNT)
+                };
+                valid = true;
+                for(let part of snake) {
+                    if(part.x === food.x && part.y === food.y) {
+                        valid = false;
+                        break;
+                    }
+                }
             }
         }
 

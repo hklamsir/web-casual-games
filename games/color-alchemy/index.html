@@ -237,7 +237,13 @@
             'YB': 'G', 'BY': 'G',
             'RB': 'P', 'BR': 'P',
             'RYB': 'K', // Complex...
-            'O': 'O', 'G': 'G', 'P': 'P' // Secondary don't change if single
+            'O': 'O', 'G': 'G', 'P': 'P', // Secondary don't change if single
+            // Robust Mixing Logic (Secondary + Primary)
+            'OR': 'O', 'RO': 'O', 'OY': 'O', 'YO': 'O', 'OB': 'K', 'BO': 'K',
+            'GY': 'G', 'YG': 'G', 'GB': 'G', 'BG': 'G', 'GR': 'K', 'RG': 'K',
+            'PR': 'P', 'RP': 'P', 'PB': 'P', 'BP': 'P', 'PY': 'K', 'YP': 'K',
+            // Brown dominates
+            'K': 'K'
         };
 
         function mixColors(c1, c2) {
@@ -245,15 +251,28 @@
             if (!c2) return c1;
             if (c1 === c2) return c1;
             
-            // Sort to match key
-            const key = [c1, c2].sort().join('');
+            // Sort to match key (this works for single letters, but for 'O' vs 'R', we need to be careful)
+            // Our keys handle 'OR' (O first then R) or 'RO' (R first then O).
+            // But if we passed 'O' and 'R', sort() might order them 'O', 'R' or 'R', 'O'.
+            // Actually 'O' comes before 'R'? No. O(79), R(82). So 'O', 'R'.
+            // But checking both permutations in table covers it.
             
-            // Primary mixes
+            // Wait, if c1='K', c2='R'. Key='KR'.
+            // If we add 'K' logic generically:
+            if (c1 === 'K' || c2 === 'K') return 'K';
+
+            // Try direct lookup
+            let key = c1 + c2;
             if (MIX_TABLE[key]) return MIX_TABLE[key];
             
-            // If mixing secondary with primary... simplified logic for now
-            // E.g., Orange (RY) + Blue (B) = Brown (RYB)
-            // Let's just say anything complex becomes Brown
+            // Try reverse
+            key = c2 + c1;
+            if (MIX_TABLE[key]) return MIX_TABLE[key];
+            
+            // Try sorting chars for Primary+Primary (e.g. R+Y -> RY)
+            const sortedKey = [c1, c2].sort().join('');
+            if (MIX_TABLE[sortedKey]) return MIX_TABLE[sortedKey];
+
             return 'K'; 
         }
 

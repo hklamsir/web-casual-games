@@ -398,13 +398,28 @@
         }
 
         // Click Event
-        clickBtn.addEventListener('click', (e) => {
+        function handleInteraction(e) {
+            // Prevent default to avoid double-firing (touchstart -> click) and zooming
+            if (e.cancelable) e.preventDefault();
+
+            let clientX, clientY;
+            if (e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
             addMoney(game.clickValue);
-            createFloatingText(e.clientX, e.clientY, `+$${game.clickValue}`);
+            createFloatingText(clientX, clientY, `+$${game.clickValue}`);
             clickBtn.style.transform = 'scale(0.95)';
             setTimeout(() => clickBtn.style.transform = 'scale(1)', 50);
             updateShopState(); // Check upgrades on manual click
-        });
+        }
+
+        clickBtn.addEventListener('mousedown', handleInteraction);
+        clickBtn.addEventListener('touchstart', handleInteraction, {passive: false});
 
         function addMoney(amount) {
             game.money += amount;

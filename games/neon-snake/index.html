@@ -329,6 +329,56 @@
         const finalScoreEl = document.getElementById('final-score');
         const skillBar = document.getElementById('skillBar');
         
+        // --- Audio System (Synthwave style) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            
+            if (type === 'eat') {
+                // High pitch "ding"
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'dash') {
+                // Low pitch power hum
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(300, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'die') {
+                // Noise-like crash (approximated with modulation)
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+                
+                // Add LFO for roughness
+                const lfo = audioCtx.createOscillator();
+                lfo.frequency.value = 50;
+                lfo.connect(gain.gain);
+                lfo.start(now);
+                lfo.stop(now+0.5);
+
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+        
         // Constants
         const GRID_SIZE = 20;
         let TILE_COUNT = 30; // Dynamic based on resize
@@ -393,6 +443,8 @@
         }
 
         function startGame() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'none';
             
@@ -458,6 +510,7 @@
                     energy = 0;
                     isDashing = false;
                 }
+                if (Math.random() < 0.3) playSound('dash'); // Periodic dash sound
             } else {
                 if(energy < 100) energy += energyRegenRate;
             }
@@ -491,6 +544,7 @@
                     if(head.y < 0) head.y = TILE_COUNT - 1;
                     if(head.y >= TILE_COUNT) head.y = 0;
                 } else {
+                    playSound('die');
                     gameOver();
                     return;
                 }
@@ -500,6 +554,7 @@
             if(!isDashing) {
                 for(let part of snake) {
                     if(head.x === part.x && head.y === part.y) {
+                        playSound('die');
                         gameOver();
                         return;
                     }
@@ -512,6 +567,7 @@
             if(head.x === food.x && head.y === food.y) {
                 score += 10;
                 scoreEl.innerText = score;
+                playSound('eat');
                 explode(head.x, head.y, '#ff00ff');
                 spawnFood();
             } else {
@@ -592,7 +648,10 @@
                     queueInput({x: 1, y: 0});
                     break;
                 case ' ':
-                    if(energy > 10) isDashing = true; // Min energy to start
+                    if(energy > 10) {
+                         isDashing = true; 
+                         playSound('dash');
+                    }
                     break;
             }
         });
@@ -649,7 +708,12 @@
             queueInput({x: dx, y: dy});
         }
 
-        function startDash() { if(energy > 10) isDashing = true; }
+        function startDash() { 
+            if(energy > 10) {
+                isDashing = true; 
+                playSound('dash');
+            }
+        }
         function endDash() { isDashing = false; }
 
         // Setup Mobile Controls

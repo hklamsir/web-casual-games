@@ -269,27 +269,46 @@
             }
             /* Mobile Controls Layout Fix */
             .mobile-controls {
-                display: flex;
-                flex-direction: row; /* Force horizontal layout */
+                display: none;
+                width: 100%;
+                max-width: 600px;
+                margin-top: 20px;
                 justify-content: space-between;
                 align-items: center;
+                padding: 0 20px;
+                box-sizing: border-box;
+                z-index: 200; /* Above scanline */
             }
             .d-pad {
+                position: relative;
                 width: 150px;
                 height: 150px;
-                flex-shrink: 0; /* Prevent shrinking */
-                transform: scale(1.2); /* Make D-pad slightly bigger */
-                transform-origin: bottom left;
+                flex-shrink: 0;
             }
             .dash-btn {
-                width: 90px;
-                height: 90px;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: rgba(255, 0, 255, 0.2);
+                border: 2px solid var(--secondary);
+                color: var(--secondary);
+                font-size: 1rem;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                user-select: none;
+                touch-action: manipulation;
                 flex-shrink: 0;
-                transform: scale(1.2); /* Make dash button bigger */
-                transform-origin: bottom right;
             }
             .skill-container { 
-                bottom: 10px; /* Adjust skill bar position */
+                bottom: -20px;
+            }
+            
+            @media (max-width: 768px) {
+                .mobile-controls {
+                    display: flex;
+                }
             }
         }
     </style>

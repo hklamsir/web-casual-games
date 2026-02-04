@@ -267,12 +267,30 @@
                 max-width: 600px;
                 max-height: 600px;
             }
+            /* Mobile Controls Layout Fix */
             .mobile-controls {
                 display: flex;
+                flex-direction: row; /* Force horizontal layout */
+                justify-content: space-between;
+                align-items: center;
             }
-            .instructions .key { display: none; } /* Hide keyboard hints */
-            .skill-label { display: none; } /* Move to button text */
-            .skill-container { bottom: -20px; }
+            .d-pad {
+                width: 150px;
+                height: 150px;
+                flex-shrink: 0; /* Prevent shrinking */
+                transform: scale(1.2); /* Make D-pad slightly bigger */
+                transform-origin: bottom left;
+            }
+            .dash-btn {
+                width: 90px;
+                height: 90px;
+                flex-shrink: 0;
+                transform: scale(1.2); /* Make dash button bigger */
+                transform-origin: bottom right;
+            }
+            .skill-container { 
+                bottom: 10px; /* Adjust skill bar position */
+            }
         }
     </style>
 </head>
@@ -506,6 +524,14 @@
             // Prevent spiral of death on lag/tab switch
             if (dt > 500) dt = 500;
             
+            // Check if game is actually playing to prevent running update logic after game over
+            if (document.getElementById('game-over-screen').style.display !== 'none') {
+                 // Loop continues but no update logic runs, effectively pausing the game logic
+                 // We don't cancelAnimationFrame here to keep drawing the last state if needed,
+                 // but typically gameOver cancels it. This is a safety check.
+                 return; 
+            }
+            
             // Fixed update step for logic
             const updateRate = isDashing ? SPEED_DASH : SPEED_NORMAL;
             
@@ -527,9 +553,18 @@
             skillBar.style.backgroundColor = isDashing ? '#fff' : 'var(--secondary)';
             skillBar.style.boxShadow = isDashing ? '0 0 20px #fff' : '0 0 10px var(--secondary)';
 
-            if (accumulator > updateRate) {
+            // Update Logic loop
+            // We use a while loop but with a safety break to prevent infinite loops if updateRate is 0 or logic is slow
+            let updates = 0;
+            while (accumulator > updateRate && updates < 10) {
                 update();
                 accumulator -= updateRate;
+                updates++;
+                
+                // If game over happened inside update, break immediately
+                if (document.getElementById('game-over-screen').style.display !== 'none') {
+                    return;
+                }
             }
 
             draw();

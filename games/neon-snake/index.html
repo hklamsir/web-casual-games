@@ -202,8 +202,12 @@
             box-sizing: border-box;
             z-index: 200; /* Above scanline */
         }
-
-        .d-pad {
+        
+        @media (max-width: 768px) and (hover: none) and (pointer: coarse) {
+            .mobile-controls {
+                display: flex;
+            }
+        }
             position: relative;
             width: 150px;
             height: 150px;
@@ -289,7 +293,7 @@
 
         <div id="start-screen">
             <h2 style="color:var(--primary);">SYSTEM READY</h2>
-            <button class="btn" onclick="startGame()">INITIALIZE</button>
+            <button class="btn" onclick="startGame()">開始遊戲</button>
             <div class="instructions">
                 SWIPE or USE D-PAD to Move<br>
                 TAP DASH for PHASE SHIFT<br>
@@ -382,8 +386,8 @@
         // Constants
         const GRID_SIZE = 20;
         let TILE_COUNT = 30; // Dynamic based on resize
-        const SPEED_NORMAL = 100;
-        const SPEED_DASH = 40;
+        const SPEED_NORMAL = 130; // Slower speed (was 100)
+        const SPEED_DASH = 60; // Slower dash (was 40)
 
         function resizeCanvas() {
             // Get container size (force square if possible or adapt)
@@ -463,15 +467,19 @@
 
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             lastTime = performance.now();
+            accumulator = 0; // Reset accumulator to prevent catch-up lag
             requestAnimationFrame(loop);
         }
 
         function spawnFood() {
             let valid = false;
+            // Buffer to keep food away from walls (2 tiles)
+            const buffer = 2;
+            
             while (!valid) {
                 food = {
-                    x: Math.floor(Math.random() * TILE_COUNT),
-                    y: Math.floor(Math.random() * TILE_COUNT)
+                    x: Math.floor(Math.random() * (TILE_COUNT - 2 * buffer)) + buffer,
+                    y: Math.floor(Math.random() * (TILE_COUNT - 2 * buffer)) + buffer
                 };
                 valid = true;
                 for(let part of snake) {

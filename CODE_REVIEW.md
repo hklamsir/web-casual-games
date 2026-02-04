@@ -6,55 +6,48 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-03
+**Date:** 2026-02-04
 **Reviewer:** AI Assistant
 
 ## 1. Executive Summary
-The `web-casual-games` project contains three games: **Cat Café Tycoon**, **Neon Snake 2077**, and **Space Invaders**. 
-Overall, the code is structured well for prototyping (single-file components) but has room for improved modularity.
-**Critical issues** regarding mobile responsiveness and collision logic in *Space Invaders* and *Neon Snake* have been fixed during this review.
+The `web-casual-games` project contains four games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, and the newly added **Emoji Memory Match**.
+The repository is growing. Recent focus has been on mobile responsiveness and adding variety to the game genres.
 
-## 2. Changes Implemented (Fixes)
+## 2. Recent Changes & Fixes
 
-### 👾 Space Invaders
-*   **Fixed Mobile Responsiveness**:
-    *   Changed `#gameContainer` width from fixed `600px` to `100%` (max 600px).
-    *   Set Canvas to scale automatically (`width: 100%; height: auto`) while maintaining internal resolution.
-    *   Improved button layout for mobile touch targets.
-*   **Fixed Logic Mismatch**:
-    *   Standardized invader dimensions. Previously, logic used `45px` hardcoded for collision/draw, while spawn logic used `30px`.
-    *   Updated `spawnInvaders` and `draw` functions to use consistent `invaderWidth` (40px) and `invaderHeight` (30px).
-    *   Unified collision detection to use these properties instead of magic numbers.
+### 🐶 Emoji Memory Match (New)
+*   **Architecture**: Single-file HTML5/JS implementation.
+*   **Responsive**: Uses CSS Grid (`grid-template-columns: repeat(4, 1fr)`) to handle different screen sizes automatically.
+*   **Logic**:
+    *   Fisher-Yates shuffle algorithm implemented correctly.
+    *   State management (locked/active) prevents clicking while animating.
+*   **UX**:
+    *   Includes a move counter and timer.
+    *   "Restart" button available.
 
-### 🐍 Neon Snake 2077
-*   **Fixed Layout Scaling**:
-    *   Updated CSS from `95vw` (square based on width) to `95vmin` (square based on smallest viewport dimension).
-    *   This prevents the game container from overflowing or getting cropped on landscape mobile screens.
+### 🐍 Neon Snake 2077 (Updates)
+*   **Visuals**: Enhanced with particle effects and neon glow (CSS `box-shadow` & Canvas `shadowBlur`).
+*   **Audio**: Implemented Web Audio API for procedural sound effects (no external assets needed).
+*   **Controls**: Fixed mobile D-pad layout issues (reverted to stable CSS) and adjusted game speed for better playability.
+
+### 👾 Space Invaders (Updates)
+*   **Stability**: Fixed a critical "blank screen" issue caused by image loading race conditions. Added a robust `loadImages` preloader.
 
 ## 3. Detailed Review & Suggestions
 
+### 🐶 Emoji Memory Match
+*   **Pros**:
+    *   Lightweight: Uses Unicode emojis instead of images, loading instantly.
+    *   CSS 3D Transform: The card flip animation is smooth and performant.
+*   **Cons**:
+    *   **Hardcoded Array**: The emoji list is hardcoded. Adding categories (food, animals, flags) would be a nice feature.
+    *   **Alert**: Using `window.alert` for the win condition is disruptive. A custom modal overlay would match the UI better.
+
 ### 🐱 Cat Café Tycoon
-*   **Quality**: Good use of `localStorage` for state persistence.
-*   **Performance**: DOM element pooling (limiting cats/staff) is a good optimization.
-*   **Suggestion**: 
-    *   Move large SVG data or image paths to a configuration object or separate file to clean up the code.
-    *   The `gameLoop` runs every frame but logic only triggers every 15s. Consider throttling the loop or using a separate timer for income to save battery on mobile.
-
-### 🐍 Neon Snake 2077
-*   **Quality**: Clean implementation of the game loop with fixed time step.
-*   **Visuals**: "Phase Dash" mechanic and particle effects are well implemented.
-*   **Suggestion**:
-    *   Add a "Pause" button.
-    *   The `resizeCanvas` function is currently static (600x600). While CSS scaling handles the display, allowing dynamic resolution could make the game sharper on high-DPI displays.
-
-### 👾 Space Invaders
-*   **Quality**: Functional classic arcade logic.
-*   **Audio**: Good use of HTML5 Audio.
-*   **Suggestion**:
-    *   **Preloading**: The game starts immediately, but images might not be loaded. Added safeguards in `draw()`, but a proper "Loading..." screen would be better.
-    *   **Code Structure**: There is significant repetition in collision detection loops (Player Bullet -> Invader, Player Bullet -> UFO, Invader Bullet -> Player). A `checkCollision(rect1, rect2)` helper function would reduce code size and errors.
+*   **Status**: Stable.
+*   **Suggestion**: Consider adding background music similar to the other games.
 
 ## 4. Next Steps
-1.  **Refactor**: Separate CSS, JS, and HTML into distinct files for better maintainability.
-2.  **Asset Management**: Implement a simple asset loader to ensure all images/sounds are ready before game start.
-3.  **PWA**: Add a `manifest.json` and service worker to allow these games to be installed as offline apps on mobile.
+1.  **Refactor**: As the number of games grows, shared CSS (like buttons, headers) should be moved to a common `styles.css`.
+2.  **Asset Management**: Continue using the `loadImages` pattern established in Space Invaders for future games that require assets.
+3.  **Automation**: The 12-hour cron job for new games is active. Ensure distinct genres are chosen for variety.

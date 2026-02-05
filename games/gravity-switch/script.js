@@ -82,25 +82,35 @@ const obsImages = {
     'spike': new Image(),
     'block': new Image(),
     'tall': new Image(),
-    'saw': new Image()
+    'saw': new Image(),
+    'pillar': new Image()
 };
 obsImages.spike.src = 'images/obstacle.svg';
 obsImages.block.src = 'images/obstacle_block.svg';
 obsImages.tall.src = 'images/obstacle_tall.svg';
 obsImages.saw.src = 'images/obstacle_saw.svg';
+obsImages.pillar.src = 'images/obstacle_tall.svg'; // Reuse tall graphic for now
 
 // Resize handling
 function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    
+    // Maintain aspect ratio logic if needed, or adjust game scale here
+    // For gravity switch, the vertical space matters most.
+    
+    // Ensure player stays relative
+    if (player) {
+        player.y = Math.min(player.y, canvas.height - player.size);
+    }
 }
 window.addEventListener('resize', resize);
 resize();
 
 class Player {
     constructor() {
-        this.size = 50; // Increased size for image
-        this.x = canvas.width * 0.2;
+        this.size = 50; 
+        this.x = Math.min(canvas.width * 0.2, 150); // Don't get too far right on wide screens
         this.y = canvas.height / 2;
         this.vy = 0;
         this.trail = [];
@@ -171,9 +181,11 @@ class Obstacle {
         this.marked = false;
         
         // Randomly select type
-        const types = ['spike', 'block', 'tall', 'saw'];
+        const types = ['spike', 'block', 'tall', 'saw', 'pillar'];
         this.type = types[Math.floor(Math.random() * types.length)];
         
+        const screenH = canvas.height;
+
         // Set dimensions based on type
         switch(this.type) {
             case 'spike':
@@ -186,11 +198,15 @@ class Obstacle {
                 break;
             case 'tall':
                 this.w = 40;
-                this.h = 120;
+                this.h = screenH * 0.3; // 30% of screen height
                 break;
             case 'saw':
                 this.w = 60;
                 this.h = 30;
+                break;
+            case 'pillar': // New tall obstacle
+                this.w = 50;
+                this.h = screenH * 0.4; // 40% of screen height
                 break;
         }
 

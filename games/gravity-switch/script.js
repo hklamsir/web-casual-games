@@ -6,9 +6,12 @@ const scoreEl = document.getElementById('score-display');
 const levelEl = document.getElementById('level-display');
 const livesEl = document.getElementById('lives-display');
 const startScreen = document.getElementById('start-screen');
+const infoScreen = document.getElementById('info-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreEl = document.getElementById('final-score');
 const startBtn = document.getElementById('start-btn');
+const infoBtn = document.getElementById('info-btn');
+const closeInfoBtn = document.getElementById('close-info-btn');
 const restartBtn = document.getElementById('restart-btn');
 
 // Game Constants
@@ -74,8 +77,17 @@ function playSound(type) {
 // Images
 const playerImg = new Image();
 playerImg.src = 'images/player.svg';
-const obstacleImg = new Image();
-obstacleImg.src = 'images/obstacle.svg';
+
+const obsImages = {
+    'spike': new Image(),
+    'block': new Image(),
+    'tall': new Image(),
+    'saw': new Image()
+};
+obsImages.spike.src = 'images/obstacle.svg';
+obsImages.block.src = 'images/obstacle_block.svg';
+obsImages.tall.src = 'images/obstacle_tall.svg';
+obsImages.saw.src = 'images/obstacle_saw.svg';
 
 // Resize handling
 function resize() {
@@ -155,10 +167,33 @@ class Player {
 
 class Obstacle {
     constructor() {
-        this.w = 40;
-        this.h = 80 + Math.random() * 40;
         this.x = canvas.width;
+        this.marked = false;
         
+        // Randomly select type
+        const types = ['spike', 'block', 'tall', 'saw'];
+        this.type = types[Math.floor(Math.random() * types.length)];
+        
+        // Set dimensions based on type
+        switch(this.type) {
+            case 'spike':
+                this.w = 40;
+                this.h = 60;
+                break;
+            case 'block':
+                this.w = 60;
+                this.h = 80;
+                break;
+            case 'tall':
+                this.w = 40;
+                this.h = 120;
+                break;
+            case 'saw':
+                this.w = 60;
+                this.h = 30;
+                break;
+        }
+
         // Randomly place on floor or ceiling
         this.isTop = Math.random() > 0.5;
         
@@ -167,8 +202,6 @@ class Obstacle {
         } else {
             this.y = canvas.height - this.h;
         }
-        
-        this.marked = false;
     }
 
     update() {
@@ -177,14 +210,17 @@ class Obstacle {
 
     draw() {
         ctx.save();
+        
+        // Center rotation/scale point
         ctx.translate(this.x + this.w/2, this.y + this.h/2);
+        
         if (this.isTop) {
             ctx.scale(1, -1); // Flip vertically if on top
         }
         
-        if (obstacleImg.complete) {
-            // Draw image stretched to fit height
-            ctx.drawImage(obstacleImg, -this.w/2, -this.h/2, this.w, this.h);
+        const img = obsImages[this.type];
+        if (img && img.complete) {
+            ctx.drawImage(img, -this.w/2, -this.h/2, this.w, this.h);
         } else {
             ctx.fillStyle = '#ff0055';
             ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
@@ -405,6 +441,16 @@ window.addEventListener('mousedown', (e) => {
 
 startBtn.addEventListener('click', init);
 restartBtn.addEventListener('click', init);
+
+infoBtn.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    infoScreen.classList.remove('hidden');
+});
+
+closeInfoBtn.addEventListener('click', () => {
+    infoScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
 
 // Initial Render
 resize();

@@ -373,8 +373,7 @@ function gameOver() {
 
 function loop() {
     // Clear screen
-    ctx.fillStyle = '#0f0f1a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw Background Grid (Cyber effect) with parallax feel
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
@@ -465,5 +464,4 @@ closeInfoBtn.addEventListener('click', () => {
 
 // Initial Render
 // No resize function needed, fixed size
-ctx.fillStyle = '#0f0f1a';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.clearRect(0, 0, canvas.width, canvas.height);

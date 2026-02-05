@@ -1,0 +1,284 @@
+:root {
+    --bg-color: #FDF6E3;
+    --panel-bg: #FFFFFF;
+    --accent: #D4A373; 
+    --text-main: #4A4E69;
+    --btn-color: #A5A58D;
+    --btn-hover: #6B705C;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.game-container {
+    display: flex;
+    width: 900px;
+    height: 600px;
+    background: var(--panel-bg);
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    overflow: hidden;
+    max-width: 100%; /* Responsive */
+}
+
+/* Left Side: Café View */
+.cafe-view {
+    flex: 2;
+    padding: 30px;
+    position: relative;
+    background-color: #FDF6E3;
+    background-image: url('img/bg.svg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    font-family: 'Lora', serif;
+    color: var(--accent);
+    margin-bottom: 5px;
+    font-size: 1.8rem;
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    text-shadow: 2px 2px 0px #fff;
+}
+
+.stats-bar {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    background: rgba(255,255,255,0.9);
+    padding: 5px 15px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.main-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.9);
+    border: 8px solid #EFEFEF;
+    font-size: 4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+    touch-action: manipulation; /* Prevent double-tap zoom */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+}
+
+.main-btn:active {
+    transform: scale(0.95);
+    border-color: var(--accent);
+}
+
+.main-btn:hover {
+    box-shadow: 0 8px 25px rgba(212, 163, 115, 0.4);
+}
+
+.floating-text {
+    position: absolute;
+    font-weight: bold;
+    color: var(--accent);
+    text-shadow: 1px 1px 0 #fff;
+    animation: floatUp 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 20;
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-50px); }
+}
+
+/* Right Side: Upgrades */
+.upgrade-panel {
+    flex: 1;
+    background-color: #FAFAFA;
+    border-left: 2px solid #F0F0F0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reset-btn {
+    background: none;
+    border: 1px solid #ff9999;
+    color: #ff5555;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+.reset-btn:hover { background: #fff0f0; }
+
+.upgrade-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.upgrade-item {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upgrade-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+.upgrade-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+.item-info h4 { margin: 0; font-size: 1rem; }
+.item-info p { margin: 5px 0 0; font-size: 0.8rem; color: #999; }
+.item-cost { font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+
+.back-link {
+    position: absolute;
+    bottom: 20px;
+    left: 30px;
+    text-decoration: none;
+    color: #555;
+    font-size: 0.9rem;
+    cursor: pointer;
+    background: rgba(255,255,255,0.8);
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+.back-link:hover { color: var(--text-main); background: #fff; }
+
+.cat-area {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 100%;
+    height: 150px;
+    pointer-events: none;
+}
+
+.cat {
+    position: absolute;
+    bottom: 30px;
+    width: 64px;
+    animation: bounce 3s infinite ease-in-out;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Staff Walking Animation */
+.staff {
+    position: absolute;
+    bottom: 60px; /* Slightly higher than cats */
+    width: 64px;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+    animation: walk 10s infinite linear alternate;
+}
+
+@keyframes walk {
+    0% { transform: translateX(0) scaleX(1); }
+    45% { transform: translateX(300px) scaleX(1); }
+    50% { transform: translateX(300px) scaleX(-1); } /* Turn around */
+    95% { transform: translateX(0) scaleX(-1); }
+    100% { transform: translateX(0) scaleX(1); }
+}
+
+.level-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #D4A373;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Mobile Layout */
+@media (max-width: 900px) {
+    body {
+        height: auto;
+        padding: 20px 0;
+        align-items: flex-start; /* Allow scroll */
+    }
+
+    .game-container {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .cafe-view {
+        height: 500px; /* Fixed height for view */
+        flex: none;
+    }
+
+    .upgrade-panel {
+        height: 400px;
+        border-left: none;
+        border-top: 2px solid #F0F0F0;
+    }
+    
+    .main-btn {
+        width: 150px;
+        height: 150px;
+        font-size: 3rem;
+    }
+    
+    h1 { font-size: 1.5rem; top: 15px; left: 20px; }
+    .stats-bar { top: 15px; right: 20px; }
+}

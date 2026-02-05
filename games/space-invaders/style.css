@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+#gameContainer {
+  position: relative;
+  width: 600px;
+  margin: 0 auto;
+}
+#gameCanvas {
+  display: block;
+  background: black;
+  border: 2px solid white;
+}
+#info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 22px;
+  width: 100%;
+}
+#info span {
+  text-align: left;
+  white-space: nowrap;
+}
+#score {
+  width: 130px;
+}
+#bestScore {
+  width: 210px;
+}
+#level {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+}
+#lives {
+  width: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#lives img {
+  vertical-align: middle;
+  margin-left: 5px;
+}
+.controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.movement-controls {
+  display: flex;
+  gap: 5px;
+}
+.controlButton {
+  background-color: #333;
+  border: 1px solid #fff;
+  color: #fff;
+  font-size: 20px;
+  padding: 30px 20px;
+  margin: 8px 0;
+  border-radius: 5px;
+  width: 160px;
+}
+.controlButton:active {
+  background-color: #555;
+}

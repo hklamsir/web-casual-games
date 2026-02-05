@@ -1,0 +1,291 @@
+:root {
+    --bg-color: #050510;
+    --grid-color: rgba(0, 255, 255, 0.1);
+    --primary: #00f3ff; /* Cyan */
+    --secondary: #ff00ff; /* Magenta */
+    --text-color: #fff;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center;
+}
+
+/* Scanline Effect */
+body::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-shadow: 
+        0 0 5px var(--primary),
+        0 0 10px var(--primary),
+        0 0 20px var(--primary);
+    animation: flicker 2s infinite;
+}
+
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
+    }
+    20%, 24%, 55% {
+        opacity: 0.5;
+        text-shadow: none;
+    }
+}
+
+#game-container {
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+    border: 2px solid var(--primary);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+canvas {
+    display: block;
+}
+
+/* HUD */
+.hud {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+    pointer-events: none;
+    font-size: 1.2rem;
+    text-shadow: 0 0 5px currentColor;
+}
+
+.score-box { color: var(--primary); }
+.high-score { color: #aaa; font-size: 0.9rem; }
+
+/* Skill Bar */
+.skill-container {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 10px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.skill-bar {
+    width: 100%;
+    height: 100%;
+    background: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
+    transform-origin: left;
+    transition: transform 0.1s linear;
+}
+
+.skill-label {
+    position: absolute;
+    bottom: -55px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* UI Overlays */
+#start-screen, #game-over-screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10;
+    text-align: center;
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 15px 40px;
+    background: transparent;
+    border: 2px solid var(--secondary);
+    color: var(--secondary);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px var(--secondary);
+}
+
+.btn:hover {
+    background: var(--secondary);
+    color: #000;
+    box-shadow: 0 0 30px var(--secondary);
+}
+
+.instructions {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    color: #888;
+    line-height: 1.6;
+}
+
+.key {
+    display: inline-block;
+    border: 1px solid #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 0.8rem;
+}
+
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid transparent;
+    transition: 0.3s;
+    z-index: 200;
+}
+.back-link:hover { color: var(--primary); border-color: var(--primary); }
+
+/* Mobile Controls */
+.mobile-controls {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 200; /* Above scanline */
+}
+
+@media (max-width: 768px) {
+    .mobile-controls {
+        display: flex;
+    }
+    .instructions .key { display: none; } /* Hide keyboard hints */
+    .skill-label { display: none; } /* Move to button text */
+    .skill-container { bottom: -20px; }
+}
+
+.d-pad {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.d-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary);
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.d-btn:active { background: var(--primary); color: #000; }
+
+.d-up { top: 0; left: 50px; }
+.d-down { bottom: 0; left: 50px; }
+.d-left { top: 50px; left: 0; }
+.d-right { top: 50px; right: 0; }
+
+.dash-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 0, 255, 0.2);
+    border: 2px solid var(--secondary);
+    color: var(--secondary);
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.dash-btn:active { background: var(--secondary); color: #000; box-shadow: 0 0 20px var(--secondary); }
+
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; margin-top: 40px; }
+    canvas {
+        width: 100%;
+        height: auto;
+        max-width: 100vw;
+    }
+    #game-container {
+        width: 95vmin;
+        height: 95vmin;
+        max-width: 600px;
+        max-height: 600px;
+    }
+    /* Mobile Controls Layout Fix */
+    .mobile-controls {
+        display: flex;
+        flex-direction: row; /* Force horizontal layout */
+        justify-content: space-between;
+        align-items: center;
+    }
+    .d-pad {
+        width: 150px;
+        height: 150px;
+        flex-shrink: 0; /* Prevent shrinking */
+        transform: scale(1.2); /* Make D-pad slightly bigger */
+        transform-origin: bottom left;
+    }
+    .dash-btn {
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+        transform: scale(1.2); /* Make dash button bigger */
+        transform-origin: bottom right;
+    }
+    .skill-container { 
+        bottom: 10px; /* Adjust skill bar position */
+    }
+}

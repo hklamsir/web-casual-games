@@ -1,0 +1,23 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0088aa;stop-opacity:1" />
+    </radialGradient>
+    <filter id="neon">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="30" cy="30" r="25" fill="url(#glow)" stroke="#ffffff" stroke-width="2" filter="url(#neon)"/>
+  <circle cx="30" cy="30" r="15" fill="#000000" stroke="#00ffff" stroke-width="2"/>
+  <rect x="25" y="5" width="10" height="50" fill="#00ffff" rx="2">
+    <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="1s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="5" y="25" width="50" height="10" fill="#00ffff" rx="2">
+    <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>

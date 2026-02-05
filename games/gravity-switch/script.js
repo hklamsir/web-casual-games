@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 
 // UI Elements
 const scoreEl = document.getElementById('score-display');
+const levelEl = document.getElementById('level-display');
+const livesEl = document.getElementById('lives-display');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreEl = document.getElementById('final-score');
@@ -11,7 +13,6 @@ const restartBtn = document.getElementById('restart-btn');
 
 // Game Constants
 const GRAVITY_FORCE = 0.6;
-const JUMP_FORCE = 0; // Not a jump, just gravity flip
 const SPEED_INITIAL = 6;
 const OBSTACLE_WIDTH = 40;
 const OBSTACLE_HEIGHT = 60; // Max height variation
@@ -19,14 +20,62 @@ const OBSTACLE_HEIGHT = 60; // Max height variation
 // Game State
 let isPlaying = false;
 let score = 0;
+let level = 1;
+let lives = 3;
 let speed = SPEED_INITIAL;
 let frames = 0;
 let gravityDir = 1; // 1 = down, -1 = up
+let isInvincible = false;
 
 // Entities
 let player;
 let obstacles = [];
 let particles = [];
+
+// Audio Context
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+
+    if (type === 'flip') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    } else if (type === 'gameover') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.exponentialRampToValueAtTime(20, now + 1.0);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.linearRampToValueAtTime(0, now + 1.0);
+        osc.start(now);
+        osc.stop(now + 1.0);
+    }
+}
+
+// Images
+const playerImg = new Image();
+playerImg.src = 'images/player.svg';
+const obstacleImg = new Image();
+obstacleImg.src = 'images/obstacle.svg';
 
 // Resize handling
 function resize() {
@@ -38,12 +87,12 @@ resize();
 
 class Player {
     constructor() {
-        this.size = 30;
+        this.size = 50; // Increased size for image
         this.x = canvas.width * 0.2;
         this.y = canvas.height / 2;
         this.vy = 0;
-        this.color = '#00ffff';
         this.trail = [];
+        this.rotation = 0;
     }
 
     update() {
@@ -59,42 +108,55 @@ class Player {
             this.y = 0;
             this.vy = 0;
         }
+        
+        // Rotation effect based on movement
+        this.rotation += 0.1 * (speed / SPEED_INITIAL);
 
         // Trail effect
         if (frames % 3 === 0) {
             this.trail.push({ x: this.x, y: this.y, alpha: 0.5 });
         }
         this.trail.forEach(t => t.x -= speed);
-        this.trail = this.trail.filter(t => t.x > 0 && t.alpha > 0);
+        this.trail = this.trail.filter(t => t.x > -50 && t.alpha > 0);
     }
 
     draw() {
         // Draw Trail
         this.trail.forEach(t => {
             ctx.fillStyle = `rgba(0, 255, 255, ${t.alpha})`;
-            ctx.fillRect(t.x, t.y, this.size, this.size);
+            ctx.beginPath();
+            ctx.arc(t.x + this.size/2, t.y + this.size/2, this.size/3, 0, Math.PI*2);
+            ctx.fill();
             t.alpha -= 0.05;
         });
 
-        // Draw Player
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-        ctx.shadowBlur = 0;
+        // Draw Player Image with Rotation
+        ctx.save();
+        ctx.translate(this.x + this.size/2, this.y + this.size/2);
+        ctx.rotate(this.rotation);
+        
+        // Invincibility blink
+        if (!isInvincible || Math.floor(Date.now() / 100) % 2 === 0) {
+            if (playerImg.complete) {
+                ctx.drawImage(playerImg, -this.size/2, -this.size/2, this.size, this.size);
+            } else {
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+            }
+        }
+        ctx.restore();
     }
 
     flip() {
         gravityDir *= -1;
-        // Optional: Add a small boost or reset velocity for snappier feel
-        // this.vy = 0; 
+        playSound('flip');
     }
 }
 
 class Obstacle {
     constructor() {
-        this.w = 40 + Math.random() * 30;
-        this.h = 50 + Math.random() * 80;
+        this.w = 40;
+        this.h = 80 + Math.random() * 40;
         this.x = canvas.width;
         
         // Randomly place on floor or ceiling
@@ -114,11 +176,20 @@ class Obstacle {
     }
 
     draw() {
-        ctx.fillStyle = '#ff0055';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#ff0055';
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-        ctx.shadowBlur = 0;
+        ctx.save();
+        ctx.translate(this.x + this.w/2, this.y + this.h/2);
+        if (this.isTop) {
+            ctx.scale(1, -1); // Flip vertically if on top
+        }
+        
+        if (obstacleImg.complete) {
+            // Draw image stretched to fit height
+            ctx.drawImage(obstacleImg, -this.w/2, -this.h/2, this.w, this.h);
+        } else {
+            ctx.fillStyle = '#ff0055';
+            ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+        }
+        ctx.restore();
     }
 }
 
@@ -145,23 +216,37 @@ class Particle {
 }
 
 function init() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
     player = new Player();
     obstacles = [];
     particles = [];
     score = 0;
+    level = 1;
+    lives = 3;
     speed = SPEED_INITIAL;
     gravityDir = 1;
-    scoreEl.innerText = '分數: 0';
+    isInvincible = false;
+    
+    updateStats();
+    
     isPlaying = true;
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
     loop();
 }
 
+function updateStats() {
+    scoreEl.innerText = `分數: ${score}`;
+    levelEl.innerText = `Level: ${level}`;
+    livesEl.innerText = '❤️'.repeat(lives);
+}
+
 function spawnObstacle() {
     // Spawn rate depends on speed
-    if (frames % Math.floor(1000 / speed) === 0) { // Rough spawn rate
-        // Chance to spawn
+    const spawnRate = Math.max(20, Math.floor(120 / (speed / SPEED_INITIAL)));
+    
+    if (frames % spawnRate === 0) {
         if (Math.random() > 0.3) {
             obstacles.push(new Obstacle());
         }
@@ -169,35 +254,70 @@ function spawnObstacle() {
 }
 
 function checkCollisions() {
-    for (let obs of obstacles) {
-        // AABB Collision
+    if (isInvincible) return;
+
+    // Use a slightly smaller hitbox for better gameplay feel
+    const hitboxPadding = 5;
+
+    for (let i = 0; i < obstacles.length; i++) {
+        let obs = obstacles[i];
+        
         if (
-            player.x < obs.x + obs.w &&
-            player.x + player.size > obs.x &&
-            player.y < obs.y + obs.h &&
-            player.y + player.size > obs.y
+            player.x + hitboxPadding < obs.x + obs.w - hitboxPadding &&
+            player.x + player.size - hitboxPadding > obs.x + hitboxPadding &&
+            player.y + hitboxPadding < obs.y + obs.h - hitboxPadding &&
+            player.y + player.size - hitboxPadding > obs.y + hitboxPadding
         ) {
-            gameOver();
+            handleHit(obs);
+            return; // Handle one collision at a time
         }
 
         // Score
         if (!obs.marked && player.x > obs.x + obs.w) {
             score++;
-            scoreEl.innerText = `分數: ${score}`;
             obs.marked = true;
             
-            // Increase speed slightly
-            if (score % 5 === 0) speed += 0.5;
+            // Level up every 10 points
+            if (score % 10 === 0) {
+                level++;
+                speed += 1;
+                // Optional: Play level up sound
+            }
+            updateStats();
         }
+    }
+}
+
+function handleHit(obs) {
+    lives--;
+    updateStats();
+    playSound('hit');
+    
+    // Remove the obstacle that hit us
+    const index = obstacles.indexOf(obs);
+    if (index > -1) obstacles.splice(index, 1);
+
+    // Explosion effect
+    for(let i=0; i<15; i++) {
+        particles.push(new Particle(player.x + player.size/2, player.y + player.size/2, '#ff0055'));
+    }
+
+    if (lives <= 0) {
+        gameOver();
+    } else {
+        // Invincibility
+        isInvincible = true;
+        setTimeout(() => { isInvincible = false; }, 1500);
     }
 }
 
 function gameOver() {
     isPlaying = false;
+    playSound('gameover');
     
     // Explosion effect
-    for(let i=0; i<30; i++) {
-        particles.push(new Particle(player.x + player.size/2, player.y + player.size/2, player.color));
+    for(let i=0; i<50; i++) {
+        particles.push(new Particle(player.x + player.size/2, player.y + player.size/2, '#00ffff'));
     }
     
     finalScoreEl.innerText = score;
@@ -209,13 +329,22 @@ function loop() {
     ctx.fillStyle = '#0f0f1a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Background Grid (Cyber effect)
+    // Draw Background Grid (Cyber effect) with parallax feel
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for(let x = (frames * -speed) % 50; x < canvas.width; x += 50) {
+    
+    // Vertical lines moving
+    const gridOffset = (frames * -speed * 0.5) % 50;
+    for(let x = gridOffset; x < canvas.width; x += 50) {
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
+    }
+    
+    // Horizontal lines static
+    for(let y = 0; y < canvas.height; y += 50) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
     }
     ctx.stroke();
 
@@ -228,11 +357,19 @@ function loop() {
         obstacles.forEach((obs, index) => {
             obs.update();
             obs.draw();
-            if (obs.x + obs.w < 0) obstacles.splice(index, 1);
+            if (obs.x + obs.w < -100) obstacles.splice(index, 1);
         });
 
         checkCollisions();
         frames++;
+        
+        // Update particles
+        particles.forEach((p, i) => {
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+        
         requestAnimationFrame(loop);
     } else {
         // Draw particles even if game over
@@ -257,8 +394,11 @@ function handleInput(e) {
 
 window.addEventListener('keydown', handleInput);
 window.addEventListener('touchstart', (e) => {
-    if(e.target.tagName !== 'BUTTON') handleInput(e);
-});
+    if(e.target.tagName !== 'BUTTON') {
+        e.preventDefault(); // Prevent default touch actions like scroll/zoom
+        handleInput(e);
+    }
+}, {passive: false});
 window.addEventListener('mousedown', (e) => {
     if(e.target.tagName !== 'BUTTON') handleInput(e);
 });

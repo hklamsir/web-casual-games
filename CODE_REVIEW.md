@@ -6,48 +6,46 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-04
-**Reviewer:** AI Assistant
+**Date:** 2026-02-05
+**Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project contains four games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, and the newly added **Emoji Memory Match**.
-The repository is growing. Recent focus has been on mobile responsiveness and adding variety to the game genres.
+The `web-casual-games` project now contains five games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, **Emoji Memory Match**, and the newly added **Gravity Switch**.
+The repository continues to expand with diverse genres. The focus remains on lightweight, mobile-first web experiences.
 
 ## 2. Recent Changes & Fixes
 
-### 🐶 Emoji Memory Match (New)
-*   **Architecture**: Single-file HTML5/JS implementation.
-*   **Responsive**: Uses CSS Grid (`grid-template-columns: repeat(4, 1fr)`) to handle different screen sizes automatically.
-*   **Logic**:
-    *   Fisher-Yates shuffle algorithm implemented correctly.
-    *   State management (locked/active) prevents clicking while animating.
-*   **UX**:
-    *   Includes a move counter and timer.
-    *   "Restart" button available.
+### 🌌 Gravity Switch (New)
+*   **Genre**: Endless Runner / Arcade (Gravity Flip mechanics).
+*   **Architecture**: Canvas 2D API based rendering.
+*   **Performance**: Optimized game loop using `requestAnimationFrame`. Efficient object pooling (removing off-screen obstacles) to maintain stable 60 FPS.
+*   **Visuals**:
+    *   Cyberpunk/Minimalist dark aesthetic using CSS variables.
+    *   Dynamic background grid and particle explosion effects on death.
+*   **Mobile Support**:
+    *   Implements `touchstart` for low-latency input.
+    *   `touch-action: none` prevents browser zooming/scrolling during gameplay.
 
-### 🐍 Neon Snake 2077 (Updates)
-*   **Visuals**: Enhanced with particle effects and neon glow (CSS `box-shadow` & Canvas `shadowBlur`).
-*   **Audio**: Implemented Web Audio API for procedural sound effects (no external assets needed).
-*   **Controls**: Fixed mobile D-pad layout issues (reverted to stable CSS) and adjusted game speed for better playability.
-
-### 👾 Space Invaders (Updates)
-*   **Stability**: Fixed a critical "blank screen" issue caused by image loading race conditions. Added a robust `loadImages` preloader.
+### 🐶 Emoji Memory Match (Previous)
+*   **Status**: Stable.
+*   **Feedback**: User engagement is high due to simple mechanics.
 
 ## 3. Detailed Review & Suggestions
 
-### 🐶 Emoji Memory Match
+### 🌌 Gravity Switch
 *   **Pros**:
-    *   Lightweight: Uses Unicode emojis instead of images, loading instantly.
-    *   CSS 3D Transform: The card flip animation is smooth and performant.
+    *   **Controls**: One-tap control scheme is perfect for mobile.
+    *   **Juice**: Screen shake or more aggressive particles could enhance impact, but current implementation is clean.
+    *   **Responsive**: Canvas resizes dynamically with `window.resize`.
 *   **Cons**:
-    *   **Hardcoded Array**: The emoji list is hardcoded. Adding categories (food, animals, flags) would be a nice feature.
-    *   **Alert**: Using `window.alert` for the win condition is disruptive. A custom modal overlay would match the UI better.
+    *   **Difficulty Curve**: The speed increase is linear. Consider adding "phases" or changing patterns to keep it interesting.
+    *   **Audio**: Currently lacks sound effects (jump/crash). Adding the `AudioContext` synth from Neon Snake would be a good enhancement.
 
-### 🐱 Cat Café Tycoon
-*   **Status**: Stable.
-*   **Suggestion**: Consider adding background music similar to the other games.
+### General Project Health
+*   **Shared Assets**: Still pending a move to a shared `common/` directory for styles and utility scripts.
+*   **Accessibility**: Added `aria-label` to some buttons, but could be improved across all games.
 
 ## 4. Next Steps
-1.  **Refactor**: As the number of games grows, shared CSS (like buttons, headers) should be moved to a common `styles.css`.
-2.  **Asset Management**: Continue using the `loadImages` pattern established in Space Invaders for future games that require assets.
-3.  **Automation**: The 12-hour cron job for new games is active. Ensure distinct genres are chosen for variety.
+1.  **Audio Integration**: Add procedural sound effects to *Gravity Switch*.
+2.  **Refactor**: Create a `common.css` file to unify the "Back to Hall" button and "Game Over" modal styles.
+3.  **Deployment**: Push changes to GitHub Pages.

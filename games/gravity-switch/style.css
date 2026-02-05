@@ -1,0 +1,111 @@
+:root {
+    --bg-color: #0f0f1a;
+    --player-color: #00ffff;
+    --obstacle-color: #ff0055;
+    --text-color: #ffffff;
+    --ui-bg: rgba(0, 0, 0, 0.85);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    font-family: 'Orbitron', sans-serif;
+    touch-action: none; /* Prevent zooming/scrolling on mobile */
+    user-select: none;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.2rem;
+    z-index: 100;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    text-shadow: 0 0 5px rgba(0,255,255,0.5);
+}
+
+.back-button:hover {
+    opacity: 1;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through to canvas unless on buttons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#score-display {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    text-shadow: 0 0 10px var(--player-color);
+}
+
+.screen {
+    background: var(--ui-bg);
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    text-align: center;
+    border: 2px solid var(--player-color);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    pointer-events: auto;
+    backdrop-filter: blur(5px);
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1 {
+    color: var(--player-color);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+p {
+    color: #ccc;
+    margin-bottom: 2rem;
+}
+
+button {
+    background: transparent;
+    color: var(--obstacle-color);
+    border: 2px solid var(--obstacle-color);
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: var(--obstacle-color);
+    color: white;
+    box-shadow: 0 0 15px var(--obstacle-color);
+}
+
+button:active {
+    transform: scale(0.95);
+}

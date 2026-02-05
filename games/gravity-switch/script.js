@@ -92,25 +92,17 @@ obsImages.saw.src = 'images/obstacle_saw.svg';
 obsImages.pillar.src = 'images/obstacle_tall.svg'; // Reuse tall graphic for now
 
 // Resize handling
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    // Maintain aspect ratio logic if needed, or adjust game scale here
-    // For gravity switch, the vertical space matters most.
-    
-    // Ensure player stays relative
-    if (player) {
-        player.y = Math.min(player.y, canvas.height - player.size);
-    }
-}
-window.addEventListener('resize', resize);
-resize();
+// Fixed logic size
+canvas.width = 1280;
+canvas.height = 720;
+
+// Removed dynamic resize listener to keep logic consistent
+// Window resize is handled by CSS object-fit
 
 class Player {
     constructor() {
         this.size = 50; 
-        this.x = Math.min(canvas.width * 0.2, 150); // Don't get too far right on wide screens
+        this.x = 200; // Fixed spawn x
         this.y = canvas.height / 2;
         this.vy = 0;
         this.trail = [];
@@ -469,6 +461,5 @@ closeInfoBtn.addEventListener('click', () => {
 });
 
 // Initial Render
-resize();
 ctx.fillStyle = '#0f0f1a';
 ctx.fillRect(0, 0, canvas.width, canvas.height);

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>量子 2048 | Quantum 2048</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <header>
+            <div class="header-top">
+                <a href="../../index.html" class="back-btn">← 返回大廳</a>
+                <h1 class="title">Quantum 2048</h1>
+            </div>
+            <div class="scores-container">
+                <div class="score-box">
+                    <span class="score-label">分數</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">最高分</span>
+                    <span id="best-score">0</span>
+                </div>
+            </div>
+            <p class="subtitle">合併量子方塊以達成 <span class="highlight">2048</span> 態！</p>
+            <button id="restart-btn">重置實驗</button>
+        </header>
+
+        <div class="game-container" id="game-container">
+            <div class="grid-container">
+                <div class="grid-row">
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+                </div>
+            </div>
+            <div class="tile-container" id="tile-container">
+                <!-- Tiles injected by JS -->
+            </div>
+            <div class="game-message" id="game-message">
+                <p id="message-text"></p>
+                <div class="lower">
+                    <button class="retry-button" id="retry-button">再來一次</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-hint">
+            <p>使用 <strong>方向鍵</strong> 或 <strong>滑動</strong> 來移動方塊</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

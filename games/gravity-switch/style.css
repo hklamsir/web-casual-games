@@ -17,22 +17,23 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
 }
 
-#game-container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#gameContainer {
+    position: relative;
+    width: 600px; /* Fixed width like space-invaders */
+    height: 600px; /* Assume square or similar */
+    margin: 0 auto;
+    background: #0f0f1a;
+    border: 2px solid var(--player-color);
 }
 
 canvas {
     display: block;
-    /* Fixed logic size, but scaled to fit */
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Maintain aspect ratio */
+    background: #0f0f1a;
 }
 
 .back-button {
@@ -62,6 +63,7 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10;
 }
 
 .stats-bar {
@@ -151,4 +153,12 @@ button:hover {
 
 button:active {
     transform: scale(0.95);
+}
+
+@media (max-width: 620px) {
+    #gameContainer {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
 }

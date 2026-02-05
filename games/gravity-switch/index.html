@@ -10,42 +10,41 @@
 <body>
     <a href="../../index.html" class="back-button">← 返回大廳</a>
     
-    <div id="ui-layer">
-        <div class="stats-bar">
-            <span id="score-display">分數: 0</span>
-            <span id="level-display">Level: 1</span>
-            <span id="lives-display">❤️❤️❤️</span>
-        </div>
-        <div id="start-screen" class="screen">
-            <h1>GRAVITY SWITCH</h1>
-            <p>點擊畫面反轉重力</p>
-            <p>避開障礙物</p>
-            <div class="btn-group">
-                <button id="start-btn">開始遊戲</button>
-                <button id="info-btn">遊戲說明</button>
-            </div>
-        </div>
-        
-        <div id="info-screen" class="screen hidden">
-            <h2>遊戲說明</h2>
-            <div class="info-content">
-                <p>🌀 <b>核心機制：</b> 點擊屏幕或按下空白鍵來反轉重力。</p>
-                <p>⚠️ <b>障礙物：</b> 避開尖刺、高塔和鋸齒。</p>
-                <p>❤️ <b>生命值：</b> 你有 3 點生命，撞到障礙物會扣血並短暫無敵。</p>
-                <p>🚀 <b>升級：</b> 每得 10 分進入下一關，速度會變快！</p>
-            </div>
-            <button id="close-info-btn">返回</button>
-        </div>
-
-        <div id="game-over-screen" class="screen hidden">
-            <h1>GAME OVER</h1>
-            <p>最終分數: <span id="final-score">0</span></p>
-            <button id="restart-btn">再來一次</button>
-        </div>
-    </div>
-
-    <div id="game-container">
+    <div id="gameContainer">
         <canvas id="game-canvas"></canvas>
+        <div id="ui-layer">
+            <div class="stats-bar">
+                <span id="score-display">分數: 0</span>
+                <span id="level-display">Level: 1</span>
+                <span id="lives-display">❤️❤️❤️</span>
+            </div>
+            <div id="start-screen" class="screen">
+                <h1>GRAVITY SWITCH</h1>
+                <p>點擊畫面反轉重力</p>
+                <p>避開障礙物</p>
+                <div class="btn-group">
+                    <button id="start-btn">開始遊戲</button>
+                    <button id="info-btn">遊戲說明</button>
+                </div>
+            </div>
+            
+            <div id="info-screen" class="screen hidden">
+                <h2>遊戲說明</h2>
+                <div class="info-content">
+                    <p>🌀 <b>核心機制：</b> 點擊屏幕或按下空白鍵來反轉重力。</p>
+                    <p>⚠️ <b>障礙物：</b> 避開尖刺、高塔和鋸齒。</p>
+                    <p>❤️ <b>生命值：</b> 你有 3 點生命，撞到障礙物會扣血並短暫無敵。</p>
+                    <p>🚀 <b>升級：</b> 每得 10 分進入下一關，速度會變快！</p>
+                </div>
+                <button id="close-info-btn">返回</button>
+            </div>
+
+            <div id="game-over-screen" class="screen hidden">
+                <h1>GAME OVER</h1>
+                <p>最終分數: <span id="final-score">0</span></p>
+                <button id="restart-btn">再來一次</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

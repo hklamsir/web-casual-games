@@ -1,7 +1,18 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
-// UI Elements
+// Fixed logical size (similar to space-invaders approach but square/flexible)
+const GAME_WIDTH = 600;
+const GAME_HEIGHT = 600;
+
+canvas.width = GAME_WIDTH;
+canvas.height = GAME_HEIGHT;
+
+// Removed dynamic resize listener since we use CSS scaling
+// function resize() { ... } 
+// window.addEventListener('resize', resize);
+// resize();
+
 const scoreEl = document.getElementById('score-display');
 const levelEl = document.getElementById('level-display');
 const livesEl = document.getElementById('lives-display');
@@ -16,7 +27,7 @@ const restartBtn = document.getElementById('restart-btn');
 
 // Game Constants
 const GRAVITY_FORCE = 0.6;
-const SPEED_INITIAL = 6;
+const SPEED_INITIAL = 5; // Reduced slightly for 600x600 scale
 const OBSTACLE_WIDTH = 40;
 const OBSTACLE_HEIGHT = 60; // Max height variation
 
@@ -91,18 +102,10 @@ obsImages.tall.src = 'images/obstacle_tall.svg';
 obsImages.saw.src = 'images/obstacle_saw.svg';
 obsImages.pillar.src = 'images/obstacle_tall.svg'; // Reuse tall graphic for now
 
-// Resize handling
-// Fixed logic size
-canvas.width = 1280;
-canvas.height = 720;
-
-// Removed dynamic resize listener to keep logic consistent
-// Window resize is handled by CSS object-fit
-
 class Player {
     constructor() {
         this.size = 50; 
-        this.x = 200; // Fixed spawn x
+        this.x = 100; // Fixed spawn x for 600w
         this.y = canvas.height / 2;
         this.vy = 0;
         this.trail = [];
@@ -178,7 +181,7 @@ class Obstacle {
         
         const screenH = canvas.height;
 
-        // Set dimensions based on type
+        // Set dimensions based on type (optimized for 600x600)
         switch(this.type) {
             case 'spike':
                 this.w = 40;
@@ -190,7 +193,7 @@ class Obstacle {
                 break;
             case 'tall':
                 this.w = 40;
-                this.h = screenH * 0.3; // 30% of screen height
+                this.h = 180; // 30% of 600
                 break;
             case 'saw':
                 this.w = 60;
@@ -198,7 +201,7 @@ class Obstacle {
                 break;
             case 'pillar': // New tall obstacle
                 this.w = 50;
-                this.h = screenH * 0.4; // 40% of screen height
+                this.h = 240; // 40% of 600
                 break;
         }
 
@@ -461,5 +464,6 @@ closeInfoBtn.addEventListener('click', () => {
 });
 
 // Initial Render
+// No resize function needed, fixed size
 ctx.fillStyle = '#0f0f1a';
 ctx.fillRect(0, 0, canvas.width, canvas.height);

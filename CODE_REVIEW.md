@@ -6,68 +6,49 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-05
+**Date:** 2026-02-06
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project now contains six games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, **Emoji Memory Match**, **Gravity Switch**, and the newly added **Quantum 2048**.
+The `web-casual-games` project now contains seven games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, **Emoji Memory Match**, **Gravity Switch**, **Quantum 2048**, and the newly added **Zen Stack**.
 The repository continues to expand with diverse genres. The focus remains on lightweight, mobile-first web experiences.
 
 ## 2. Recent Changes & Fixes
 
-### ⚛️ Quantum 2048 (New)
-*   **Genre**: Puzzle / Sliding Block.
-*   **Architecture**: DOM-based rendering with CSS Grid and Transforms.
+### 🧱 Zen Stack (New)
+*   **Genre**: Physics / Stacking / Rhythm.
+*   **Architecture**: Canvas 2D API.
 *   **Logic**: 
-    *   Standard 2048 merge logic (recursive slide and combine).
-    *   State tracked in 2D array, DOM updated via full re-render (optimized for simplicity, though reusing elements for position classes).
+    *   Block slicing mechanics: Calculates overlap between current and previous block.
+    *   Debris generation: The "sliced off" part becomes a physical object that falls with gravity.
+    *   Camera Logic: Smoothly lerps (linear interpolation) upwards to keep the stack focus in the lower third of the screen.
 *   **Visuals**:
-    *   Deep space / Quantum theme using Neon colors.
-    *   CSS Animations (`@keyframes appear`) for new tiles.
+    *   Pastel "Zen" color palette.
+    *   Simple shading (top highlight, bottom shadow) to give a pseudo-3D look.
 *   **Mobile Support**:
-    *   Implemented custom swipe detection (calculating dx/dy from touch events).
-    *   Prevents default scrolling on the game board.
+    *   Full-screen tap/touch input.
+    *   Prevents double-tap zooming via CSS and JS event handling.
 
-### 🌌 Gravity Switch (New)
-*   **Genre**: Endless Runner / Arcade (Gravity Flip mechanics).
-*   **Architecture**: Canvas 2D API based rendering.
-*   **Performance**: Optimized game loop using `requestAnimationFrame`. Efficient object pooling (removing off-screen obstacles) to maintain stable 60 FPS.
-*   **Visuals**:
-    *   Cyberpunk/Minimalist dark aesthetic using CSS variables.
-    *   Dynamic background grid and particle explosion effects on death.
-*   **Mobile Support**:
-    *   Implements `touchstart` for low-latency input.
-    *   `touch-action: none` prevents browser zooming/scrolling during gameplay.
-
-### 🐶 Emoji Memory Match (Previous)
-*   **Status**: Stable.
-*   **Feedback**: User engagement is high due to simple mechanics.
+### ⚛️ Quantum 2048 (Previous)
+*   **Status**: Released.
+*   **Feedback**: Smooth animations and responsive layout are working well.
 
 ## 3. Detailed Review & Suggestions
 
-### ⚛️ Quantum 2048
+### 🧱 Zen Stack
 *   **Pros**:
-    *   **Aesthetics**: The neon glow and dark background fit the "Quantum" theme perfectly.
-    *   **Responsiveness**: Grid adapts well to different screen sizes.
-    *   **Usability**: Keyboard arrows and Touch swipes both work seamlessly.
+    *   **Core Loop**: The "perfect hit" vs "slicing" mechanic creates immediate feedback and tension.
+    *   **Visual Feedback**: The falling debris adds a satisfying "weight" to mistakes.
+    *   **Performance**: Uses object pooling (cleanup) for debris, ensuring long-term stability.
 *   **Cons**:
-    *   **Animation**: The current rendering logic (clearing/redrawing or minimal reuse) might make merge animations less fluid than a complex transition system.
-    *   **End Game**: Currently just shows an overlay. Could add a "Continue?" option or particle effects on 2048 tile.
-
-### 🌌 Gravity Switch
-*   **Pros**:
-    *   **Controls**: One-tap control scheme is perfect for mobile.
-    *   **Juice**: Screen shake or more aggressive particles could enhance impact, but current implementation is clean.
-    *   **Responsive**: Canvas resizes dynamically with `window.resize`.
-*   **Cons**:
-    *   **Difficulty Curve**: The speed increase is linear. Consider adding "phases" or changing patterns to keep it interesting.
-    *   **Audio**: Currently lacks sound effects (jump/crash). Adding the `AudioContext` synth from Neon Snake would be a good enhancement.
+    *   **Sound**: Currently silent. Adding a musical note that scales up the scale on perfect hits (Combo) would massively improve the "Zen" feel.
+    *   **Difficulty**: Linear speed increase. Could add varying block sizes or moving base targets for advanced modes.
 
 ### General Project Health
 *   **Shared Assets**: Still pending a move to a shared `common/` directory for styles and utility scripts.
 *   **Accessibility**: Added `aria-label` to some buttons, but could be improved across all games.
 
 ## 4. Next Steps
-1.  **Audio Integration**: Add procedural sound effects to *Gravity Switch* and *Quantum 2048* (merge sounds).
+1.  **Audio Integration**: Add procedural sound effects (synth tones) to *Zen Stack* for the combo mechanic.
 2.  **Refactor**: Create a `common.css` file to unify the "Back to Hall" button and "Game Over" modal styles.
 3.  **Deployment**: Push changes to GitHub Pages.

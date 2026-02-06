@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zen Stack - 禪意堆疊</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui-layer">
+            <div id="score-container">
+                <div id="score">0</div>
+                <div id="best-score">最佳: 0</div>
+            </div>
+            <div id="start-screen" class="active">
+                <h1>Zen Stack</h1>
+                <p>點擊螢幕堆疊方塊</p>
+                <button id="start-btn">開始遊戲</button>
+            </div>
+            <div id="game-over-screen">
+                <h2>遊戲結束</h2>
+                <p id="final-score">分數: 0</p>
+                <button id="restart-btn">再來一次</button>
+                <button id="home-btn" onclick="location.href='../../index.html'">返回主頁</button>
+            </div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

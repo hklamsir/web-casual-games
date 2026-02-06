@@ -1,0 +1,121 @@
+:root {
+    --bg-color: #e0e5ec;
+    --text-color: #4a4a4a;
+    --primary-color: #6c5ce7;
+    --accent-color: #a29bfe;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    touch-action: none; /* Prevent double-tap zoom */
+}
+
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#score-container {
+    position: absolute;
+    top: 10%;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+#score {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+#best-score {
+    font-size: 1rem;
+    color: #888;
+}
+
+#start-screen, #game-over-screen {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    pointer-events: auto;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+    display: none;
+}
+
+#start-screen.active, #game-over-screen.active {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+button {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    margin: 5px;
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(108, 92, 231, 0.4);
+}

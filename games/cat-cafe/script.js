@@ -46,6 +46,10 @@ function exitGame() {
     window.location.href = '../../index.html';
 }
 
+function showInfo() {
+    document.getElementById('infoModal').style.display = 'flex';
+}
+
 function resetGame() {
     if(confirm("確定要重置遊戲進度嗎？所有貓咪和升級都會消失喔！")) {
         localStorage.removeItem('catCafeSave');

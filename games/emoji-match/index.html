@@ -10,6 +10,8 @@
 <body>
 
     <a href="../../index.html" class="back-link">← 返回大廳</a>
+    
+    <button class="info-btn" onclick="showInfo()">?</button>
 
     <h1>Emoji Match</h1>
     
@@ -40,6 +42,22 @@
             <h2 style="color:var(--accent); margin-top:0;">🏆 恭喜通關！</h2>
             <p>你完成了所有關卡！太厲害了！</p>
             <button class="btn" onclick="restartGame()">再來一次 ↺</button>
+        </div>
+    </div>
+    
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal" style="text-align: left; max-width: 400px;">
+            <h2 style="color:var(--primary); margin-top:0; text-align: center;">遊戲說明</h2>
+            <p>歡迎來到表情對對碰！</p>
+            <ul style="line-height: 1.6; padding-left: 20px;">
+                <li>🃏 <b>翻牌配對：</b> 點擊卡片翻開，找出兩張相同的表情。</li>
+                <li>⏳ <b>計時挑戰：</b> 盡可能用最少的時間和步數完成。</li>
+                <li>🚀 <b>關卡制：</b> 共有 6 個關卡，卡片數量會越來越多！</li>
+            </ul>
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn" onclick="document.getElementById('infoModal').style.display='none'">明白了</button>
+            </div>
         </div>
     </div>
 

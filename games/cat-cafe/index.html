@@ -13,6 +13,7 @@
         <!-- Main Game Area -->
         <div class="cafe-view">
             <h1>Cat Café Tycoon</h1>
+            <button class="info-btn" onclick="showInfo()">?</button>
             <div class="stats-bar">💰 $<span id="money">0</span></div>
 
             <div class="main-btn" id="clickBtn">☕</div>
@@ -52,6 +53,22 @@
             <p>貓咪們在您離開期間也很努力工作喔！</p>
             <h1 style="font-size:2.5rem; margin:20px 0;">+$<span id="offlineEarnings">0</span></h1>
             <button onclick="document.getElementById('offlineModal').style.display='none'" style="background:var(--accent); color:white; border:none; padding:10px 30px; border-radius:50px; font-size:1.1rem; cursor:pointer;">開心收下 💰</button>
+        </div>
+    </div>
+    
+    <!-- Info Modal -->
+    <div id="infoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:20px; text-align:left; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
+            <h2 style="color:var(--accent); margin-top:0; text-align:center;">遊戲說明</h2>
+            <ul style="line-height: 1.8; color: var(--text-main);">
+                <li>☕ <b>點擊賺錢：</b> 點擊中間的咖啡杯來獲得初始資金。</li>
+                <li>🛠️ <b>升級設備：</b> 購買咖啡機可增加點擊收益。</li>
+                <li>🐱 <b>招募貓咪：</b> 收留流浪貓可獲得自動收入（每15秒）。</li>
+                <li>💤 <b>離線收益：</b> 即使關閉瀏覽器，店鋪也會繼續賺錢喔！</li>
+            </ul>
+            <div style="text-align:center; margin-top:20px;">
+                <button onclick="document.getElementById('infoModal').style.display='none'" style="background:var(--accent); color:white; border:none; padding:10px 30px; border-radius:50px; font-size:1.1rem; cursor:pointer;">開始經營</button>
+            </div>
         </div>
     </div>
 

@@ -250,5 +250,9 @@ function restartGame() {
     initGame(0);
 }
 
+function showInfo() {
+    document.getElementById('infoModal').style.display = 'flex';
+}
+
 // Start
 initGame(0);

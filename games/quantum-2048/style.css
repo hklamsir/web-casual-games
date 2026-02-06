@@ -50,6 +50,8 @@ header {
 .back-btn {
     position: absolute;
     left: 0;
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
     text-decoration: none;
     color: #8d99ae;
     font-size: 0.9rem;

@@ -39,13 +39,14 @@ h1 {
 
 .game-board {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    /* grid-template-columns set by JS */
     gap: 15px;
     padding: 20px;
     background: rgba(255,255,255,0.5);
     border-radius: 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     margin-bottom: 30px;
+    transition: all 0.3s ease;
 }
 
 .card {
@@ -126,6 +127,32 @@ h1 {
     font-weight: bold;
 }
 
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 @media (max-width: 400px) {
     .game-board {
         gap: 10px;
@@ -134,5 +161,9 @@ h1 {
     .card {
         width: 60px;
         height: 60px;
+    }
+    .stats {
+        padding: 10px 15px;
+        font-size: 1rem;
     }
 }

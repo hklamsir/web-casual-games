@@ -14,6 +14,7 @@
     <h1>Emoji Match</h1>
     
     <div class="stats">
+        <span>關卡: <b id="level">1</b></span>
         <span>步數: <b id="moves">0</b></span>
         <span>時間: <b id="timer">00:00</b></span>
     </div>
@@ -23,6 +24,24 @@
     </div>
 
     <button class="btn" onclick="restartGame()">重新開始</button>
+
+    <!-- Level Complete Modal -->
+    <div class="modal-overlay" id="levelModal">
+        <div class="modal">
+            <h2 style="color:var(--primary); margin-top:0;">🎉 關卡完成！</h2>
+            <p>步數: <span id="levelMoves">0</span> | 時間: <span id="levelTime">00:00</span></p>
+            <button class="btn" onclick="nextLevel()">下一關 ➔</button>
+        </div>
+    </div>
+    
+    <!-- Game Complete Modal -->
+    <div class="modal-overlay" id="gameCompleteModal">
+        <div class="modal">
+            <h2 style="color:var(--accent); margin-top:0;">🏆 恭喜通關！</h2>
+            <p>你完成了所有關卡！太厲害了！</p>
+            <button class="btn" onclick="restartGame()">再來一次 ↺</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

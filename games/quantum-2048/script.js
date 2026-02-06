@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageText = document.getElementById('message-text');
     const restartBtn = document.getElementById('restart-btn');
     const retryBtn = document.getElementById('retry-button');
+    const guideBtn = document.getElementById('guide-btn');
+    const guideModal = document.getElementById('guide-modal');
+    const closeGuideBtn = document.getElementById('close-guide-btn');
 
     let grid = [];
     let score = 0;
@@ -302,6 +305,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     restartBtn.addEventListener('click', initGame);
     retryBtn.addEventListener('click', initGame);
+    
+    guideBtn.addEventListener('click', () => {
+        guideModal.classList.remove('hidden');
+    });
+    
+    closeGuideBtn.addEventListener('click', () => {
+        guideModal.classList.add('hidden');
+    });
 
     initGame();
 });

@@ -8,10 +8,13 @@ const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreEl = document.getElementById('final-score');
 const startBtn = document.getElementById('start-btn');
+const infoBtn = document.getElementById('info-btn');
+const closeInfoBtn = document.getElementById('close-info-btn');
+const infoScreen = document.getElementById('info-screen');
 const restartBtn = document.getElementById('restart-btn');
 
 // Game State
-let gameState = 'START'; // START, PLAYING, GAMEOVER
+let gameState = 'START'; // START, PLAYING, GAMEOVER, INFO
 let score = 0;
 let bestScore = localStorage.getItem('zenStackBest') || 0;
 let frames = 0;
@@ -344,13 +347,13 @@ function loop() {
 
 // Input
 function handleInput(e) {
+    if (e.target.tagName === 'BUTTON') return; // Ignore button clicks
     if (e.type === 'touchstart') e.preventDefault(); // Prevent default touch actions
     
     if (gameState === 'START') {
-        gameState = 'PLAYING';
-        startScreen.classList.remove('active');
-        scoreEl.style.display = 'block';
-        initGame();
+        // Now handled by start button, but keep click-to-start if desired?
+        // Let's rely on button for cleaner UI flow since we added instructions
+        // But if user clicks outside, maybe nothing?
     } else if (gameState === 'PLAYING') {
         placeBlock();
     }
@@ -368,6 +371,22 @@ startBtn.addEventListener('click', (e) => {
     startScreen.classList.remove('active');
     scoreEl.style.display = 'block';
     initGame();
+});
+
+infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    gameState = 'INFO';
+    startScreen.classList.remove('active');
+    infoScreen.classList.remove('hidden');
+    infoScreen.style.display = 'block';
+});
+
+closeInfoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    gameState = 'START';
+    infoScreen.classList.add('hidden');
+    infoScreen.style.display = 'none';
+    startScreen.classList.add('active');
 });
 
 restartBtn.addEventListener('click', (e) => {

@@ -85,6 +85,40 @@ canvas {
     transform: scale(1);
 }
 
+#info-screen {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    pointer-events: auto;
+    max-width: 400px;
+    width: 80%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.info-content {
+    text-align: left;
+    margin: 20px 0;
+    line-height: 1.8;
+}
+
+.info-content p {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #555;
+}
+
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
 h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;

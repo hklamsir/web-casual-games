@@ -28,7 +28,10 @@
                 </div>
             </div>
             <p class="subtitle">合併量子方塊以達成 <span class="highlight">2048</span> 態！</p>
-            <button id="restart-btn">重置實驗</button>
+            <div class="header-buttons">
+                <button id="guide-btn">遊戲攻略</button>
+                <button id="restart-btn">重置實驗</button>
+            </div>
         </header>
 
         <div class="game-container" id="game-container">
@@ -54,6 +57,20 @@
                 <div class="lower">
                     <button class="retry-button" id="retry-button">再來一次</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Strategy Modal -->
+        <div id="guide-modal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>量子 2048 攻略</h2>
+                <div class="modal-content">
+                    <p>⚛️ <b>基本規則：</b> 滑動移動所有方塊，相同數字的方塊相撞會合併升級。</p>
+                    <p>📐 <b>角落策略：</b> 選擇一個角落（如左下角）作為「高能區」，將最大的數字保持在那裡。</p>
+                    <p>🚫 <b>滿員危機：</b> 盡量不要讓其中一個方向填滿，保留移動空間。</p>
+                    <p>🌊 <b>流動性：</b> 試著讓數字按順序排列（如：2-4-8-16），方便連續合併。</p>
+                </div>
+                <button id="close-guide-btn">明白了</button>
             </div>
         </div>
 

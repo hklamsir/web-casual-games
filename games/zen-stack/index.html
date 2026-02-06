@@ -17,8 +17,22 @@
             <div id="start-screen" class="active">
                 <h1>Zen Stack</h1>
                 <p>點擊螢幕堆疊方塊</p>
-                <button id="start-btn">開始遊戲</button>
+                <div class="btn-group">
+                    <button id="start-btn">開始遊戲</button>
+                    <button id="info-btn">遊戲說明</button>
+                </div>
             </div>
+            
+            <div id="info-screen" class="hidden">
+                <h2>遊戲說明</h2>
+                <div class="info-content">
+                    <p>🏗️ <b>玩法：</b> 當移動的方塊與下方重合時，點擊螢幕堆疊。</p>
+                    <p>✂️ <b>削減：</b> 未重合的部分會被切除，方塊會越來越小。</p>
+                    <p>🎯 <b>完美堆疊：</b> 完全重合會有額外分數，連續完美會擴大方塊！</p>
+                </div>
+                <button id="close-info-btn">返回</button>
+            </div>
+
             <div id="game-over-screen">
                 <h2>遊戲結束</h2>
                 <p id="final-score">分數: 0</p>

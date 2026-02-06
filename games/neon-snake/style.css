@@ -169,19 +169,6 @@ canvas {
     font-size: 0.8rem;
 }
 
-.back-link {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: #666;
-    text-decoration: none;
-    font-size: 0.9rem;
-    border-bottom: 1px solid transparent;
-    transition: 0.3s;
-    z-index: 200;
-}
-.back-link:hover { color: var(--primary); border-color: var(--primary); }
-
 /* Mobile Controls */
 .mobile-controls {
     display: none;
@@ -263,29 +250,5 @@ canvas {
         height: 95vmin;
         max-width: 600px;
         max-height: 600px;
-    }
-    /* Mobile Controls Layout Fix */
-    .mobile-controls {
-        display: flex;
-        flex-direction: row; /* Force horizontal layout */
-        justify-content: space-between;
-        align-items: center;
-    }
-    .d-pad {
-        width: 150px;
-        height: 150px;
-        flex-shrink: 0; /* Prevent shrinking */
-        transform: scale(1.2); /* Make D-pad slightly bigger */
-        transform-origin: bottom left;
-    }
-    .dash-btn {
-        width: 90px;
-        height: 90px;
-        flex-shrink: 0;
-        transform: scale(1.2); /* Make dash button bigger */
-        transform-origin: bottom right;
-    }
-    .skill-container { 
-        bottom: 10px; /* Adjust skill bar position */
     }
 }

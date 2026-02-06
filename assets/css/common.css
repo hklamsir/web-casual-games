@@ -1,0 +1,92 @@
+/* Shared Styles for Web Casual Games */
+
+/* --- Back to Hall Button --- */
+.back-link, .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: 1rem;
+    z-index: 1000;
+    transition: opacity 0.3s, transform 0.2s;
+    opacity: 0.8;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.back-link:hover, .back-btn:hover {
+    opacity: 1;
+    transform: translateX(5px); /* Subtle slide hint */
+}
+
+/* Theme variants */
+body.theme-dark .back-link,
+body.theme-dark .back-btn {
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+body.theme-light .back-link,
+body.theme-light .back-btn {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* --- Common Modal Structure --- */
+/* Games should use this structure:
+   <div class="modal-overlay hidden">
+     <div class="modal-content">...</div>
+   </div>
+*/
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden; /* Ensure it doesn't block clicks */
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    color: #333;
+}
+
+/* Dark theme modal override */
+body.theme-dark .modal-content {
+    background: #1a1a2e;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Utility Classes --- */
+.text-center { text-align: center; }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }

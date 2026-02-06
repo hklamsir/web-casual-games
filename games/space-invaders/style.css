@@ -6,19 +6,6 @@ body {
   color: white;
 }
 
-.back-link {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    color: #666;
-    text-decoration: none;
-    font-size: 0.9rem;
-    border-bottom: 1px solid transparent;
-    transition: 0.3s;
-    z-index: 200;
-}
-.back-link:hover { color: #00f3ff; border-color: #00f3ff; }
-
 #gameContainer {
   position: relative;
   width: 600px;

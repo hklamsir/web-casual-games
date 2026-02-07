@@ -5,42 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>貓咪咖啡廳大亨 | Cat Café Tycoon</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/common.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-light">
-    <a href="../../index.html" class="back-link">← 返回大廳</a>
+<body>
+    <div class="page-wrapper">
+        <a href="../../index.html" class="cat-cafe-back-btn" onclick="saveGame()">← 返回大廳</a>
 
-    <div class="game-container">
-        <!-- Main Game Area -->
-        <div class="cafe-view">
-            <h1>Cat Café Tycoon</h1>
-            <button class="info-btn" onclick="showInfo()">?</button>
-            <div class="stats-bar">💰 $<span id="money">0</span></div>
+        <div class="game-container">
+            <!-- Main Game Area -->
+            <div class="cafe-view">
+                <h1>Cat Café Tycoon</h1>
+                <button class="info-btn" onclick="showInfo()">?</button>
+                <div class="stats-bar">💰 $<span id="money">0</span></div>
 
-            <div class="main-btn" id="clickBtn">☕</div>
-            
-            <div class="cat-area" id="catArea">
-                <!-- Cats will appear here -->
+                <div class="main-btn" id="clickBtn">☕</div>
+                
+                <div class="cat-area" id="catArea">
+                    <!-- Cats will appear here -->
+                </div>
+                
+                <!-- Upgradable Items Display -->
+                <div id="coffee-wrapper" style="position:absolute; bottom:200px; left:80px; width:100px; display:none;">
+                    <div class="level-badge" id="coffee-badge">Lv. 1</div>
+                    <img id="coffee-display" src="" style="width:100%;" alt="Coffee Machine">
+                </div>
+                
+                <img id="scratcher-display" src="" style="position:absolute; bottom:40px; left:20px; width:80px; display:none;" alt="Cat Scratcher">
             </div>
-            
-            <!-- Upgradable Items Display -->
-            <div id="coffee-wrapper" style="position:absolute; bottom:200px; left:80px; width:100px; display:none;">
-                <div class="level-badge" id="coffee-badge">Lv. 1</div>
-                <img id="coffee-display" src="" style="width:100%;" alt="Coffee Machine">
-            </div>
-            
-            <img id="scratcher-display" src="" style="position:absolute; bottom:40px; left:20px; width:80px; display:none;" alt="Cat Scratcher">
-        </div>
 
-        <!-- Right Sidebar: Shop -->
-        <div class="upgrade-panel">
-            <div class="panel-title">
-                店鋪升級
-                <button class="reset-btn" onclick="resetGame()">重置</button>
-            </div>
-            <div class="upgrade-list" id="shopList">
-                <!-- Shop items injected by JS -->
+            <!-- Right Sidebar: Shop -->
+            <div class="upgrade-panel">
+                <div class="panel-title">
+                    店鋪升級
+                    <button class="reset-btn" onclick="resetGame()">重置</button>
+                </div>
+                <div class="upgrade-list" id="shopList">
+                    <!-- Shop items injected by JS -->
+                </div>
             </div>
         </div>
     </div>

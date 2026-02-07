@@ -290,26 +290,44 @@ function updateStats() {
 }
 
 function spawnObstacle() {
-    // Base spawn rate: lower = more frequent
-    // At level 1: every ~40 frames; at level 5+: every ~25 frames
-    const baseRate = 50;
-    const levelReduction = Math.min(level * 3, 25); // Cap reduction at 25
-    const spawnRate = Math.max(25, baseRate - levelReduction);
+    // More aggressive spawn rate for better gameplay
+    // Level 1: every ~25 frames; Level 5+: every ~18 frames
+    const baseRate = 30;
+    const levelReduction = Math.min(level * 2, 12);
+    const spawnRate = Math.max(18, baseRate - levelReduction);
     
     if (frames % spawnRate === 0) {
-        // Higher chance to spawn at higher levels
-        const spawnChance = Math.min(0.9, 0.6 + level * 0.05);
+        // Always high chance to spawn
+        const spawnChance = 0.85;
         if (Math.random() < spawnChance) {
-            // At higher levels, avoid spawning large obstacles too often
             const obs = new Obstacle();
             
-            // Limit pillar/tall spawns at high speed to give player reaction time
-            if (level >= 5 && (obs.type === 'pillar' || obs.type === 'tall')) {
-                // 50% chance to downgrade to smaller obstacle
-                if (Math.random() < 0.5) {
-                    obs.type = 'spike';
-                    obs.w = 40;
-                    obs.h = 60;
+            // At ALL levels, limit large obstacles based on current speed
+            // Higher speed = more likely to downgrade large obstacles
+            if (obs.type === 'pillar' || obs.type === 'tall') {
+                // Calculate downgrade chance based on level
+                // Level 1-2: 20% downgrade, Level 5+: 80% downgrade
+                const downgradeChance = Math.min(0.9, 0.2 + level * 0.12);
+                if (Math.random() < downgradeChance) {
+                    // Downgrade to smaller obstacle types
+                    const smallTypes = ['spike', 'block', 'saw'];
+                    obs.type = smallTypes[Math.floor(Math.random() * smallTypes.length)];
+                    
+                    // Reset dimensions for smaller type
+                    switch(obs.type) {
+                        case 'spike':
+                            obs.w = 40;
+                            obs.h = 60;
+                            break;
+                        case 'block':
+                            obs.w = 60;
+                            obs.h = 80;
+                            break;
+                        case 'saw':
+                            obs.w = 60;
+                            obs.h = 30;
+                            break;
+                    }
                     obs.y = obs.isTop ? 0 : canvas.height - obs.h;
                 }
             }

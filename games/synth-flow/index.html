@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Synth Flow | 音律流動</title>
+    <meta name="description" content="節奏音樂遊戲 - 跟隨節拍點擊音符，感受電子音樂的魅力。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎵 遊戲說明</h2>
+            <div class="instructions-body">
+                <p><strong>目標：</strong>跟隨節拍，在音符落到判定線時點擊！</p>
+                <ul>
+                    <li>🎹 點擊對應的軌道或按下鍵盤 <kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd></li>
+                    <li>✨ <strong>Perfect</strong>：完美時機，最高分數</li>
+                    <li>👍 <strong>Good</strong>：稍有偏差，獲得部分分數</li>
+                    <li>💔 <strong>Miss</strong>：錯過音符，連擊中斷</li>
+                    <li>🔥 累積連擊 (Combo) 可獲得額外加分！</li>
+                </ul>
+            </div>
+            <button id="start-game-btn" class="btn-primary">開始遊戲</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameover-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎶 演奏結束</h2>
+            <div class="results">
+                <p>分數：<span id="final-score">0</span></p>
+                <p>最高連擊：<span id="final-combo">0</span></p>
+                <p>Perfect：<span id="final-perfect">0</span> | Good：<span id="final-good">0</span> | Miss：<span id="final-miss">0</span></p>
+            </div>
+            <button id="retry-btn" class="btn-primary">再玩一次</button>
+            <a href="../../index.html" class="btn-secondary">返回首頁</a>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="hidden">
+        <header id="hud">
+            <div class="hud-left">
+                <span class="label">SCORE</span>
+                <span id="score">0</span>
+            </div>
+            <div class="hud-center">
+                <span class="label">COMBO</span>
+                <span id="combo">0</span>
+            </div>
+            <div class="hud-right">
+                <span class="label">PROGRESS</span>
+                <div id="progress-bar"><div id="progress-fill"></div></div>
+            </div>
+        </header>
+
+        <main id="game-area">
+            <div id="lanes">
+                <div class="lane" data-lane="0"><div class="hit-zone"></div></div>
+                <div class="lane" data-lane="1"><div class="hit-zone"></div></div>
+                <div class="lane" data-lane="2"><div class="hit-zone"></div></div>
+                <div class="lane" data-lane="3"><div class="hit-zone"></div></div>
+            </div>
+            <div id="judgement-line"></div>
+            <div id="feedback"></div>
+        </main>
+
+        <footer id="touch-controls">
+            <button class="touch-btn" data-lane="0">D</button>
+            <button class="touch-btn" data-lane="1">F</button>
+            <button class="touch-btn" data-lane="2">J</button>
+            <button class="touch-btn" data-lane="3">K</button>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

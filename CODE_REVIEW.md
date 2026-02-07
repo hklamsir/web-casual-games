@@ -6,49 +6,83 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-06
+**Date:** 2026-02-07
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project now contains seven games: **Cat Café Tycoon**, **Neon Snake 2077**, **Space Invaders**, **Emoji Memory Match**, **Gravity Switch**, **Quantum 2048**, and the newly added **Zen Stack**.
-The repository continues to expand with diverse genres. The focus remains on lightweight, mobile-first web experiences.
+The `web-casual-games` project now contains **eight games**: Cat Café Tycoon, Neon Snake 2077, Space Invaders, Emoji Memory Match, Gravity Switch, Quantum 2048, Zen Stack, and the newly added **Synth Flow** (音律流動).
+
+The latest addition introduces the **rhythm/music game** genre to the collection — a significant expansion that brings a completely new gameplay style.
 
 ## 2. Recent Changes & Fixes
 
-### 🧱 Zen Stack (New)
-*   **Genre**: Physics / Stacking / Rhythm.
-*   **Architecture**: Canvas 2D API.
-*   **Logic**: 
-    *   Block slicing mechanics: Calculates overlap between current and previous block.
-    *   Debris generation: The "sliced off" part becomes a physical object that falls with gravity.
-    *   Camera Logic: Smoothly lerps (linear interpolation) upwards to keep the stack focus in the lower third of the screen.
+### 🎵 Synth Flow (New)
+*   **Genre**: Rhythm / Music Game.
+*   **Architecture**: DOM-based note rendering with CSS animations.
+*   **Core Mechanics**:
+    *   **4-Lane System**: Notes fall from the top to a judgement line at the bottom.
+    *   **Judgement Windows**: PERFECT (±30px), GOOD (±60px), MISS (outside window or unplayed).
+    *   **Combo System**: Consecutive hits multiply score bonuses.
+    *   **Procedural Beatmap**: Algorithmically generated patterns based on BPM and difficulty curve.
+*   **Audio**:
+    *   **Web Audio API**: Real-time synthesized hit sounds (sine wave for PERFECT/GOOD, sawtooth for MISS).
+    *   **No external audio files required** — fully procedural audio.
+*   **Controls**:
+    *   **Keyboard**: D, F, J, K keys for lanes 1-4.
+    *   **Touch**: Four responsive buttons at the bottom of the screen.
 *   **Visuals**:
-    *   Pastel "Zen" color palette.
-    *   Simple shading (top highlight, bottom shadow) to give a pseudo-3D look.
+    *   **Synthwave/Cyberpunk Aesthetics**: Neon gradients, glow effects, scanline overlay.
+    *   **Color-coded Lanes**: Each lane has a distinct color (pink, purple, cyan, blue).
+    *   **Feedback Animations**: Notes explode on hit; feedback text pops with appropriate colors.
 *   **Mobile Support**:
-    *   Full-screen tap/touch input.
-    *   Prevents double-tap zooming via CSS and JS event handling.
+    *   Touch-friendly button sizing (70px+ tap targets).
+    *   `touch-action: manipulation` to prevent zoom delays.
+    *   Responsive layout scales lanes and buttons for smaller screens.
 
-### ⚛️ Quantum 2048 (Previous)
-*   **Status**: Released.
-*   **Feedback**: Smooth animations and responsive layout are working well.
+### 🧱 Zen Stack (Previous)
+*   **Status**: Released and stable.
+*   **No changes in this release.**
 
 ## 3. Detailed Review & Suggestions
 
-### 🧱 Zen Stack
-*   **Pros**:
-    *   **Core Loop**: The "perfect hit" vs "slicing" mechanic creates immediate feedback and tension.
-    *   **Visual Feedback**: The falling debris adds a satisfying "weight" to mistakes.
-    *   **Performance**: Uses object pooling (cleanup) for debris, ensuring long-term stability.
-*   **Cons**:
-    *   **Sound**: Currently silent. Adding a musical note that scales up the scale on perfect hits (Combo) would massively improve the "Zen" feel.
-    *   **Difficulty**: Linear speed increase. Could add varying block sizes or moving base targets for advanced modes.
+### 🎵 Synth Flow
 
-### General Project Health
-*   **Shared Assets**: Still pending a move to a shared `common/` directory for styles and utility scripts.
-*   **Accessibility**: Added `aria-label` to some buttons, but could be improved across all games.
+#### Pros
+*   **Clean Architecture**: IIFE pattern with clear separation of state, config, and DOM elements.
+*   **Procedural Generation**: No need for external beatmap files; patterns are generated algorithmically.
+*   **Web Audio API**: Lightweight audio with no asset dependencies.
+*   **Visual Polish**: The Synthwave aesthetic is cohesive and visually striking.
+*   **Performance**: Uses `will-change: top` for GPU-accelerated note movement; `requestAnimationFrame` for smooth updates.
 
-## 4. Next Steps
-1.  **Audio Integration**: Add procedural sound effects (synth tones) to *Zen Stack* for the combo mechanic.
-2.  **Refactor**: Create a `common.css` file to unify the "Back to Hall" button and "Game Over" modal styles.
-3.  **Deployment**: Push changes to GitHub Pages.
+#### Cons / Improvements
+*   **Background Music**: Currently no background track. Future enhancement could add a procedural synthesizer or allow loading a custom audio file with beat detection.
+*   **Long Note Support**: Currently only supports single-tap notes. Long notes (hold notes) could add variety.
+*   **Difficulty Modes**: Consider adding Easy/Normal/Hard presets that adjust `noteSpeed` and `beatInterval`.
+*   **Score Persistence**: No local storage for high scores yet. Could add a leaderboard.
+
+### Code Quality Notes
+*   **Keyboard vs Touch Parity**: Both input methods trigger the same `handleLanePress()` function — good consistency.
+*   **Memory Management**: Notes are properly cleaned up after hit or miss; no memory leaks observed.
+*   **Accessibility**: Could add `aria-label` to touch buttons and keyboard hint text for screen readers.
+
+## 4. Project-Wide Status
+
+| Game | Genre | Mobile | Audio | Instructions |
+|------|-------|--------|-------|--------------|
+| Cat Café | Idle | ✅ | ❌ | ✅ |
+| Neon Snake | Arcade | ✅ | ❌ | ✅ |
+| Space Invaders | Shooter | ✅ | ✅ | ✅ |
+| Emoji Match | Puzzle | ✅ | ✅ | ✅ |
+| Gravity Switch | Runner | ✅ | ❌ | ✅ |
+| Quantum 2048 | Puzzle | ✅ | ❌ | ✅ |
+| Zen Stack | Stacking | ✅ | ❌ | ✅ |
+| Synth Flow | Rhythm | ✅ | ✅ | ✅ |
+
+## 5. Next Steps
+1.  **Synth Flow Enhancements**: Add background music loop and consider hold notes.
+2.  **Audio Unification**: Add Web Audio API-based sounds to Cat Café, Neon Snake, Gravity Switch, Quantum 2048, and Zen Stack.
+3.  **Shared Styles**: Create a `common/` directory for reusable modal, button, and HUD styles.
+4.  **Deployment**: Push changes to GitHub Pages.
+
+---
+*Report generated by OpenClaw 🦋*

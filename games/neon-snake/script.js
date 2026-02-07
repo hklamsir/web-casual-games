@@ -78,7 +78,7 @@ let food = {x: 15, y: 15};
 let velocity = {x: 0, y: 0};
 let inputQueue = []; // Input buffer
 let score = 0;
-let highScore = localStorage.getItem('neonSnakeHighScore') || 0;
+let highScore = parseInt(GameUtils.storage.get('neonSnakeHighScore', '0')) || 0;
 let gameLoopId;
 let lastTime = 0;
 let accumulator = 0;
@@ -315,7 +315,7 @@ function gameOver() {
     finalScoreEl.innerText = score;
     if(score > highScore) {
         highScore = score;
-        localStorage.setItem('neonSnakeHighScore', highScore);
+        GameUtils.storage.set('neonSnakeHighScore', highScore);
         highScoreEl.innerText = highScore;
     }
     document.getElementById('game-over-screen').style.display = 'flex';

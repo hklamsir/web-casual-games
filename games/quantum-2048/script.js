@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let grid = [];
     let score = 0;
-    let bestScore = localStorage.getItem('quantum2048-best') || 0;
+    let bestScore = GameUtils.storage.get('quantum2048-best', '0') || 0;
     bestScoreElement.textContent = bestScore;
 
     const gridSize = 4;
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (score > bestScore) {
             bestScore = score;
             bestScoreElement.textContent = bestScore;
-            localStorage.setItem('quantum2048-best', bestScore);
+            GameUtils.storage.set('quantum2048-best', bestScore);
         }
     }
 

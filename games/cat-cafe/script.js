@@ -52,7 +52,7 @@ function showInfo() {
 
 function resetGame() {
     if(confirm("確定要重置遊戲進度嗎？所有貓咪和升級都會消失喔！")) {
-        localStorage.removeItem('catCafeSave');
+        GameUtils.storage.remove('catCafeSave');
         location.reload();
     }
 }
@@ -255,13 +255,12 @@ function updateUI() {
 
 function saveGame() {
     game.lastSaveTime = Date.now(); // Record time
-    localStorage.setItem('catCafeSave', JSON.stringify(game));
+    GameUtils.storage.setJSON('catCafeSave', game);
 }
 
 function loadGame() {
-    const save = localStorage.getItem('catCafeSave');
-    if (save) {
-        const data = JSON.parse(save);
+    const data = GameUtils.storage.getJSON('catCafeSave');
+    if (data) {
         game = { ...game, ...data, items: game.items }; 
         
         // Ensure coffeeType exists for old saves

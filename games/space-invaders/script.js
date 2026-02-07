@@ -10,7 +10,7 @@ const livesDisplay = document.getElementById('lives');
 
 let gameState = "start";
 let score = 0;
-let bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
+let bestScore = parseInt(GameUtils.storage.get("bestScore", "0")) || 0;
 let level = 1;
 const maxLevel = 10;
 
@@ -455,7 +455,7 @@ function update() {
         score += 10;
         if (score > bestScore) {
           bestScore = score;
-          localStorage.setItem("bestScore", bestScore);
+          GameUtils.storage.set("bestScore", bestScore);
         }
         break;
       }
@@ -473,7 +473,7 @@ function update() {
       player.bullets.splice(i, 1);
       if (score > bestScore) {
         bestScore = score;
-        localStorage.setItem("bestScore", bestScore);
+        GameUtils.storage.set("bestScore", bestScore);
       }
       continue;
     }

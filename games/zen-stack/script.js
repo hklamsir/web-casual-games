@@ -16,7 +16,7 @@ const restartBtn = document.getElementById('restart-btn');
 // Game State
 let gameState = 'START'; // START, PLAYING, GAMEOVER, INFO
 let score = 0;
-let bestScore = localStorage.getItem('zenStackBest') || 0;
+let bestScore = GameUtils.storage.get('zenStackBest', '0') || 0;
 let frames = 0;
 
 // Config
@@ -313,7 +313,7 @@ function gameOver() {
     gameState = 'GAMEOVER';
     if (score > bestScore) {
         bestScore = score;
-        localStorage.setItem('zenStackBest', bestScore);
+        GameUtils.storage.set('zenStackBest', bestScore);
     }
     finalScoreEl.innerText = `分數: ${score}`;
     scoreEl.style.display = 'none';

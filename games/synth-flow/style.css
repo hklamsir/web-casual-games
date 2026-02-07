@@ -4,19 +4,37 @@
 ======================================== */
 
 :root {
-    --bg-dark: #0a0a1a;
-    --bg-gradient: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #2a1a4e 100%);
-    --lane-1: #ff6b9d;
-    --lane-2: #c66bff;
-    --lane-3: #6bffc6;
-    --lane-4: #6bb3ff;
-    --neon-pink: #ff00aa;
-    --neon-cyan: #00ffff;
-    --neon-purple: #aa00ff;
-    --text-glow: 0 0 10px currentColor, 0 0 20px currentColor;
-    --perfect-color: #ffdd00;
-    --good-color: #00ff88;
-    --miss-color: #ff4466;
+    /* Standardized naming convention */
+    --game-bg-primary: #0a0a1a;
+    --game-bg-gradient: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #2a1a4e 100%);
+    --game-accent-primary: #00ffff;
+    --game-accent-secondary: #ff00aa;
+    --game-accent-tertiary: #aa00ff;
+    --game-success: #00ff88;
+    --game-perfect: #ffdd00;
+    --game-error: #ff4466;
+    --game-glow: 0 0 10px currentColor, 0 0 20px currentColor;
+    
+    /* Lane colors */
+    --game-lane-1: #ff6b9d;
+    --game-lane-2: #c66bff;
+    --game-lane-3: #6bffc6;
+    --game-lane-4: #6bb3ff;
+    
+    /* Legacy aliases */
+    --bg-dark: var(--game-bg-primary);
+    --bg-gradient: var(--game-bg-gradient);
+    --lane-1: var(--game-lane-1);
+    --lane-2: var(--game-lane-2);
+    --lane-3: var(--game-lane-3);
+    --lane-4: var(--game-lane-4);
+    --neon-pink: var(--game-accent-secondary);
+    --neon-cyan: var(--game-accent-primary);
+    --neon-purple: var(--game-accent-tertiary);
+    --text-glow: var(--game-glow);
+    --perfect-color: var(--game-perfect);
+    --good-color: var(--game-success);
+    --miss-color: var(--game-error);
 }
 
 * {

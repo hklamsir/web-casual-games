@@ -1,9 +1,17 @@
 :root {
-    --bg-color: #F0F4F8;
-    --card-bg: #FFFFFF;
-    --primary: #FF9EAA; /* Pastel Pink */
-    --accent: #BBDED6;  /* Pastel Green */
-    --text: #4A4E69;
+    /* Standardized naming convention */
+    --game-bg-primary: #F0F4F8;
+    --game-bg-secondary: #FFFFFF;
+    --game-accent-primary: #FF9EAA; /* Pastel Pink */
+    --game-accent-secondary: #BBDED6;  /* Pastel Green */
+    --game-text-primary: #4A4E69;
+    
+    /* Legacy aliases */
+    --bg-color: var(--game-bg-primary);
+    --card-bg: var(--game-bg-secondary);
+    --primary: var(--game-accent-primary);
+    --accent: var(--game-accent-secondary);
+    --text: var(--game-text-primary);
 }
 
 body {

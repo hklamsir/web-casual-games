@@ -1,9 +1,17 @@
 :root {
-    --bg-color: #050510;
-    --grid-color: rgba(0, 255, 255, 0.1);
-    --primary: #00f3ff; /* Cyan */
-    --secondary: #ff00ff; /* Magenta */
-    --text-color: #fff;
+    /* Standardized naming convention */
+    --game-bg-primary: #050510;
+    --game-bg-secondary: rgba(0, 255, 255, 0.1);
+    --game-accent-primary: #00f3ff; /* Cyan */
+    --game-accent-secondary: #ff00ff; /* Magenta */
+    --game-text-primary: #fff;
+    
+    /* Legacy aliases */
+    --bg-color: var(--game-bg-primary);
+    --grid-color: var(--game-bg-secondary);
+    --primary: var(--game-accent-primary);
+    --secondary: var(--game-accent-secondary);
+    --text-color: var(--game-text-primary);
 }
 
 body {

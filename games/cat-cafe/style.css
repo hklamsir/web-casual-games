@@ -1,10 +1,19 @@
 :root {
-    --bg-color: #FDF6E3;
-    --panel-bg: #FFFFFF;
-    --accent: #D4A373; 
-    --text-main: #4A4E69;
-    --btn-color: #A5A58D;
-    --btn-hover: #6B705C;
+    /* Standardized naming convention */
+    --game-bg-primary: #FDF6E3;
+    --game-bg-secondary: #FFFFFF;
+    --game-accent-primary: #D4A373;
+    --game-text-primary: #4A4E69;
+    --game-btn-bg: #A5A58D;
+    --game-btn-hover: #6B705C;
+    
+    /* Legacy aliases (for backward compatibility) */
+    --bg-color: var(--game-bg-primary);
+    --panel-bg: var(--game-bg-secondary);
+    --accent: var(--game-accent-primary);
+    --text-main: var(--game-text-primary);
+    --btn-color: var(--game-btn-bg);
+    --btn-hover: var(--game-btn-hover);
 }
 
 body {
@@ -17,6 +26,15 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
+    position: relative;
+}
+
+/* Override common.css for this game's layout */
+body.theme-light .back-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
 }
 
 .game-container {

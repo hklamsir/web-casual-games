@@ -1,11 +1,21 @@
 :root {
-    --bg-color: #0b0c15;
-    --grid-color: #1a1c29;
-    --text-color: #e0e6ed;
-    --tile-bg: #23263a;
-    --neon-blue: #4cc9f0;
-    --neon-purple: #7209b7;
-    --neon-pink: #f72585;
+    /* Standardized naming convention */
+    --game-bg-primary: #0b0c15;
+    --game-bg-secondary: #1a1c29;
+    --game-text-primary: #e0e6ed;
+    --game-accent-primary: #4cc9f0;
+    --game-accent-secondary: #7209b7;
+    --game-accent-tertiary: #f72585;
+    --game-tile-bg: #23263a;
+    
+    /* Legacy aliases */
+    --bg-color: var(--game-bg-primary);
+    --grid-color: var(--game-bg-secondary);
+    --text-color: var(--game-text-primary);
+    --tile-bg: var(--game-tile-bg);
+    --neon-blue: var(--game-accent-primary);
+    --neon-purple: var(--game-accent-secondary);
+    --neon-pink: var(--game-accent-tertiary);
 }
 
 body {

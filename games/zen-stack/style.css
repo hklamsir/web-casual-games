@@ -1,8 +1,15 @@
 :root {
-    --bg-color: #e0e5ec;
-    --text-color: #4a4a4a;
-    --primary-color: #6c5ce7;
-    --accent-color: #a29bfe;
+    /* Standardized naming convention */
+    --game-bg-primary: #e0e5ec;
+    --game-text-primary: #4a4a4a;
+    --game-accent-primary: #6c5ce7;
+    --game-accent-secondary: #a29bfe;
+    
+    /* Legacy aliases */
+    --bg-color: var(--game-bg-primary);
+    --text-color: var(--game-text-primary);
+    --primary-color: var(--game-accent-primary);
+    --accent-color: var(--game-accent-secondary);
 }
 
 * {

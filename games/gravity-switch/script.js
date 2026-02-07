@@ -290,12 +290,31 @@ function updateStats() {
 }
 
 function spawnObstacle() {
-    // Spawn rate depends on speed
-    const spawnRate = Math.max(20, Math.floor(120 / (speed / SPEED_INITIAL)));
+    // Base spawn rate: lower = more frequent
+    // At level 1: every ~40 frames; at level 5+: every ~25 frames
+    const baseRate = 50;
+    const levelReduction = Math.min(level * 3, 25); // Cap reduction at 25
+    const spawnRate = Math.max(25, baseRate - levelReduction);
     
     if (frames % spawnRate === 0) {
-        if (Math.random() > 0.3) {
-            obstacles.push(new Obstacle());
+        // Higher chance to spawn at higher levels
+        const spawnChance = Math.min(0.9, 0.6 + level * 0.05);
+        if (Math.random() < spawnChance) {
+            // At higher levels, avoid spawning large obstacles too often
+            const obs = new Obstacle();
+            
+            // Limit pillar/tall spawns at high speed to give player reaction time
+            if (level >= 5 && (obs.type === 'pillar' || obs.type === 'tall')) {
+                // 50% chance to downgrade to smaller obstacle
+                if (Math.random() < 0.5) {
+                    obs.type = 'spike';
+                    obs.w = 40;
+                    obs.h = 60;
+                    obs.y = obs.isTop ? 0 : canvas.height - obs.h;
+                }
+            }
+            
+            obstacles.push(obs);
         }
     }
 }

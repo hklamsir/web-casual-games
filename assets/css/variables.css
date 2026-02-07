@@ -1,0 +1,124 @@
+/**
+ * Web Casual Games - Standardized CSS Variable Naming Convention
+ * 
+ * All games should use these standardized variable names for consistency.
+ * Import this file or copy these variables to your game's style.css.
+ */
+
+:root {
+    /* ========================================
+       Background Colors
+    ======================================== */
+    --game-bg-primary: #0a0a1a;      /* Main background */
+    --game-bg-secondary: #1a1a2e;    /* Secondary/panel background */
+    --game-bg-tertiary: #2a2a4e;     /* Tertiary/card background */
+    
+    /* ========================================
+       Text Colors
+    ======================================== */
+    --game-text-primary: #ffffff;    /* Main text */
+    --game-text-secondary: #aaaaaa;  /* Secondary/muted text */
+    --game-text-accent: #00ffff;     /* Highlighted text */
+    
+    /* ========================================
+       Brand/Accent Colors
+    ======================================== */
+    --game-accent-primary: #00f3ff;  /* Primary accent (cyan) */
+    --game-accent-secondary: #ff00ff; /* Secondary accent (magenta) */
+    --game-accent-tertiary: #ffdd00; /* Tertiary accent (gold) */
+    
+    /* ========================================
+       UI Element Colors
+    ======================================== */
+    --game-btn-bg: transparent;
+    --game-btn-border: var(--game-accent-primary);
+    --game-btn-text: var(--game-accent-primary);
+    --game-btn-hover-bg: var(--game-accent-primary);
+    --game-btn-hover-text: #000000;
+    
+    /* ========================================
+       Feedback Colors
+    ======================================== */
+    --game-success: #00ff88;         /* Success/Good */
+    --game-warning: #ffaa00;         /* Warning */
+    --game-error: #ff4466;           /* Error/Miss */
+    --game-perfect: #ffdd00;         /* Perfect score */
+    
+    /* ========================================
+       Game-specific Colors (override per game)
+    ======================================== */
+    --game-player: #00ffff;
+    --game-obstacle: #ff0055;
+    --game-collectible: #ffdd00;
+    
+    /* ========================================
+       Shadows & Glows
+    ======================================== */
+    --game-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --game-glow-primary: 0 0 10px var(--game-accent-primary), 0 0 20px var(--game-accent-primary);
+    --game-glow-secondary: 0 0 10px var(--game-accent-secondary), 0 0 20px var(--game-accent-secondary);
+    
+    /* ========================================
+       Spacing (consistent padding/margin)
+    ======================================== */
+    --game-spacing-xs: 5px;
+    --game-spacing-sm: 10px;
+    --game-spacing-md: 20px;
+    --game-spacing-lg: 30px;
+    --game-spacing-xl: 50px;
+    
+    /* ========================================
+       Border Radius
+    ======================================== */
+    --game-radius-sm: 5px;
+    --game-radius-md: 10px;
+    --game-radius-lg: 20px;
+    --game-radius-full: 50%;
+    
+    /* ========================================
+       Transitions
+    ======================================== */
+    --game-transition-fast: 0.1s ease;
+    --game-transition-normal: 0.3s ease;
+    --game-transition-slow: 0.5s ease;
+}
+
+/* ========================================
+   Theme: Light (for pastel games like Cat Cafe, Zen Stack)
+======================================== */
+.theme-light {
+    --game-bg-primary: #F9F7F2;
+    --game-bg-secondary: #FFFFFF;
+    --game-bg-tertiary: #FDF6E3;
+    --game-text-primary: #4A4E69;
+    --game-text-secondary: #8d99ae;
+    --game-accent-primary: #D4A373;
+    --game-accent-secondary: #A3B18A;
+    --game-shadow: 0 4px 20px rgba(74, 78, 105, 0.08);
+}
+
+/* ========================================
+   Theme: Dark Neon (for cyberpunk games like Neon Snake, Space Invaders)
+======================================== */
+.theme-dark {
+    --game-bg-primary: #050510;
+    --game-bg-secondary: #0b0c15;
+    --game-bg-tertiary: #1a1c29;
+    --game-text-primary: #e0e6ed;
+    --game-text-secondary: #8d99ae;
+    --game-accent-primary: #00f3ff;
+    --game-accent-secondary: #ff00ff;
+    --game-glow-primary: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+}
+
+/* ========================================
+   Theme: Pastel (for relaxing games like Emoji Match)
+======================================== */
+.theme-pastel {
+    --game-bg-primary: #fff0f5;
+    --game-bg-secondary: #ffffff;
+    --game-accent-primary: #ff9a9e;
+    --game-accent-secondary: #fad0c4;
+    --game-success: #a8edea;
+    --game-text-primary: #5c5c5c;
+}

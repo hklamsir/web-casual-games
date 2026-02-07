@@ -1,4 +1,5 @@
 /* Shared Styles for Web Casual Games */
+@import url('./variables.css');
 
 /* --- Back to Hall Button --- */
 .back-link, .back-btn {

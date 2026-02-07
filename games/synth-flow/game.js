@@ -206,25 +206,46 @@
     function gameLoop() {
         if (!state.isPlaying) return;
         
-        const elapsed = performance.now() - state.startTime;
-        const progress = Math.min(1, elapsed / CONFIG.songDuration);
-        
-        // Update progress bar
-        elements.progressFill.style.width = `${progress * 100}%`;
-        
-        // Spawn notes based on beatmap
-        spawnNotes(elapsed);
-        
-        // Update note positions
-        updateNotes();
-        
-        // Check for game end
-        if (elapsed >= CONFIG.songDuration && state.notes.length === 0) {
-            endGame();
-            return;
+        try {
+            const elapsed = performance.now() - state.startTime;
+            const progress = Math.min(1, elapsed / CONFIG.songDuration);
+            
+            // Update progress bar
+            elements.progressFill.style.width = `${progress * 100}%`;
+            
+            // Spawn notes based on beatmap
+            spawnNotes(elapsed);
+            
+            // Update note positions
+            updateNotes();
+            
+            // Check for game end
+            if (elapsed >= CONFIG.songDuration && state.notes.length === 0) {
+                endGame();
+                return;
+            }
+            
+            state.animationId = requestAnimationFrame(gameLoop);
+        } catch (error) {
+            console.error('[Synth Flow] Game loop error:', error);
+            state.isPlaying = false;
+            cancelAnimationFrame(state.animationId);
+            showError('遊戲發生錯誤，請重新開始。');
         }
-        
-        state.animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function showError(message) {
+        // Create error overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'error-overlay';
+        overlay.innerHTML = `
+            <div class="error-modal">
+                <h2>⚠️ 錯誤</h2>
+                <p>${message}</p>
+                <button onclick="location.reload()">重新載入</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
     }
 
     function spawnNotes(elapsed) {

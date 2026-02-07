@@ -4,6 +4,7 @@ const timerEl = document.getElementById('timer');
 const levelEl = document.getElementById('level');
 const levelModal = document.getElementById('levelModal');
 const gameCompleteModal = document.getElementById('gameCompleteModal');
+const timeoutModal = document.getElementById('timeoutModal');
 const levelMovesEl = document.getElementById('levelMoves');
 const levelTimeEl = document.getElementById('levelTime');
 
@@ -14,7 +15,8 @@ const Sound = {
     flip: () => playTone(400, 'sine', 0.1, 0.05),
     match: () => playMelody([523.25, 659.25, 783.99], 'sine', 0.1), // C Major
     error: () => playTone(150, 'sawtooth', 0.3, 0.2),
-    win: () => playMelody([523.25, 659.25, 783.99, 1046.50], 'square', 0.15, 0.1) // Fanfare
+    win: () => playMelody([523.25, 659.25, 783.99, 1046.50], 'square', 0.15, 0.1), // Fanfare
+    timeout: () => playTone(200, 'sawtooth', 0.5, 0.3) // Timeout sound
 };
 
 function playTone(freq, type, duration, vol=0.1) {
@@ -64,13 +66,15 @@ const EMOJI_POOL = [
     '🐌','🐢','🐠','🦀','🐙','🦑','🦕','🐬','🦓','🦒'
 ];
 
+// Time limits per level (in seconds)
+// Calculated based on: pairs * 5 seconds base + buffer
 const LEVELS = [
-    { cols: 3, rows: 2, pairs: 3 },  // Level 1: 6 cards
-    { cols: 4, rows: 3, pairs: 6 },  // Level 2: 12 cards
-    { cols: 4, rows: 4, pairs: 8 },  // Level 3: 16 cards
-    { cols: 5, rows: 4, pairs: 10 }, // Level 4: 20 cards
-    { cols: 6, rows: 4, pairs: 12 }, // Level 5: 24 cards
-    { cols: 6, rows: 5, pairs: 15 }  // Level 6: 30 cards
+    { cols: 3, rows: 2, pairs: 3, timeLimit: 30 },   // Level 1: 6 cards, 30s
+    { cols: 4, rows: 3, pairs: 6, timeLimit: 45 },   // Level 2: 12 cards, 45s
+    { cols: 4, rows: 4, pairs: 8, timeLimit: 60 },   // Level 3: 16 cards, 60s
+    { cols: 5, rows: 4, pairs: 10, timeLimit: 75 },  // Level 4: 20 cards, 75s
+    { cols: 6, rows: 4, pairs: 12, timeLimit: 90 },  // Level 5: 24 cards, 90s
+    { cols: 6, rows: 5, pairs: 15, timeLimit: 120 }  // Level 6: 30 cards, 120s
 ];
 
 let currentLevel = 0;
@@ -79,7 +83,7 @@ let flippedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let timerInterval;
-let seconds = 0;
+let timeRemaining = 0;
 let isLocked = false;
 let isGameActive = false;
 
@@ -97,7 +101,6 @@ function shuffle(array) {
 function initGame(levelIndex) {
     // Reset State
     stopTimer();
-    timerEl.innerText = "00:00";
     moves = 0;
     movesEl.innerText = 0;
     matchedPairs = 0;
@@ -108,13 +111,18 @@ function initGame(levelIndex) {
     // Hide Modals
     levelModal.style.display = 'none';
     gameCompleteModal.style.display = 'none';
+    if (timeoutModal) timeoutModal.style.display = 'none';
 
     // Config Level
-    if (levelIndex >= LEVELS.length) levelIndex = 0; // Loop or end? Let's restart.
+    if (levelIndex >= LEVELS.length) levelIndex = 0;
     currentLevel = levelIndex;
     levelEl.innerText = currentLevel + 1;
     
     const config = LEVELS[currentLevel];
+    
+    // Set countdown time
+    timeRemaining = config.timeLimit;
+    updateTimerDisplay();
     
     // Set Grid
     board.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
@@ -156,22 +164,60 @@ function createCard(emoji) {
     return card;
 }
 
+function updateTimerDisplay() {
+    const mins = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+    const secs = (timeRemaining % 60).toString().padStart(2, '0');
+    timerEl.innerText = `${mins}:${secs}`;
+    
+    // Add warning color when time is low
+    if (timeRemaining <= 10) {
+        timerEl.style.color = '#ff4466';
+        timerEl.style.animation = 'pulse 0.5s infinite';
+    } else if (timeRemaining <= 20) {
+        timerEl.style.color = '#ffaa00';
+        timerEl.style.animation = 'none';
+    } else {
+        timerEl.style.color = '';
+        timerEl.style.animation = 'none';
+    }
+}
+
 function startTimer() {
     if (isGameActive) return;
     isGameActive = true;
-    seconds = 0;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
-        seconds++;
-        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const secs = (seconds % 60).toString().padStart(2, '0');
-        timerEl.innerText = `${mins}:${secs}`;
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+            handleTimeout();
+        }
     }, 1000);
 }
 
 function stopTimer() {
     isGameActive = false;
     clearInterval(timerInterval);
+}
+
+function handleTimeout() {
+    stopTimer();
+    Sound.timeout();
+    isLocked = true;
+    
+    // Show timeout modal
+    if (timeoutModal) {
+        timeoutModal.style.display = 'flex';
+    } else {
+        // Fallback: use alert if modal doesn't exist
+        alert('時間到！請再試一次。');
+        initGame(currentLevel);
+    }
+}
+
+function retryLevel() {
+    initGame(currentLevel);
 }
 
 function flipCard(card, emoji) {
@@ -211,7 +257,7 @@ function checkMatch() {
                 stopTimer();
                 handleLevelComplete();
             }
-        }, 300); // Slight delay for visual flip to finish
+        }, 300);
     } else {
         // No Match
         setTimeout(() => {
@@ -227,6 +273,12 @@ function checkMatch() {
 function handleLevelComplete() {
     Sound.win();
     
+    // Calculate time used
+    const config = LEVELS[currentLevel];
+    const timeUsed = config.timeLimit - timeRemaining;
+    const mins = Math.floor(timeUsed / 60).toString().padStart(2, '0');
+    const secs = (timeUsed % 60).toString().padStart(2, '0');
+    
     if (currentLevel + 1 >= LEVELS.length) {
         // All levels finished
         setTimeout(() => {
@@ -235,7 +287,7 @@ function handleLevelComplete() {
     } else {
         // Show Level Complete Modal
         levelMovesEl.innerText = moves;
-        levelTimeEl.innerText = timerEl.innerText;
+        levelTimeEl.innerText = `${mins}:${secs}`;
         setTimeout(() => {
             levelModal.style.display = 'flex';
         }, 500);

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>墨韻織詞 | Word Weaver</title>
+    <meta name="description" content="在墨韻流動中尋找隱藏的詞語，一款結合東方美學的文字解謎遊戲。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h2>墨韻織詞</h2>
+            <p class="subtitle">Word Weaver</p>
+            <div class="instructions">
+                <h3>🎮 遊戲規則</h3>
+                <ul>
+                    <li>🖐️ 滑動連接相鄰的字母組成單詞</li>
+                    <li>📝 單詞需至少 3 個字母</li>
+                    <li>⭐ 找出所有隱藏單詞即可過關</li>
+                    <li>💡 卡關時可使用「提示」功能</li>
+                    <li>🔄 支援八個方向連接（含斜向）</li>
+                </ul>
+                <h3>🎯 計分方式</h3>
+                <ul>
+                    <li>3 字母：+100 分</li>
+                    <li>4 字母：+200 分</li>
+                    <li>5+ 字母：+300 分</li>
+                    <li>完成關卡：獎勵分數</li>
+                </ul>
+            </div>
+            <button id="start-btn" class="ink-btn">開始遊戲</button>
+        </div>
+    </div>
+
+    <!-- Level Complete Modal -->
+    <div id="level-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎉 關卡完成！</h2>
+            <p id="level-score-text">得分：0</p>
+            <button id="next-level-btn" class="ink-btn">下一關</button>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="hidden">
+        <header>
+            <div class="header-left">
+                <button id="back-btn" class="icon-btn" title="返回">🏠</button>
+                <span id="level-display">第 1 關</span>
+            </div>
+            <div class="header-center">
+                <h1>墨韻織詞</h1>
+            </div>
+            <div class="header-right">
+                <span id="score-display">0 分</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Current Word Display -->
+            <div id="current-word-area">
+                <div id="current-word"></div>
+            </div>
+
+            <!-- Letter Grid -->
+            <div id="grid-container">
+                <svg id="line-svg"></svg>
+                <div id="letter-grid"></div>
+            </div>
+
+            <!-- Found Words -->
+            <div id="words-area">
+                <h3>找到的詞語 <span id="words-count">(0/0)</span></h3>
+                <div id="found-words"></div>
+            </div>
+
+            <!-- Controls -->
+            <div id="controls">
+                <button id="hint-btn" class="control-btn">💡 提示</button>
+                <button id="shuffle-btn" class="control-btn">🔀 重排</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

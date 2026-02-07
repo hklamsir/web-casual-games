@@ -290,10 +290,9 @@ function updateStats() {
 }
 
 function spawnObstacle() {
-    // More aggressive spawn rate for better gameplay
-    // Level 1: every ~25 frames; Level 5+: every ~18 frames
-    const baseRate = 30;
-    const levelReduction = Math.min(level * 2, 12);
+    // Spawn rate: Level 1 = 33 frames, decreasing with level
+    const baseRate = 33;
+    const levelReduction = Math.min(level * 2, 15);
     const spawnRate = Math.max(18, baseRate - levelReduction);
     
     if (frames % spawnRate === 0) {

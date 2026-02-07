@@ -10,60 +10,72 @@ fontSize: 12
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project now contains **eight games**: Cat Café Tycoon, Neon Snake 2077, Space Invaders, Emoji Memory Match, Gravity Switch, Quantum 2048, Zen Stack, and the newly added **Synth Flow** (音律流動).
+The `web-casual-games` project now contains **nine games**: Cat Café Tycoon, Neon Snake 2077, Space Invaders, Emoji Memory Match, Gravity Switch, Quantum 2048, Zen Stack, Synth Flow, and the newly added **Word Weaver** (墨韻織詞).
 
-The latest addition introduces the **rhythm/music game** genre to the collection — a significant expansion that brings a completely new gameplay style.
+The latest addition introduces the **word puzzle** genre — a cerebral counterbalance to the collection's arcade-heavy lineup, featuring elegant East Asian ink brush aesthetics.
 
 ## 2. Recent Changes & Fixes
 
-### 🎵 Synth Flow (New)
-*   **Genre**: Rhythm / Music Game.
-*   **Architecture**: DOM-based note rendering with CSS animations.
+### ✍️ Word Weaver (New)
+*   **Genre**: Word Puzzle / Brain Training.
+*   **Architecture**: DOM-based grid with SVG line overlay for path visualization.
 *   **Core Mechanics**:
-    *   **4-Lane System**: Notes fall from the top to a judgement line at the bottom.
-    *   **Judgement Windows**: PERFECT (±30px), GOOD (±60px), MISS (outside window or unplayed).
-    *   **Combo System**: Consecutive hits multiply score bonuses.
-    *   **Procedural Beatmap**: Algorithmically generated patterns based on BPM and difficulty curve.
+    *   **Letter Grid**: 4x4 (levels 1-3) or 5x5 (levels 4+) grid of letters.
+    *   **Swipe-to-Select**: Touch/drag adjacent cells to form words.
+    *   **8-Direction Linking**: Horizontal, vertical, and diagonal adjacency supported.
+    *   **Word Validation**: Only predefined target words count; minimum 3 letters.
+    *   **Progressive Levels**: 8 levels with increasing grid size and word count.
+*   **Scoring**:
+    *   3-letter word: 100 pts
+    *   4-letter word: 200 pts
+    *   5+ letter word: 300 pts
+    *   Level completion bonus: level × 100 pts
+*   **Features**:
+    *   **Hint System**: Highlights the first letter of an unfound word.
+    *   **Shuffle Animation**: Visual feedback for grid interaction.
+    *   **Ink Splash Effect**: Celebratory visual on correct word.
 *   **Audio**:
-    *   **Web Audio API**: Real-time synthesized hit sounds (sine wave for PERFECT/GOOD, sawtooth for MISS).
-    *   **No external audio files required** — fully procedural audio.
+    *   **Web Audio API**: Procedural sounds for select, success, fail, and level-up.
+    *   **No external audio files required**.
 *   **Controls**:
-    *   **Keyboard**: D, F, J, K keys for lanes 1-4.
-    *   **Touch**: Four responsive buttons at the bottom of the screen.
+    *   **Touch**: Swipe across adjacent cells.
+    *   **Mouse**: Click and drag across cells.
 *   **Visuals**:
-    *   **Synthwave/Cyberpunk Aesthetics**: Neon gradients, glow effects, scanline overlay.
-    *   **Color-coded Lanes**: Each lane has a distinct color (pink, purple, cyan, blue).
-    *   **Feedback Animations**: Notes explode on hit; feedback text pops with appropriate colors.
+    *   **Ink Brush Aesthetic**: Paper cream background, gold accents, brush-style fonts.
+    *   **Ma Shan Zheng Font**: Authentic Chinese calligraphy typeface from Google Fonts.
+    *   **SVG Connection Lines**: Real-time path visualization with gold stroke.
 *   **Mobile Support**:
-    *   Touch-friendly button sizing (70px+ tap targets).
-    *   `touch-action: manipulation` to prevent zoom delays.
-    *   Responsive layout scales lanes and buttons for smaller screens.
+    *   Touch events with `passive: false` for smooth swipe.
+    *   Responsive grid sizing.
+    *   Safe area padding for notched devices.
 
-### 🧱 Zen Stack (Previous)
+### 🎵 Synth Flow (Previous)
 *   **Status**: Released and stable.
 *   **No changes in this release.**
 
 ## 3. Detailed Review & Suggestions
 
-### 🎵 Synth Flow
+### ✍️ Word Weaver
 
 #### Pros
-*   **Clean Architecture**: IIFE pattern with clear separation of state, config, and DOM elements.
-*   **Procedural Generation**: No need for external beatmap files; patterns are generated algorithmically.
-*   **Web Audio API**: Lightweight audio with no asset dependencies.
-*   **Visual Polish**: The Synthwave aesthetic is cohesive and visually striking.
-*   **Performance**: Uses `will-change: top` for GPU-accelerated note movement; `requestAnimationFrame` for smooth updates.
+*   **Clean State Management**: `GameState` object centralizes all game state.
+*   **Elegant Grid Algorithm**: Word placement tries up to 100 random positions per word; fills remaining cells with random letters.
+*   **Path Validation**: Adjacency check correctly handles all 8 directions.
+*   **Touch/Mouse Parity**: Same selection logic for both input methods.
+*   **SVG Line Rendering**: Real-time path visualization during selection.
+*   **Visual Polish**: Ink brush theme is distinctive and calming.
 
 #### Cons / Improvements
-*   **Background Music**: Currently no background track. Future enhancement could add a procedural synthesizer or allow loading a custom audio file with beat detection.
-*   **Long Note Support**: Currently only supports single-tap notes. Long notes (hold notes) could add variety.
-*   **Difficulty Modes**: Consider adding Easy/Normal/Hard presets that adjust `noteSpeed` and `beatInterval`.
-*   **Score Persistence**: No local storage for high scores yet. Could add a leaderboard.
+*   **Word Dictionary**: Currently uses curated word lists per level. Could expand with a larger dictionary and procedural level generation.
+*   **Multilingual Support**: Could add Traditional Chinese character mode (成語, 詞語).
+*   **Score Persistence**: No local storage for high scores yet.
+*   **Undo Selection**: Allow tapping on the last selected cell to undo.
+*   **Used Letters Visual**: Mark letters that are part of found words (e.g., gray out or fade).
 
 ### Code Quality Notes
-*   **Keyboard vs Touch Parity**: Both input methods trigger the same `handleLanePress()` function — good consistency.
-*   **Memory Management**: Notes are properly cleaned up after hit or miss; no memory leaks observed.
-*   **Accessibility**: Could add `aria-label` to touch buttons and keyboard hint text for screen readers.
+*   **Event Handling**: Touch events use `preventDefault()` to avoid scrolling — correct.
+*   **Performance**: SVG re-rendering on resize is handled; no memory leaks observed.
+*   **Accessibility**: Could add `aria-label` to grid cells for screen readers.
 
 ## 4. Project-Wide Status
 
@@ -77,12 +89,31 @@ The latest addition introduces the **rhythm/music game** genre to the collection
 | Quantum 2048 | Puzzle | ✅ | ❌ | ✅ |
 | Zen Stack | Stacking | ✅ | ❌ | ✅ |
 | Synth Flow | Rhythm | ✅ | ✅ | ✅ |
+| Word Weaver | Word Puzzle | ✅ | ✅ | ✅ |
 
-## 5. Next Steps
-1.  **Synth Flow Enhancements**: Add background music loop and consider hold notes.
-2.  **Audio Unification**: Add Web Audio API-based sounds to Cat Café, Neon Snake, Gravity Switch, Quantum 2048, and Zen Stack.
+## 5. Genre Coverage Analysis
+The collection now covers a diverse range of casual game genres:
+
+| Genre Category | Games |
+|----------------|-------|
+| **Idle / Clicker** | Cat Café Tycoon |
+| **Arcade / Action** | Neon Snake 2077, Space Invaders, Gravity Switch |
+| **Puzzle / Brain** | Emoji Match, Quantum 2048, Word Weaver |
+| **Physics** | Zen Stack |
+| **Rhythm / Music** | Synth Flow |
+
+**Untapped Genres for Future Expansion:**
+- Tower Defense
+- Match-3
+- Trivia / Quiz
+- Card / Solitaire
+- Simulation / Farming
+
+## 6. Next Steps
+1.  **Word Weaver Enhancements**: Add Traditional Chinese word mode, score persistence.
+2.  **Audio Unification**: Add Web Audio API sounds to Cat Café, Neon Snake, Gravity Switch, Quantum 2048, and Zen Stack.
 3.  **Shared Styles**: Create a `common/` directory for reusable modal, button, and HUD styles.
-4.  **Deployment**: Push changes to GitHub Pages.
+4.  **New Genre**: Consider adding a Match-3 or Tower Defense game next.
 
 ---
 *Report generated by OpenClaw 🦋*

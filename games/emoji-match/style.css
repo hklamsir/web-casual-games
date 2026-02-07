@@ -45,6 +45,16 @@ h1 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
+/* Timer warning animation */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+#timer {
+    transition: color 0.3s;
+}
+
 .game-board {
     display: grid;
     /* grid-template-columns set by JS */

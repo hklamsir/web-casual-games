@@ -19,7 +19,7 @@
     <div class="stats">
         <span>關卡: <b id="level">1</b></span>
         <span>步數: <b id="moves">0</b></span>
-        <span>時間: <b id="timer">00:00</b></span>
+        <span>⏱️ <b id="timer">00:30</b></span>
     </div>
 
     <div class="game-board" id="board">
@@ -32,8 +32,17 @@
     <div class="modal-overlay" id="levelModal">
         <div class="modal">
             <h2 style="color:var(--primary); margin-top:0;">🎉 關卡完成！</h2>
-            <p>步數: <span id="levelMoves">0</span> | 時間: <span id="levelTime">00:00</span></p>
+            <p>步數: <span id="levelMoves">0</span> | 用時: <span id="levelTime">00:00</span></p>
             <button class="btn" onclick="nextLevel()">下一關 ➔</button>
+        </div>
+    </div>
+    
+    <!-- Timeout Modal -->
+    <div class="modal-overlay" id="timeoutModal" style="display:none;">
+        <div class="modal">
+            <h2 style="color:#ff4466; margin-top:0;">⏰ 時間到！</h2>
+            <p>沒關係，再試一次吧！</p>
+            <button class="btn" onclick="retryLevel()">重試本關 ↺</button>
         </div>
     </div>
     
@@ -53,8 +62,8 @@
             <p>歡迎來到表情對對碰！</p>
             <ul style="line-height: 1.6; padding-left: 20px;">
                 <li>🃏 <b>翻牌配對：</b> 點擊卡片翻開，找出兩張相同的表情。</li>
-                <li>⏳ <b>計時挑戰：</b> 盡可能用最少的時間和步數完成。</li>
-                <li>🚀 <b>關卡制：</b> 共有 6 個關卡，卡片數量會越來越多！</li>
+                <li>⏱️ <b>倒數計時：</b> 在時間耗盡前完成配對！</li>
+                <li>🚀 <b>關卡制：</b> 共有 6 個關卡，卡片數量和時間限制會調整。</li>
             </ul>
             <div style="text-align:center; margin-top:20px;">
                 <button class="btn" onclick="document.getElementById('infoModal').style.display='none'">明白了</button>

@@ -1,0 +1,469 @@
+/* ===== Word Weaver - Ink Style ===== */
+:root {
+    --ink-black: #1a1a2e;
+    --ink-dark: #16213e;
+    --ink-accent: #0f3460;
+    --paper-cream: #f5f0e8;
+    --paper-light: #faf8f5;
+    --gold-accent: #d4a373;
+    --success-green: #4a7c59;
+    --hint-blue: #5c7aea;
+    --shadow-ink: rgba(26, 26, 46, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+body {
+    font-family: 'Noto Serif TC', serif;
+    background: linear-gradient(135deg, var(--paper-cream) 0%, var(--paper-light) 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+}
+
+/* ===== Modal Styles ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 46, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--paper-light);
+    border-radius: 20px;
+    padding: 40px 30px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px var(--shadow-ink);
+    border: 2px solid var(--gold-accent);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold-accent), var(--ink-accent), var(--gold-accent));
+}
+
+.modal-content h2 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2.5rem;
+    color: var(--ink-black);
+    margin-bottom: 5px;
+}
+
+.modal-content .subtitle {
+    color: var(--ink-accent);
+    font-size: 1rem;
+    margin-bottom: 25px;
+    opacity: 0.7;
+}
+
+.instructions {
+    text-align: left;
+    background: rgba(212, 163, 115, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.instructions h3 {
+    font-size: 1.1rem;
+    color: var(--ink-dark);
+    margin-bottom: 12px;
+    margin-top: 15px;
+}
+
+.instructions h3:first-child {
+    margin-top: 0;
+}
+
+.instructions ul {
+    list-style: none;
+    padding-left: 5px;
+}
+
+.instructions li {
+    font-size: 0.95rem;
+    color: var(--ink-black);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.ink-btn {
+    background: linear-gradient(135deg, var(--ink-dark) 0%, var(--ink-black) 100%);
+    color: var(--paper-cream);
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-family: 'Noto Serif TC', serif;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px var(--shadow-ink);
+}
+
+.ink-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow-ink);
+}
+
+.ink-btn:active {
+    transform: translateY(0);
+}
+
+/* ===== Game Container ===== */
+#game-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#game-container.hidden {
+    display: none;
+}
+
+/* ===== Header ===== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--ink-dark) 0%, var(--ink-black) 100%);
+    color: var(--paper-cream);
+}
+
+.header-left, .header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.header-left {
+    gap: 10px;
+}
+
+.header-right {
+    justify-content: flex-end;
+}
+
+.header-center h1 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.8rem;
+    text-align: center;
+    color: var(--gold-accent);
+}
+
+.icon-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    font-size: 1.3rem;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.icon-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+#level-display {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+#score-display {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold-accent);
+}
+
+/* ===== Main Game Area ===== */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* ===== Current Word Display ===== */
+#current-word-area {
+    width: 100%;
+    max-width: 350px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 2px solid var(--gold-accent);
+}
+
+#current-word {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2rem;
+    color: var(--ink-dark);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+/* ===== Letter Grid ===== */
+#grid-container {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#line-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#line-svg line {
+    stroke: var(--gold-accent);
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 2px 4px rgba(212, 163, 115, 0.5));
+}
+
+#letter-grid {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.letter-cell {
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2rem;
+    color: var(--ink-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid transparent;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 10;
+}
+
+.letter-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.letter-cell.selected {
+    background: var(--gold-accent);
+    color: white;
+    transform: scale(1.1);
+    border-color: var(--ink-dark);
+}
+
+.letter-cell.used {
+    background: var(--success-green);
+    color: white;
+    opacity: 0.7;
+}
+
+.letter-cell.hint {
+    animation: hint-pulse 1s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(92, 122, 234, 0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(92, 122, 234, 0); }
+}
+
+/* ===== Found Words Area ===== */
+#words-area {
+    width: 100%;
+    max-width: 350px;
+    background: white;
+    border-radius: 15px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+#words-area h3 {
+    font-size: 1rem;
+    color: var(--ink-accent);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#words-count {
+    font-weight: normal;
+    color: var(--gold-accent);
+}
+
+#found-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 40px;
+}
+
+.word-chip {
+    background: linear-gradient(135deg, var(--success-green) 0%, #3d6b4a 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    animation: pop-in 0.3s ease;
+}
+
+.word-placeholder {
+    background: var(--paper-cream);
+    color: var(--ink-accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px dashed var(--gold-accent);
+}
+
+@keyframes pop-in {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===== Controls ===== */
+#controls {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+    padding-bottom: 20px;
+}
+
+.control-btn {
+    background: white;
+    border: 2px solid var(--ink-accent);
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-family: 'Noto Serif TC', serif;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--ink-dark);
+}
+
+.control-btn:hover {
+    background: var(--ink-accent);
+    color: white;
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===== Ink Splash Effect ===== */
+.ink-splash {
+    position: fixed;
+    pointer-events: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--ink-dark) 0%, transparent 70%);
+    opacity: 0.3;
+    animation: splash 0.6s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes splash {
+    0% { transform: scale(0); opacity: 0.5; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 400px) {
+    .modal-content {
+        padding: 30px 20px;
+    }
+    
+    .modal-content h2 {
+        font-size: 2rem;
+    }
+    
+    header {
+        padding: 12px 15px;
+    }
+    
+    .header-center h1 {
+        font-size: 1.5rem;
+    }
+    
+    main {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    #grid-container {
+        max-width: 280px;
+    }
+    
+    .letter-cell {
+        font-size: 1.6rem;
+    }
+    
+    #current-word {
+        font-size: 1.6rem;
+        letter-spacing: 5px;
+    }
+    
+    .control-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ===== Safe Area for notched phones ===== */
+@supports (padding: max(0px)) {
+    header {
+        padding-top: max(15px, env(safe-area-inset-top));
+    }
+    
+    #controls {
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+}

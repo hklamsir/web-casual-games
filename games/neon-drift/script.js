@@ -6,6 +6,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreDisplay = document.getElementById('score-display');
 const highScoreDisplay = document.getElementById('high-score');
+const levelDisplay = document.getElementById('level-display');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreDisplay = document.getElementById('final-score');
@@ -16,6 +17,7 @@ const exitBtn = document.getElementById('exit-btn');
 // Game State
 let gameState = 'START';
 let score = 0;
+let level = 1;
 let highScore = localStorage.getItem('neon-drift-highscore') || 0;
 let lastTime = 0;
 let animationId;
@@ -47,6 +49,7 @@ function initGame() {
     
     // Reset state
     score = 0;
+    level = 1;
     player.speed = INITIAL_SPEED;
     player.direction = 1;
     player.trail = [];
@@ -313,6 +316,15 @@ function drawGrid() {
 function updateScoreUI() {
     const displayScore = Math.floor(score);
     scoreDisplay.textContent = `分數: ${displayScore}`;
+    
+    // Level Up Logic: Every 100 points
+    const newLevel = Math.floor(displayScore / 100) + 1;
+    if (newLevel > level) {
+        level = newLevel;
+        player.speed += 0.5; // Significant speed boost on level up
+        // Optional: show level up effect
+    }
+    levelDisplay.textContent = `Level: ${level}`;
 }
 
 function endGame() {

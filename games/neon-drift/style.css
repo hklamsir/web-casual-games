@@ -44,22 +44,40 @@ canvas {
 #ui-layer {
     position: absolute;
     top: 20px;
-    left: 20px;
     right: 20px;
     pointer-events: none;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-end;
     font-weight: bold;
     font-size: 1.2rem;
     text-shadow: 0 0 10px var(--neon-cyan);
 }
 
-#score-display {
+.score-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+#level-display {
     color: var(--neon-cyan);
+    font-size: 1.4rem;
+}
+
+#score-display {
+    color: var(--text-color);
 }
 
 #high-score {
     color: var(--neon-pink);
+}
+
+/* Back Link Override */
+.back-link {
+    top: 20px !important;
+    left: 20px !important;
+    color: var(--neon-cyan) !important;
 }
 
 /* Modals */

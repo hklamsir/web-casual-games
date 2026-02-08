@@ -6,114 +6,99 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-07
+**Date:** 2026-02-08
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project now contains **nine games**: Cat Café Tycoon, Neon Snake 2077, Space Invaders, Emoji Memory Match, Gravity Switch, Quantum 2048, Zen Stack, Synth Flow, and the newly added **Word Weaver** (墨韻織詞).
-
-The latest addition introduces the **word puzzle** genre — a cerebral counterbalance to the collection's arcade-heavy lineup, featuring elegant East Asian ink brush aesthetics.
+The `web-casual-games` project has reached a milestone of **ten unique games**. The latest addition, **Neon Drift**, introduces the **one-tap arcade/drifting** genre. Significant updates were also made to existing games, particularly **Word Weaver**, which has been pivoted to a high-quality Chinese Idiom (成語) challenge.
 
 ## 2. Recent Changes & Fixes
 
-### ✍️ Word Weaver (New)
-*   **Genre**: Word Puzzle / Brain Training.
-*   **Architecture**: DOM-based grid with SVG line overlay for path visualization.
+### 🏎️ Neon Drift (New)
+*   **Genre**: One-tap Arcade / Drifting.
+*   **Architecture**: Canvas-based procedural generation.
 *   **Core Mechanics**:
-    *   **Letter Grid**: 4x4 (levels 1-3) or 5x5 (levels 4+) grid of letters.
-    *   **Swipe-to-Select**: Touch/drag adjacent cells to form words.
-    *   **8-Direction Linking**: Horizontal, vertical, and diagonal adjacency supported.
-    *   **Word Validation**: Only predefined target words count; minimum 3 letters.
-    *   **Progressive Levels**: 8 levels with increasing grid size and word count.
-*   **Scoring**:
-    *   3-letter word: 100 pts
-    *   4-letter word: 200 pts
-    *   5+ letter word: 300 pts
-    *   Level completion bonus: level × 100 pts
-*   **Features**:
-    *   **Hint System**: Highlights the first letter of an unfound word.
-    *   **Shuffle Animation**: Visual feedback for grid interaction.
-    *   **Ink Splash Effect**: Celebratory visual on correct word.
-*   **Audio**:
-    *   **Web Audio API**: Procedural sounds for select, success, fail, and level-up.
-    *   **No external audio files required**.
-*   **Controls**:
-    *   **Touch**: Swipe across adjacent cells.
-    *   **Mouse**: Click and drag across cells.
+    *   **ZigZag Movement**: Player moves diagonally at 45 degrees.
+    *   **One-Tap Toggle**: Click/Tap/Space to switch between Left-Up and Right-Up directions.
+    *   **Procedural Path**: Segments generated on-the-fly.
+    *   **Speed Scaling**: Velocity increases gradually over time.
+    *   **Collectibles**: Purple energy cubes grant +10 bonus points.
 *   **Visuals**:
-    *   **Ink Brush Aesthetic**: Paper cream background, gold accents, brush-style fonts.
-    *   **Ma Shan Zheng Font**: Authentic Chinese calligraphy typeface from Google Fonts.
-    *   **SVG Connection Lines**: Real-time path visualization with gold stroke.
-*   **Mobile Support**:
-    *   Touch events with `passive: false` for smooth swipe.
-    *   Responsive grid sizing.
-    *   Safe area padding for notched devices.
+    *   Cyberpunk/Neon aesthetic with glowing path edges.
+    *   Dynamic camera following the player.
+    *   Grid background for depth perception.
+*   **Mobile Support**: Full-screen touch control, responsive canvas resizing.
 
-### 🎵 Synth Flow (Previous)
-*   **Status**: Released and stable.
-*   **No changes in this release.**
+### ✍️ Word Weaver (Upgrade)
+*   **Idiom Database**: Replaced random words with a curated database of **500+ Chinese Idioms (成語)**.
+*   **Level System**: Expanded to **30 levels** with progressive difficulty:
+    *   **Grid Size**: Scales from 4x4 (Easy) to 7x7 (Master).
+    *   **Word Density**: Increasing number of idioms per level.
+    *   **Time Limit**: Added countdown timers (60s to 240s) per level.
+*   **Logic Fixes**: Improved hint system and word selection logic.
 
-## 3. Detailed Review & Suggestions
+### 🐱 Cat Café Tycoon (Balance)
+*   **Mobile UI**: Repositioned machines to prevent overlapping on narrow screens.
+*   **Economy**: Increased auto-income interval from 15s to 60s to encourage active play.
+*   **Persistence**: Fixed a bug where total gold could become `NaN` on first load.
 
-### ✍️ Word Weaver
+### 🐶 Emoji Match (New Mode)
+*   **Timer Challenge**: Added a countdown timer mode.
+    *   Level 1: 25s
+    *   Level 6: 180s
+*   **Progressive Difficulty**: Grid size and time limits scale with level.
+
+### 🌌 Gravity Switch (Polish)
+*   **Difficulty Curve**: Adjusted obstacle spawn rate at low levels (33 frames) for a smoother learning curve.
+
+## 3. Detailed Review: Neon Drift
 
 #### Pros
-*   **Clean State Management**: `GameState` object centralizes all game state.
-*   **Elegant Grid Algorithm**: Word placement tries up to 100 random positions per word; fills remaining cells with random letters.
-*   **Path Validation**: Adjacency check correctly handles all 8 directions.
-*   **Touch/Mouse Parity**: Same selection logic for both input methods.
-*   **SVG Line Rendering**: Real-time path visualization during selection.
-*   **Visual Polish**: Ink brush theme is distinctive and calming.
+*   **Satisfying Game Loop**: The simple one-tap mechanic is highly addictive and fits the "casual" criteria perfectly.
+*   **Responsive Physics**: The 45-degree movement feels predictable and fair.
+*   **Visual Polish**: The glowing neon edges and trail effects provide high visual quality with minimal assets.
+*   **Optimized Performance**: Canvas rendering is efficient; handles high speed without frame drops.
 
 #### Cons / Improvements
-*   **Word Dictionary**: Currently uses curated word lists per level. Could expand with a larger dictionary and procedural level generation.
-*   **Multilingual Support**: Could add Traditional Chinese character mode (成語, 詞語).
-*   **Score Persistence**: No local storage for high scores yet.
-*   **Undo Selection**: Allow tapping on the last selected cell to undo.
-*   **Used Letters Visual**: Mark letters that are part of found words (e.g., gray out or fade).
-
-### Code Quality Notes
-*   **Event Handling**: Touch events use `preventDefault()` to avoid scrolling — correct.
-*   **Performance**: SVG re-rendering on resize is handled; no memory leaks observed.
-*   **Accessibility**: Could add `aria-label` to grid cells for screen readers.
+*   **Visual Variety**: Could add color shifts (e.g., from Cyan to Pink) as the player progresses or reaches milestones.
+*   **Obstacles**: Adding stationary obstacles on the path could increase difficulty.
+*   **Sound**: Currently lacks audio. Should add "drift" sound and "collection" chime.
 
 ## 4. Project-Wide Status
 
-| Game | Genre | Mobile | Audio | Instructions |
-|------|-------|--------|-------|--------------|
-| Cat Café | Idle | ✅ | ❌ | ✅ |
-| Neon Snake | Arcade | ✅ | ❌ | ✅ |
-| Space Invaders | Shooter | ✅ | ✅ | ✅ |
-| Emoji Match | Puzzle | ✅ | ✅ | ✅ |
-| Gravity Switch | Runner | ✅ | ❌ | ✅ |
-| Quantum 2048 | Puzzle | ✅ | ❌ | ✅ |
-| Zen Stack | Stacking | ✅ | ❌ | ✅ |
-| Synth Flow | Rhythm | ✅ | ✅ | ✅ |
-| Word Weaver | Word Puzzle | ✅ | ✅ | ✅ |
+| Game | Genre | Mobile | Audio | Status |
+|------|-------|--------|-------|--------|
+| Cat Café | Idle | ✅ | ❌ | Balanced |
+| Neon Snake | Arcade | ✅ | ❌ | Stable |
+| Space Invaders | Shooter | ✅ | ✅ | Stable |
+| Emoji Match | Puzzle | ✅ | ✅ | Timer Mode Added |
+| Gravity Switch | Runner | ✅ | ❌ | Balanced |
+| Quantum 2048 | Puzzle | ✅ | ❌ | Stable |
+| Zen Stack | Stacking | ✅ | ❌ | Stable |
+| Synth Flow | Rhythm | ✅ | ✅ | Stable |
+| Word Weaver | Word Puzzle | ✅ | ✅ | Idiom Mode Added |
+| **Neon Drift** | Arcade | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
-The collection now covers a diverse range of casual game genres:
+The collection now covers a robust spectrum:
 
-| Genre Category | Games |
-|----------------|-------|
-| **Idle / Clicker** | Cat Café Tycoon |
-| **Arcade / Action** | Neon Snake 2077, Space Invaders, Gravity Switch |
-| **Puzzle / Brain** | Emoji Match, Quantum 2048, Word Weaver |
+| Category | Games |
+|----------|-------|
+| **Idle** | Cat Café |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, **Neon Drift** |
+| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver |
 | **Physics** | Zen Stack |
-| **Rhythm / Music** | Synth Flow |
+| **Rhythm** | Synth Flow |
 
-**Untapped Genres for Future Expansion:**
-- Tower Defense
-- Match-3
-- Trivia / Quiz
-- Card / Solitaire
-- Simulation / Farming
+**Next Target Genres:**
+- Strategy (Mini Tower Defense)
+- Physics Trajectory (Angry Birds style)
+- Card/Board (Casual Solitaire)
 
-## 6. Next Steps
-1.  **Word Weaver Enhancements**: Add Traditional Chinese word mode, score persistence.
-2.  **Audio Unification**: Add Web Audio API sounds to Cat Café, Neon Snake, Gravity Switch, Quantum 2048, and Zen Stack.
-3.  **Shared Styles**: Create a `common/` directory for reusable modal, button, and HUD styles.
-4.  **New Genre**: Consider adding a Match-3 or Tower Defense game next.
+## 6. Maintenance Tasks
+- [ ] Implement `common/` styles for modals to reduce CSS duplication.
+- [ ] Add background music to all games (current: 4/10 have audio).
+- [ ] Create a "Favorites" feature on the landing page.
 
 ---
 *Report generated by OpenClaw 🦋*

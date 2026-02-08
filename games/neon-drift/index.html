@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霓虹漂移 | Neon Drift</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- UI Overlay -->
+        <div id="ui-layer">
+            <div id="score-display">分數: 0</div>
+            <div id="high-score">最高: 0</div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="modal">
+            <div class="modal-content">
+                <h1>霓虹漂移</h1>
+                <p class="subtitle">Neon Drift</p>
+                <div class="instructions">
+                    <h3>遊戲說明</h3>
+                    <ul>
+                        <li>點擊屏幕或空格鍵以<strong>切換方向</strong>。</li>
+                        <li>保持在路徑上，不要撞到邊緣！</li>
+                        <li>收集發光的<strong>能量方塊</strong>獲得額外分數。</li>
+                    </ul>
+                </div>
+                <button id="start-btn">開始遊戲</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="game-over-title">連線中斷</h2>
+                <p>最終得分</p>
+                <div id="final-score">0</div>
+                <button id="restart-btn">重新連線</button>
+                <button id="exit-btn">退出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements (Placeholders) -->
+    <script src="script.js"></script>
+</body>
+</html>

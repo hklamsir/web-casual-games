@@ -342,5 +342,12 @@ h1 {
     }
     
     h1 { font-size: 1.5rem; top: 15px; left: 20px; }
-    .stats-bar { top: 15px; right: 20px; }
+    .stats-bar { top: 45px; right: auto; left: 20px; } /* Stack under title */
+    .info-btn { top: 15px; right: 20px; } /* Keep top right */
+    
+    #coffee-wrapper {
+        bottom: auto !important;
+        top: 100px !important;
+        left: 20px !important;
+    }
 }

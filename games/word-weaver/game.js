@@ -1,6 +1,7 @@
 /**
  * Word Weaver (墨韻織詞)
- * A word puzzle game with ink brush aesthetics
+ * A word puzzle game with East Asian ink brush aesthetics
+ * Focused on Chinese Idioms (成語)
  */
 
 // ===== Game State =====
@@ -16,55 +17,56 @@ const GameState = {
     hintsUsed: 0
 };
 
-// ===== Word Lists by Level =====
+// ===== Word Lists by Level (Chinese Idioms) =====
+// Based on 100 common Chinese idioms
 const WORD_LISTS = [
-    // Level 1 (4x4, easy 3-4 letter words)
+    // Level 1: Basics
     {
-        words: ['CAT', 'DOG', 'BAT', 'RAT', 'HAT', 'SAT', 'MAT', 'PAT', 'TAP', 'RAP', 'MAP', 'CAP', 'GAP', 'NAP', 'LAP'],
+        words: ['一心一意', '三言兩語', '五顏六色', '七嘴八舌', '九牛一毛', '千方百計', '萬紫千紅', '一針見血'],
+        gridSize: 4,
+        requiredWords: 3
+    },
+    // Level 2: Nature & Animals
+    {
+        words: ['龍飛鳳舞', '畫蛇添足', '守株待兔', '如魚得水', '狐假虎威', '盲人摸象', '走馬觀花', '井底之蛙'],
         gridSize: 4,
         requiredWords: 4
     },
-    // Level 2
+    // Level 3: Actions & Situations
     {
-        words: ['FISH', 'BIRD', 'FROG', 'TREE', 'LEAF', 'WIND', 'RAIN', 'SNOW', 'STAR', 'MOON'],
+        words: ['半途而廢', '持之以恆', '掩耳盜鈴', '破釜沉舟', '背水一戰', '東山再起', '胸有成竹', '草船借箭'],
         gridSize: 4,
         requiredWords: 4
     },
-    // Level 3
+    // Level 4: Values & Character (5x5)
     {
-        words: ['APPLE', 'GRAPE', 'LEMON', 'PEACH', 'BERRY', 'MANGO', 'MELON', 'PLUM', 'PEAR', 'KIWI'],
-        gridSize: 4,
+        words: ['飲水思源', '志同道合', '見利忘義', '捨己為人', '光明磊落', '大公無私', '虛懷若谷', '精益求精'],
+        gridSize: 5,
         requiredWords: 4
     },
-    // Level 4 (5x5)
+    // Level 5: More Animals & Mythology
     {
-        words: ['TIGER', 'LION', 'BEAR', 'WOLF', 'EAGLE', 'SNAKE', 'ZEBRA', 'HORSE', 'DEER', 'RABBIT'],
+        words: ['亡羊補牢', '雞犬升天', '聞雞起舞', '對牛彈琴', '狼心狗肺', '老馬識途', '談虎色變', '葉公好龍'],
         gridSize: 5,
         requiredWords: 5
     },
-    // Level 5
+    // Level 6: Wisdom
     {
-        words: ['OCEAN', 'RIVER', 'LAKE', 'CLOUD', 'STORM', 'FLAME', 'EARTH', 'STONE', 'GRASS', 'FLOWER'],
+        words: ['水到渠成', '順水推舟', '未雨綢繆', '亡羊補牢', '一箭雙雕', '事半功倍', '錦上添花', '雪中送炭'],
         gridSize: 5,
         requiredWords: 5
     },
-    // Level 6
+    // Level 7: Challenging
     {
-        words: ['HAPPY', 'SMILE', 'LAUGH', 'DREAM', 'PEACE', 'LIGHT', 'MUSIC', 'DANCE', 'PAINT', 'WRITE'],
+        words: ['紙上談兵', '指鹿為馬', '朝三暮四', '臥薪嘗膽', '螳臂當車', '破鏡重圓', '名落孫山', '毛遂自薦'],
         gridSize: 5,
         requiredWords: 5
     },
-    // Level 7 (harder)
+    // Level 8: Advanced Master
     {
-        words: ['DRAGON', 'PHOENIX', 'CASTLE', 'KNIGHT', 'WIZARD', 'MAGIC', 'FOREST', 'GARDEN', 'TEMPLE', 'PALACE'],
+        words: ['海闊天空', '冰凍三尺', '夜長夢多', '獨木難支', '水中撈月', '遠水近火', '臨渴掘井', '船到橋頭'],
         gridSize: 5,
-        requiredWords: 5
-    },
-    // Level 8
-    {
-        words: ['CRYSTAL', 'DIAMOND', 'EMERALD', 'SILVER', 'GOLDEN', 'COPPER', 'BRONZE', 'MARBLE', 'PEARL', 'JADE'],
-        gridSize: 5,
-        requiredWords: 5
+        requiredWords: 6
     }
 ];
 
@@ -195,10 +197,10 @@ function generateGrid() {
     GameState.targetWords = placedWords;
     
     // Fill remaining cells with random letters
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = '的一是在不了有和人這中大來上個國到說們為子社分學下自長以行本發成多名後作理道起前所實文用事方於部出資政果加各業也世通其當時產地開發主能間制種現行成水之見一三四五六七八九十百千萬龍飛鳳舞畫蛇添足守株待兔如魚得水狐假虎威盲人摸象走馬觀花井底之蛙半途而廢持之以恆掩耳盜鈴破釜沉舟背水一戰東山再起胸有成竹草船借箭飲水思源志同道合見利忘義捨己為人光明磊落大公無私虛懷若谷精益求精亡羊補牢雞犬升天聞雞起舞對牛彈琴狼心狗肺老馬識途談虎色變葉公好龍水到渠成順水推舟未雨綢繆一箭雙雕事半功倍錦上添花雪中送炭紙上談兵指鹿為馬朝三暮四臥薪嘗膽螳臂當車破鏡重圓名落孫山毛遂自薦海闊天空冰凍三尺夜長夢多獨木難支水中撈月遠水近火臨渴掘井船到橋頭';
     for (let i = 0; i < totalCells; i++) {
         if (GameState.letters[i] === '') {
-            GameState.letters[i] = alphabet[Math.floor(Math.random() * 26)];
+            GameState.letters[i] = alphabet[Math.floor(Math.random() * alphabet.length)];
         }
     }
 }
@@ -396,7 +398,7 @@ function renderLines() {
 function submitWord() {
     const word = GameState.selectedCells.map(i => GameState.letters[i]).join('');
     
-    if (word.length >= 3 && 
+    if (word.length >= 2 && 
         GameState.targetWords.includes(word) && 
         !GameState.foundWords.includes(word)) {
         
@@ -404,9 +406,7 @@ function submitWord() {
         GameState.foundWords.push(word);
         
         // Calculate score
-        let points = 100;
-        if (word.length === 4) points = 200;
-        if (word.length >= 5) points = 300;
+        let points = word.length * 100;
         GameState.score += points;
         
         playSound('success');
@@ -419,7 +419,7 @@ function submitWord() {
         
         renderFoundWords();
         updateUI();
-    } else if (word.length >= 3) {
+    } else if (word.length >= 2) {
         playSound('fail');
     }
     

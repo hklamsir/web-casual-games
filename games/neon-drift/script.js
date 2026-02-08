@@ -24,10 +24,10 @@ let animationId;
 
 // Game Constants
 const TILE_SIZE = 40;
-const PLAYER_SIZE = 12;
-const PATH_WIDTH = 120;
-const INITIAL_SPEED = 4;
-const SPEED_INCREMENT = 0.0005;
+const PLAYER_SIZE = 18; // Increased for car
+const PATH_WIDTH = 150; // Widened path
+const INITIAL_SPEED = 3.5; // Slightly slower start
+const SPEED_INCREMENT = 0.0001; // Reduced continuous increment
 
 // Player Settings
 const player = {
@@ -272,20 +272,52 @@ function draw() {
         ctx.stroke();
     }
 
-    // Draw Player
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowBlur = 20;
+    // Draw Player (Car)
+    drawCar(player.x, player.y, player.direction);
+
+    ctx.restore();
+}
+
+function drawCar(x, y, dir) {
+    ctx.save();
+    ctx.translate(x, y);
+    // Rotate car based on direction (45 degrees)
+    ctx.rotate(dir === 1 ? Math.PI / 4 : -Math.PI / 4);
+    
+    // Shadow glow
+    ctx.shadowBlur = 15;
     ctx.shadowColor = '#ff00ff';
+    
+    // Car Body
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(player.x, player.y, PLAYER_SIZE, 0, Math.PI * 2);
+    ctx.roundRect(-12, -20, 24, 40, 5);
     ctx.fill();
     
-    // Player direction indicator
+    // Windshield
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(-8, -5, 16, 10);
+    
+    // Headlights
+    ctx.fillStyle = '#00ffff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00ffff';
+    ctx.fillRect(-10, -22, 5, 3);
+    ctx.fillRect(5, -22, 5, 3);
+    
+    // Tail lights
+    ctx.fillStyle = '#ff0055';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff0055';
+    ctx.fillRect(-10, 18, 5, 3);
+    ctx.fillRect(5, 18, 5, 3);
+    
+    // Neon side stripes
     ctx.strokeStyle = '#ff00ff';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(player.x, player.y);
-    ctx.lineTo(player.x + player.direction * 20, player.y - 20);
+    ctx.moveTo(-14, -10); ctx.lineTo(-14, 10);
+    ctx.moveTo(14, -10); ctx.lineTo(14, 10);
     ctx.stroke();
 
     ctx.restore();

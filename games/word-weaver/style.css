@@ -226,7 +226,7 @@ main {
 }
 
 #current-word {
-    font-family: 'Ma Shan Zheng', cursive;
+    font-family: 'Noto Serif TC', serif;
     font-size: 2rem;
     color: var(--ink-dark);
     letter-spacing: 8px;
@@ -274,7 +274,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Ma Shan Zheng', cursive;
+    font-family: 'Noto Serif TC', serif; /* Use Noto Serif for better legibility of characters like '井' */
     font-size: 2rem;
     color: var(--ink-dark);
     cursor: pointer;

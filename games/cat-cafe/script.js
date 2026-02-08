@@ -1,5 +1,5 @@
 // Constants
-const INCOME_INTERVAL = 15; // Seconds
+const INCOME_INTERVAL = 60; // Seconds
 
 // Game State
 let game = {
@@ -10,9 +10,9 @@ let game = {
     coffeeType: 1, // Store random coffee machine type
     items: {
         'coffee_machine': { name: '高級咖啡機', cost: 15, income: 0, clickBonus: 1, icon: '⚙️', desc: '點擊收益 +1' },
-        'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每15秒收益 +2' }, // Updated desc
-        'cat_toy': { name: '貓抓板', cost: 200, income: 5, clickBonus: 0, icon: '🧶', desc: '每15秒收益 +5' }, // Updated desc
-        'barista': { name: '雇用店員', cost: 1000, income: 20, clickBonus: 0, icon: '👱‍♀️', desc: '每15秒收益 +20' } // Updated desc
+        'stray_cat': { name: '收留流浪貓', cost: 50, income: 2, clickBonus: 0, icon: '🐱', desc: '每分鐘收益 +2' }, 
+        'cat_toy': { name: '貓抓板', cost: 200, income: 5, clickBonus: 0, icon: '🧶', desc: '每分鐘收益 +5' }, 
+        'barista': { name: '雇用店員', cost: 1000, income: 20, clickBonus: 0, icon: '👱‍♀️', desc: '每分鐘收益 +20' } 
     },
     owned: {
         'coffee_machine': 0,

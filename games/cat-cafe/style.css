@@ -341,13 +341,17 @@ h1 {
         font-size: 3rem;
     }
     
-    h1 { font-size: 1.5rem; top: 15px; left: 20px; }
-    .stats-bar { top: 45px; right: auto; left: 20px; } /* Stack under title */
-    .info-btn { top: 15px; right: 20px; } /* Keep top right */
+    h1 { font-size: 1.5rem; top: 15px; left: 20px; width: 60%; }
+    .stats-bar { top: 45px; right: auto; left: 20px; max-width: 80%; }
+    .info-btn { top: 15px; right: 20px; left: auto; transform: none; }
     
     #coffee-wrapper {
-        bottom: auto !important;
-        top: 100px !important;
+        bottom: 40px !important;
         left: 20px !important;
+        top: auto !important;
+    }
+    
+    #scratcher-display {
+        left: 130px !important; /* Move scratcher to the right of coffee machine */
     }
 }

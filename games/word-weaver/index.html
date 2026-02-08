@@ -47,17 +47,26 @@
         </div>
     </div>
 
+    <!-- Timeout Modal -->
+    <div id="timeout-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 style="color: #ff4466;">⏰ 時間到！</h2>
+            <p>別灰心，成語世界深不可測，再來一次吧！</p>
+            <button id="retry-btn" class="ink-btn" style="margin-top: 20px;">重試本關</button>
+        </div>
+    </div>
+
     <!-- Game Container -->
     <div id="game-container" class="hidden">
         <header>
             <div class="header-left">
-                <button id="back-btn" class="icon-btn" title="返回">🏠</button>
                 <span id="level-display">第 1 關</span>
             </div>
             <div class="header-center">
                 <h1>墨韻織詞</h1>
             </div>
             <div class="header-right">
+                <div id="timer-display" style="margin-right: 15px; color: var(--gold-accent); font-weight: bold;">⏳ 02:00</div>
                 <span id="score-display">0 分</span>
             </div>
         </header>

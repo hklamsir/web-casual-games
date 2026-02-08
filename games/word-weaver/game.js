@@ -15,7 +15,9 @@ const GameState = {
     foundWords: [],
     selectedCells: [],
     isSelecting: false,
-    hintsUsed: 0
+    hintsUsed: 0,
+    timeLeft: 0,
+    timerInterval: null
 };
 
 // ===== Word Lists by Level (Chinese Idioms) =====
@@ -154,9 +156,11 @@ const WORD_LISTS = [
 const DOM = {
     instructionsModal: document.getElementById('instructions-modal'),
     levelModal: document.getElementById('level-modal'),
+    timeoutModal: document.getElementById('timeout-modal'),
     gameContainer: document.getElementById('game-container'),
     startBtn: document.getElementById('start-btn'),
     nextLevelBtn: document.getElementById('next-level-btn'),
+    retryBtn: document.getElementById('retry-btn'),
     backBtn: document.getElementById('back-btn'),
     hintBtn: document.getElementById('hint-btn'),
     shuffleBtn: document.getElementById('shuffle-btn'),
@@ -167,6 +171,7 @@ const DOM = {
     wordsCount: document.getElementById('words-count'),
     levelDisplay: document.getElementById('level-display'),
     scoreDisplay: document.getElementById('score-display'),
+    timerDisplay: document.getElementById('timer-display'),
     levelScoreText: document.getElementById('level-score-text')
 };
 
@@ -243,6 +248,16 @@ function initLevel() {
     GameState.foundWords = [];
     GameState.selectedCells = [];
     GameState.isSelecting = false;
+    
+    // Set time limit based on level difficulty
+    // Level 1-5: 60s, Level 6-15: 120s, Level 16-25: 180s, Level 26-30: 240s
+    if (GameState.level <= 5) GameState.timeLeft = 60;
+    else if (GameState.level <= 15) GameState.timeLeft = 120;
+    else if (GameState.level <= 25) GameState.timeLeft = 180;
+    else GameState.timeLeft = 240;
+    
+    stopTimer();
+    updateTimerDisplay();
     
     // Select random words for this level
     const shuffledWords = [...levelData.words].sort(() => Math.random() - 0.5);
@@ -402,6 +417,40 @@ function updateUI() {
     DOM.scoreDisplay.textContent = `${GameState.score} 分`;
 }
 
+function updateTimerDisplay() {
+    const mins = Math.floor(GameState.timeLeft / 60).toString().padStart(2, '0');
+    const secs = (GameState.timeLeft % 60).toString().padStart(2, '0');
+    DOM.timerDisplay.textContent = `⏳ ${mins}:${secs}`;
+    
+    if (GameState.timeLeft <= 10) {
+        DOM.timerDisplay.style.color = '#ff4466';
+    } else {
+        DOM.timerDisplay.style.color = '';
+    }
+}
+
+function startTimer() {
+    if (GameState.timerInterval) return;
+    GameState.timerInterval = setInterval(() => {
+        GameState.timeLeft--;
+        updateTimerDisplay();
+        if (GameState.timeLeft <= 0) {
+            handleTimeout();
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(GameState.timerInterval);
+    GameState.timerInterval = null;
+}
+
+function handleTimeout() {
+    stopTimer();
+    playSound('fail');
+    DOM.timeoutModal.classList.remove('hidden');
+}
+
 // ===== Selection Logic =====
 function getCellFromPoint(x, y) {
     const element = document.elementFromPoint(x, y);
@@ -499,6 +548,7 @@ function submitWord() {
         
         // Check level complete
         if (GameState.foundWords.length === GameState.targetWords.length) {
+            stopTimer();
             setTimeout(showLevelComplete, 500);
         }
         
@@ -545,6 +595,7 @@ function showLevelComplete() {
 function handleTouchStart(e) {
     e.preventDefault();
     initAudio();
+    startTimer();
     GameState.isSelecting = true;
     
     const touch = e.touches[0];
@@ -571,6 +622,7 @@ function handleTouchEnd(e) {
 
 function handleMouseDown(e) {
     initAudio();
+    startTimer();
     GameState.isSelecting = true;
     const index = parseInt(e.target.dataset.index);
     selectCell(index);
@@ -639,10 +691,10 @@ function init() {
         GameState.level++;
         initLevel();
     });
-    
-    DOM.backBtn.addEventListener('click', () => {
-        DOM.gameContainer.classList.add('hidden');
-        DOM.instructionsModal.classList.remove('hidden');
+
+    DOM.retryBtn.addEventListener('click', () => {
+        DOM.timeoutModal.classList.add('hidden');
+        initLevel();
     });
     
     DOM.hintBtn.addEventListener('click', showHint);

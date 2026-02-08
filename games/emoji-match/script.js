@@ -67,14 +67,14 @@ const EMOJI_POOL = [
 ];
 
 // Time limits per level (in seconds)
-// Calculated based on: pairs * 5 seconds base + buffer
+// Balanced for mobile play
 const LEVELS = [
-    { cols: 3, rows: 2, pairs: 3, timeLimit: 30 },   // Level 1: 6 cards, 30s
+    { cols: 3, rows: 2, pairs: 3, timeLimit: 25 },   // Level 1: 6 cards, 25s
     { cols: 4, rows: 3, pairs: 6, timeLimit: 45 },   // Level 2: 12 cards, 45s
-    { cols: 4, rows: 4, pairs: 8, timeLimit: 60 },   // Level 3: 16 cards, 60s
-    { cols: 5, rows: 4, pairs: 10, timeLimit: 75 },  // Level 4: 20 cards, 75s
-    { cols: 6, rows: 4, pairs: 12, timeLimit: 90 },  // Level 5: 24 cards, 90s
-    { cols: 6, rows: 5, pairs: 15, timeLimit: 120 }  // Level 6: 30 cards, 120s
+    { cols: 4, rows: 4, pairs: 8, timeLimit: 70 },   // Level 3: 16 cards, 70s
+    { cols: 5, rows: 4, pairs: 10, timeLimit: 100 }, // Level 4: 20 cards, 100s
+    { cols: 6, rows: 4, pairs: 12, timeLimit: 140 }, // Level 5: 24 cards, 140s
+    { cols: 6, rows: 5, pairs: 15, timeLimit: 180 }  // Level 6: 30 cards, 180s
 ];
 
 let currentLevel = 0;

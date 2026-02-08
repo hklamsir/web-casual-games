@@ -292,7 +292,7 @@ function updateStats() {
 function spawnObstacle() {
     // Spawn rate: Level 1 = 33 frames, decreasing with level
     const baseRate = 33;
-    const levelReduction = Math.min(level * 2, 15);
+    const levelReduction = Math.min((level - 1) * 2, 15);
     const spawnRate = Math.max(18, baseRate - levelReduction);
     
     if (frames % spawnRate === 0) {

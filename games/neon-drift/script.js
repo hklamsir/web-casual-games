@@ -75,8 +75,9 @@ function addPathSegment() {
     let startX, startY, dir;
     
     if (!lastPath) {
+        // Start exactly where the player is to ensure they are on the path
         startX = player.x;
-        startY = player.y + 100;
+        startY = player.y; 
         dir = 1;
     } else {
         startX = lastPath.endX;

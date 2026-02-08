@@ -11,6 +11,7 @@ const GameState = {
     gridSize: 4,
     letters: [],
     targetWords: [],
+    wordPositions: {}, // Map: word -> array of indices
     foundWords: [],
     selectedCells: [],
     isSelecting: false,
@@ -260,15 +261,18 @@ function generateGrid() {
     const size = GameState.gridSize;
     const totalCells = size * size;
     
-    // Initialize empty grid
+    // Initialize empty grid and positions
     GameState.letters = Array(totalCells).fill('');
+    GameState.wordPositions = {};
     
     // Place words in grid
     const placedWords = [];
     
     for (const word of GameState.targetWords) {
-        if (tryPlaceWord(word)) {
+        const positions = tryPlaceWord(word);
+        if (positions) {
             placedWords.push(word);
+            GameState.wordPositions[word] = positions;
         }
     }
     
@@ -304,12 +308,11 @@ function tryPlaceWord(word) {
         const dir = directions[Math.floor(Math.random() * directions.length)];
         
         if (canPlaceWord(word, startRow, startCol, dir)) {
-            placeWord(word, startRow, startCol, dir);
-            return true;
+            return placeWord(word, startRow, startCol, dir);
         }
     }
     
-    return false;
+    return null;
 }
 
 function canPlaceWord(word, row, col, [dr, dc]) {
@@ -332,13 +335,16 @@ function canPlaceWord(word, row, col, [dr, dc]) {
 
 function placeWord(word, row, col, [dr, dc]) {
     const size = GameState.gridSize;
+    const indices = [];
     
     for (let i = 0; i < word.length; i++) {
         const r = row + i * dr;
         const c = col + i * dc;
         const idx = r * size + c;
         GameState.letters[idx] = word[i];
+        indices.push(idx);
     }
+    return indices;
 }
 
 function renderGrid() {
@@ -589,16 +595,17 @@ function showHint() {
     const unfound = GameState.targetWords.find(w => !GameState.foundWords.includes(w));
     if (!unfound) return;
     
-    // Find the first letter of that word
-    const firstLetter = unfound[0];
+    // Get the actual positions of that word in the grid
+    const positions = GameState.wordPositions[unfound];
+    if (!positions || positions.length === 0) return;
+    
+    // Highlight the first letter's index
+    const firstIndex = positions[0];
     const cells = document.querySelectorAll('.letter-cell');
     
-    for (let i = 0; i < GameState.letters.length; i++) {
-        if (GameState.letters[i] === firstLetter) {
-            cells[i].classList.add('hint');
-            setTimeout(() => cells[i].classList.remove('hint'), 2000);
-            break;
-        }
+    if (cells[firstIndex]) {
+        cells[firstIndex].classList.add('hint');
+        setTimeout(() => cells[firstIndex].classList.remove('hint'), 2000);
     }
     
     GameState.hintsUsed++;

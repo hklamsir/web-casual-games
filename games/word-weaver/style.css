@@ -410,6 +410,11 @@ main {
     z-index: 1000;
 }
 
+/* Back Link Polish */
+.back-link {
+    z-index: 2001 !important;
+}
+
 @keyframes splash {
     0% { transform: scale(0); opacity: 0.5; }
     100% { transform: scale(3); opacity: 0; }

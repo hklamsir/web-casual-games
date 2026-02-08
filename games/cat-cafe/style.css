@@ -342,7 +342,7 @@ h1 {
     }
     
     h1 { font-size: 1.5rem; top: 15px; left: 20px; width: 60%; }
-    .stats-bar { top: 45px; right: auto; left: 20px; max-width: 80%; }
+    .stats-bar { top: 15px; right: 60px; left: auto; max-width: 35%; }
     .info-btn { top: 15px; right: 20px; left: auto; transform: none; }
     
     #coffee-wrapper {

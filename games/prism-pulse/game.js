@@ -14,7 +14,7 @@ class PrismPulse {
         // Game Settings
         this.rows = 8;
         this.cols = 8;
-        this.colors = ['#00f2ff', '#bc13fe', '#ff00ff', '#39ff14', '#fff200', '#ff4d4d'];
+        this.colors = ['#00f2ff', '#bc13fe', '#ff00ff', '#39ff14', '#fff200'];
         this.tileSize = 0;
         this.margin = 4;
         
@@ -66,6 +66,8 @@ class PrismPulse {
         this.draw();
     }
 
+    // Removed handleClick since we use Drag & Drop
+    
     resize() {
         const container = document.getElementById('board-container');
         const size = Math.min(container.clientWidth, container.clientHeight);
@@ -95,26 +97,61 @@ class PrismPulse {
     }
 
     setupEventListeners() {
-        const handleInteraction = (e) => {
-            if (this.isAnimating) return;
-            
+        let isDragging = false;
+        let startPos = null;
+
+        const getPos = (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            return {
+                col: Math.floor(x / (this.tileSize + this.margin)),
+                row: Math.floor(y / (this.tileSize + this.margin))
+            };
+        };
+
+        const handleStart = (e) => {
+            if (this.isAnimating) return;
+            isDragging = true;
+            startPos = getPos(e);
             
-            const col = Math.floor(x / (this.tileSize + this.margin));
-            const row = Math.floor(y / (this.tileSize + this.margin));
-            
-            if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
-                this.handleClick(row, col);
+            if (startPos.row >= 0 && startPos.row < this.rows && startPos.col >= 0 && startPos.col < this.cols) {
+                this.grid[startPos.row][startPos.col].scale = 1.1;
+                this.draw();
             }
         };
 
-        this.canvas.addEventListener('mousedown', handleInteraction);
+        const handleEnd = (e) => {
+            if (!isDragging || !startPos) return;
+            isDragging = false;
+
+            const endPos = getPos(e.changedTouches ? e.changedTouches[0] : e);
+            
+            this.grid[startPos.row][startPos.col].scale = 1;
+
+            const r1 = startPos.row;
+            const c1 = startPos.col;
+            const r2 = endPos.row;
+            const c2 = endPos.col;
+
+            const isAdjacent = (Math.abs(r1 - r2) === 1 && c1 === c2) || (Math.abs(c1 - c2) === 1 && r1 === r2);
+
+            if (isAdjacent && r2 >= 0 && r2 < this.rows && c2 >= 0 && c2 < this.cols) {
+                this.swapTiles(r1, c1, r2, c2);
+            } else {
+                this.draw();
+            }
+            startPos = null;
+        };
+
+        this.canvas.addEventListener('mousedown', handleStart);
+        window.addEventListener('mouseup', handleEnd);
+        
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            handleInteraction(e);
+            handleStart(e);
         }, { passive: false });
+        window.addEventListener('touchend', handleEnd);
 
         document.getElementById('start-game-btn').onclick = () => {
             document.getElementById('instructions-modal').style.display = 'none';
@@ -134,65 +171,33 @@ class PrismPulse {
         };
     }
 
-    handleClick(row, col) {
-        if (!this.grid[row][col]) return;
-
-        if (!this.selectedTile) {
-            this.selectedTile = { row, col };
-            this.grid[row][col].scale = 1.2;
-            this.draw();
-        } else {
-            const r1 = this.selectedTile.row;
-            const c1 = this.selectedTile.col;
-            const r2 = row;
-            const c2 = col;
-
-            // Check if adjacent
-            const isAdjacent = (Math.abs(r1 - r2) === 1 && c1 === c2) || (Math.abs(c1 - c2) === 1 && r1 === r2);
-
-            if (isAdjacent) {
-                this.swapTiles(r1, c1, r2, c2);
-            } else {
-                // Deselect or select new tile
-                this.grid[r1][c1].scale = 1;
-                this.selectedTile = { row, col };
-                this.grid[row][col].scale = 1.2;
-                this.draw();
-            }
-        }
-    }
-
-    async swapTiles(r1, c1, r2, c2) {
+    swapTiles(r1, c1, r2, c2) {
+        if (this.isAnimating) return;
         this.isAnimating = true;
         
-        // Visual swap (simplified for now, just swap data and redraw)
         const temp = this.grid[r1][c1];
         this.grid[r1][c1] = this.grid[r2][c2];
         this.grid[r2][c2] = temp;
         
-        this.grid[r1][c1].scale = 1;
-        this.grid[r2][c2].scale = 1;
-        this.selectedTile = null;
         this.draw();
 
-        await this.delay(200);
-
-        const match1 = this.findMatch(r1, c1);
-        const match2 = this.findMatch(r2, c2);
-        
-        if (match1.length >= 3 || match2.length >= 3) {
-            this.combo = 1;
-            const fullMatch = [...new Set([...match1, ...match2].map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
-            this.processMatch(fullMatch);
-        } else {
-            // Swap back if no match
-            await this.delay(100);
-            const tempBack = this.grid[r1][c1];
-            this.grid[r1][c1] = this.grid[r2][c2];
-            this.grid[r2][c2] = tempBack;
-            this.draw();
-            this.isAnimating = false;
-        }
+        setTimeout(async () => {
+            const match1 = this.findMatch(r1, c1);
+            const match2 = this.findMatch(r2, c2);
+            
+            if (match1.length >= 3 || match2.length >= 3) {
+                this.combo = 1;
+                const fullMatch = [...new Set([...match1, ...match2].map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
+                this.processMatch(fullMatch);
+            } else {
+                await this.delay(100);
+                const tempBack = this.grid[r1][c1];
+                this.grid[r1][c1] = this.grid[r2][c2];
+                this.grid[r2][c2] = tempBack;
+                this.draw();
+                this.isAnimating = false;
+            }
+        }, 100);
     }
 
     findMatch(row, col) {

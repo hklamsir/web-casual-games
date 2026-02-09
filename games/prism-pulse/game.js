@@ -25,8 +25,34 @@ class PrismPulse {
         this.target = 1000;
         this.isAnimating = false;
         this.hintTimeout = null;
+        this.combo = 0;
+        this.comboTimeout = null;
         
+        this.initAudio();
         this.init();
+    }
+
+    initAudio() {
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    playPopSound(pitch = 1) {
+        if (!this.audioCtx) return;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440 * pitch, this.audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, this.audioCtx.currentTime + 0.2);
+        
+        gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.2);
+        
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.2);
     }
 
     init() {
@@ -111,6 +137,7 @@ class PrismPulse {
         if (!this.grid[row][col]) return;
         const match = this.findMatch(row, col);
         if (match.length >= 3) {
+            this.combo = 1;
             this.processMatch(match);
         } else {
             // Small visual feedback for invalid move
@@ -157,7 +184,10 @@ class PrismPulse {
         });
         
         const matchSize = match.length;
-        this.score += matchSize * matchSize * 10;
+        const comboBonus = this.combo > 1 ? this.combo : 1;
+        this.score += matchSize * matchSize * 10 * comboBonus;
+        
+        this.playPopSound(0.5 + (this.combo * 0.2));
         this.updateUI();
 
         await this.delay(200);
@@ -166,10 +196,10 @@ class PrismPulse {
         for (let c = 0; c < this.cols; c++) {
             let emptySpaces = 0;
             for (let r = this.rows - 1; r >= 0; r--) {
-                if (this.grid[r][c].isPopping) {
+                if (this.grid[r][c] && this.grid[r][c].isPopping) {
                     emptySpaces++;
                     this.grid[r][c] = null;
-                } else if (emptySpaces > 0) {
+                } else if (emptySpaces > 0 && this.grid[r][c]) {
                     const tile = this.grid[r][c];
                     this.grid[r + emptySpaces][c] = tile;
                     tile.yOffset = -emptySpaces * (this.tileSize + this.margin);
@@ -208,14 +238,34 @@ class PrismPulse {
             if (!finished) {
                 requestAnimationFrame(step);
             } else {
-                this.isAnimating = false;
-                this.checkLevelUp();
-                if (!this.hasValidMove()) {
-                    this.gameOver();
-                }
+                this.checkAutoMatch();
             }
         };
         requestAnimationFrame(step);
+    }
+
+    async checkAutoMatch() {
+        let hasMatch = false;
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const match = this.findMatch(r, c);
+                if (match.length >= 3) {
+                    this.combo++;
+                    await this.processMatch(match);
+                    hasMatch = true;
+                    return; // Process one match at a time for chain effect
+                }
+            }
+        }
+
+        if (!hasMatch) {
+            this.isAnimating = false;
+            this.combo = 0;
+            this.checkLevelUp();
+            if (!this.hasValidMove()) {
+                this.gameOver();
+            }
+        }
     }
 
     hasValidMove() {
@@ -284,6 +334,14 @@ class PrismPulse {
         this.scoreDisplay.innerText = this.score;
         this.levelDisplay.innerText = this.level;
         this.targetDisplay.innerText = this.target;
+        
+        const comboEl = document.getElementById('combo-display');
+        if (this.combo > 1) {
+            comboEl.innerText = `${this.combo} COMBO!`;
+            comboEl.style.opacity = '1';
+        } else {
+            comboEl.style.opacity = '0';
+        }
     }
 
     draw() {

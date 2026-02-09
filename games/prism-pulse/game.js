@@ -27,6 +27,7 @@ class PrismPulse {
         this.hintTimeout = null;
         this.combo = 0;
         this.comboTimeout = null;
+        this.selectedTile = null;
         
         this.initAudio();
         this.init();
@@ -135,44 +136,99 @@ class PrismPulse {
 
     handleClick(row, col) {
         if (!this.grid[row][col]) return;
-        const match = this.findMatch(row, col);
-        if (match.length >= 3) {
-            this.combo = 1;
-            this.processMatch(match);
-        } else {
-            // Small visual feedback for invalid move
+
+        if (!this.selectedTile) {
+            this.selectedTile = { row, col };
             this.grid[row][col].scale = 1.2;
-            setTimeout(() => this.grid[row][col].scale = 1, 100);
             this.draw();
+        } else {
+            const r1 = this.selectedTile.row;
+            const c1 = this.selectedTile.col;
+            const r2 = row;
+            const c2 = col;
+
+            // Check if adjacent
+            const isAdjacent = (Math.abs(r1 - r2) === 1 && c1 === c2) || (Math.abs(c1 - c2) === 1 && r1 === r2);
+
+            if (isAdjacent) {
+                this.swapTiles(r1, c1, r2, c2);
+            } else {
+                // Deselect or select new tile
+                this.grid[r1][c1].scale = 1;
+                this.selectedTile = { row, col };
+                this.grid[row][col].scale = 1.2;
+                this.draw();
+            }
+        }
+    }
+
+    async swapTiles(r1, c1, r2, c2) {
+        this.isAnimating = true;
+        
+        // Visual swap (simplified for now, just swap data and redraw)
+        const temp = this.grid[r1][c1];
+        this.grid[r1][c1] = this.grid[r2][c2];
+        this.grid[r2][c2] = temp;
+        
+        this.grid[r1][c1].scale = 1;
+        this.grid[r2][c2].scale = 1;
+        this.selectedTile = null;
+        this.draw();
+
+        await this.delay(200);
+
+        const match1 = this.findMatch(r1, c1);
+        const match2 = this.findMatch(r2, c2);
+        
+        if (match1.length >= 3 || match2.length >= 3) {
+            this.combo = 1;
+            const fullMatch = [...new Set([...match1, ...match2].map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
+            this.processMatch(fullMatch);
+        } else {
+            // Swap back if no match
+            await this.delay(100);
+            const tempBack = this.grid[r1][c1];
+            this.grid[r1][c1] = this.grid[r2][c2];
+            this.grid[r2][c2] = tempBack;
+            this.draw();
+            this.isAnimating = false;
         }
     }
 
     findMatch(row, col) {
         if (!this.grid[row][col]) return [];
         const colorIndex = this.grid[row][col].colorIndex;
-        const queue = [[row, col]];
-        const match = [];
-        const visited = new Set();
-        visited.add(`${row},${col}`);
+        
+        // Match-3 Style: Vertical and Horizontal check
+        let horizontalMatch = [[row, col]];
+        let verticalMatch = [[row, col]];
 
-        while (queue.length > 0) {
-            const [r, c] = queue.shift();
-            match.push([r, c]);
-
-            const neighbors = [
-                [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]
-            ];
-
-            for (const [nr, nc] of neighbors) {
-                if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols &&
-                    !visited.has(`${nr},${nc}`) &&
-                    this.grid[nr][nc].colorIndex === colorIndex) {
-                    visited.add(`${nr},${nc}`);
-                    queue.push([nr, nc]);
-                }
-            }
+        // Check horizontal
+        for (let c = col - 1; c >= 0; c--) {
+            if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) horizontalMatch.push([row, c]);
+            else break;
         }
-        return match;
+        for (let c = col + 1; c < this.cols; c++) {
+            if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) horizontalMatch.push([row, c]);
+            else break;
+        }
+
+        // Check vertical
+        for (let r = row - 1; r >= 0; r--) {
+            if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) verticalMatch.push([r, col]);
+            else break;
+        }
+        for (let r = row + 1; r < this.rows; r++) {
+            if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) verticalMatch.push([r, col]);
+            else break;
+        }
+
+        let finalMatch = [];
+        if (horizontalMatch.length >= 3) finalMatch = finalMatch.concat(horizontalMatch);
+        if (verticalMatch.length >= 3) finalMatch = finalMatch.concat(verticalMatch);
+
+        // Remove duplicates if cross match
+        return [...new Set(finalMatch.map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
     }
 
     async processMatch(match) {
@@ -246,23 +302,17 @@ class PrismPulse {
 
     async checkAutoMatch() {
         let hasMatch = false;
-        const processed = new Set();
 
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                if (processed.has(`${r},${c}`)) continue;
                 if (!this.grid[r][c]) continue;
-                
                 const match = this.findMatch(r, c);
-                // Auto-match only triggers for 4 or more to leave moves for player
-                if (match.length >= 4) {
+                if (match.length >= 3) {
                     this.combo++;
                     await this.processMatch(match);
                     hasMatch = true;
                     return; 
                 }
-                
-                match.forEach(([mr, mc]) => processed.add(`${mr},${mc}`));
             }
         }
 
@@ -289,14 +339,36 @@ class PrismPulse {
     }
 
     hasValidMove() {
+        // For Match-3 Swap: Check if any swap results in a match
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                if (!this.grid[r][c]) continue;
-                const match = this.findMatch(r, c);
-                if (match.length >= 3) return true;
+                // Try swap right
+                if (c < this.cols - 1) {
+                    if (this.testSwap(r, c, r, c + 1)) return true;
+                }
+                // Try swap down
+                if (r < this.rows - 1) {
+                    if (this.testSwap(r, c, r + 1, c)) return true;
+                }
             }
         }
         return false;
+    }
+
+    testSwap(r1, c1, r2, c2) {
+        // Temporary swap
+        const temp = this.grid[r1][c1];
+        this.grid[r1][c1] = this.grid[r2][c2];
+        this.grid[r2][c2] = temp;
+
+        const isMatch = this.findMatch(r1, c1).length >= 3 || this.findMatch(r2, c2).length >= 3;
+
+        // Swap back
+        const tempBack = this.grid[r1][c1];
+        this.grid[r1][c1] = this.grid[r2][c2];
+        this.grid[r2][c2] = tempBack;
+
+        return isMatch;
     }
 
     checkLevelUp() {

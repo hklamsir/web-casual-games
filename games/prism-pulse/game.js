@@ -238,16 +238,49 @@ class PrismPulse {
         } else if (tile.type === 'col') {
             for (let i = 0; i < this.rows; i++) toPop.push([i, c]);
         } else if (tile.type === 'color') {
-            const color = tile.colorIndex;
-            for (let row = 0; row < this.rows; row++) {
-                for (let col = 0; col < this.cols; col++) {
-                    if (this.grid[row][col] && this.grid[row][col].colorIndex === color) toPop.push([row, col]);
-                }
-            }
+            this.showColorSelector(tile.colorIndex, r, c);
+            return;
         }
         
         this.playSpecialSound();
         this.processMatch(toPop);
+    }
+
+    showColorSelector(defaultColorIndex, r, c) {
+        // Create a temporary overlay for color selection
+        const container = document.getElementById('board-container');
+        const overlay = document.createElement('div');
+        overlay.id = 'color-selector-overlay';
+        overlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; background:rgba(0,0,0,0.7); z-index:50; border-radius:10px; padding:20px; gap:15px;';
+        
+        const title = document.createElement('div');
+        title.innerText = "選擇要消除的顏色";
+        title.style.cssText = 'width:100%; text-align:center; font-family:Orbitron; color:white; font-size:1.2rem; margin-bottom:10px;';
+        overlay.appendChild(title);
+
+        this.colors.forEach((color, index) => {
+            const btn = document.createElement('div');
+            btn.style.cssText = `width:60px; height:60px; background:${color}; border-radius:50%; cursor:pointer; box-shadow:0 0 15px ${color}; border:3px solid white; transition:transform 0.2s;`;
+            btn.onclick = () => {
+                const toPop = [];
+                for (let row = 0; row < this.rows; row++) {
+                    for (let col = 0; col < this.cols; col++) {
+                        if (this.grid[row][col] && this.grid[row][col].colorIndex === index) toPop.push([row, col]);
+                    }
+                }
+                // Also pop the item itself
+                toPop.push([r, c]);
+                
+                this.playSpecialSound();
+                this.processMatch(toPop);
+                overlay.remove();
+            };
+            btn.onmouseenter = () => btn.style.transform = 'scale(1.1)';
+            btn.onmouseleave = () => btn.style.transform = 'scale(1)';
+            overlay.appendChild(btn);
+        });
+
+        container.appendChild(overlay);
     }
 
     findMatch(row, col) {
@@ -268,18 +301,28 @@ class PrismPulse {
         this.isAnimating = true;
         let createdItem = null;
         
-        // Items logic: only if the match came from a user move or special case
+        // 1. Identify match center (most likely the moved tile or central tile)
+        // For simplicity, we use the first coordinate as the creation point
         if (this.combo === 1) {
             if (match.length === 4) {
                 const [r, c] = match[0];
-                createdItem = { r, c, type: Math.random() > 0.5 ? 'row' : 'col' };
+                createdItem = { r, c, type: Math.random() > 0.5 ? 'row' : 'col', colorIndex: this.grid[r][c].colorIndex };
             } else if (match.length >= 5) {
                 const [r, c] = match[0];
-                createdItem = { r, c, type: 'color' };
+                createdItem = { r, c, type: 'color', colorIndex: this.grid[r][c].colorIndex };
             }
         }
 
-        match.forEach(([r, c]) => { if (this.grid[r][c]) this.grid[r][c].isPopping = true; });
+        match.forEach(([r, c]) => { 
+            if (this.grid[r][c]) {
+                this.grid[r][c].isPopping = true; 
+                // Don't pop the tile that will become an item
+                if (createdItem && r === createdItem.r && c === createdItem.c) {
+                    this.grid[r][c].isPopping = false;
+                }
+            }
+        });
+
         this.score += match.length * match.length * 10 * (this.combo || 1);
         this.playPopSound(0.5 + (this.combo * 0.2));
         this.updateUI();
@@ -291,10 +334,12 @@ class PrismPulse {
                 if (this.grid[r][c] && this.grid[r][c].isPopping) {
                     empty++;
                     this.grid[r][c] = null;
-                } else if (empty > 0 && this.grid[r][c]) {
-                    this.grid[r + empty][c] = this.grid[r][c];
-                    this.grid[r + empty][c].yOffset = -empty * (this.tileSize + this.margin);
-                    this.grid[r][c] = null;
+                } else if (this.grid[r][c]) {
+                    if (empty > 0) {
+                        this.grid[r + empty][c] = this.grid[r][c];
+                        this.grid[r + empty][c].yOffset = -empty * (this.tileSize + this.margin);
+                        this.grid[r][c] = null;
+                    }
                 }
             }
             for (let r = 0; r < empty; r++) {
@@ -303,9 +348,15 @@ class PrismPulse {
         }
 
         if (createdItem) {
-            const { r, c, type } = createdItem;
-            this.grid[r][c].type = type;
-            this.grid[r][c].isPopping = false;
+            const { r, c, type, colorIndex } = createdItem;
+            // Find where the non-popped tile landed after physics
+            // Or just place it at the top if it was destroyed (logic safety)
+            for (let row = this.rows - 1; row >= 0; row--) {
+                if (this.grid[row][c] && !this.grid[row][c].isPopping && this.grid[row][c].colorIndex === colorIndex) {
+                    this.grid[row][c].type = type;
+                    break;
+                }
+            }
         }
 
         this.animateFall();

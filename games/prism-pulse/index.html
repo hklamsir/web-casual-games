@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>棱鏡脈衝 | Prism Pulse</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <div class="stat-item">
+                <span class="label">分數</span>
+                <span id="score-val">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">等級</span>
+                <span id="level-val">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">目標</span>
+                <span id="target-val">1000</span>
+            </div>
+        </header>
+
+        <div id="board-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+
+        <footer>
+            <button id="hint-btn" class="game-btn">提示</button>
+            <button id="back-btn" class="game-btn">返回大廳</button>
+        </footer>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h2>棱鏡脈衝 Prism Pulse</h2>
+            <div class="instruction-body">
+                <p>這是一款快節奏的色彩配對遊戲。</p>
+                <ul>
+                    <li><strong>如何遊玩：</strong> 點擊或觸碰 3 個或以上相連的同色棱鏡。</li>
+                    <li><strong>連鎖反應：</strong> 一次消除越多，分數越高。</li>
+                    <li><strong>升級：</strong> 達到目標分數即可進入下一關。</li>
+                    <li><strong>提示：</strong> 卡關時可以使用提示功能。</li>
+                </ul>
+            </div>
+            <button id="start-game-btn" class="primary-btn">開始遊戲</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2 id="final-status">遊戲結束</h2>
+            <p>最終得分：<span id="final-score">0</span></p>
+            <p>最終等級：<span id="final-level">1</span></p>
+            <button id="restart-btn" class="primary-btn">再次挑戰</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

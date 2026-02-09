@@ -10,41 +10,41 @@ fontSize: 12
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has expanded to **11 unique games**. The latest addition, **Glitch Sorter (電幻修復師)**, introduces the **sorting/reaction** genre, further diversifying the platform's offerings. The project continues to maintain high standards for mobile responsiveness and performance.
+The `web-casual-games` project has reached a major milestone with **12 unique games**. The latest additions, **Glitch Sorter (電幻修復師)** and **Prism Pulse (棱鏡脈衝)**, have significantly broadened the variety of gameplay mechanics. The platform now features a healthy mix of arcade, puzzle, rhythm, and idle genres.
 
 ## 2. Recent Changes & Fixes
 
-### 🔧 Glitch Sorter (New)
-*   **Genre**: Arcade Sorting / Reaction.
-*   **Architecture**: Canvas-based entity-component system (Core, Particle).
+### 💎 Prism Pulse (New)
+*   **Genre**: Match-3 / Collapse Puzzle.
+*   **Architecture**: Canvas-based grid rendering with a recursive flood-fill algorithm for match detection.
 *   **Core Mechanics**:
-    *   **Color-Coded Sorting**: Red cores must be dragged to the left gate, blue to the right.
-    *   **Drag-and-Drop Interaction**: Optimized for both mouse and multi-touch mobile devices.
-    *   **Energy Management**: Missing cores or wrong sorting depletes the energy bar. Correct sorting restores a small amount.
-    *   **Procedural Difficulty**: Core spawn rate and vertical velocity scale with the current level (determined by score).
+    *   **Collapse Logic**: Click any group of 3 or more connected identical prisms to clear them.
+    *   **Chain Reactions**: Gravity-based falling tiles and automatic refill from the top.
+    *   **Score Scaling**: Quadratic scoring (size * size * 10) encourages players to build larger clusters.
+    *   **Progression**: Level-up system with increasing score targets.
+    *   **Hint System**: Automated search for the largest available match to assist players.
 *   **Visuals**:
-    *   Cyberpunk / "Data Stream" aesthetic.
-    *   Post-processing effects: Scanlines and screen flicker.
-    *   Particle explosion system for feedback on success/failure.
-    *   CSS-based Glitch text effects for UI overlays.
-*   **Mobile Support**: Full-screen touch control, auto-canvas resizing, and large hitboxes for easier dragging on small screens.
+    *   Neon/Glassmorphism aesthetic with high-contrast glowing colors.
+    *   Procedural Hexagonal tile rendering on Canvas.
+    *   Scale-based animations for "popping" and "falling" effects.
+*   **Mobile Support**: Full touch-screen compatibility with `touchstart` event optimization.
 
-### 🏠 Global Navigation (Update)
-*   Updated `index.html` with the 11th game card.
-*   Standardized the "Back to Hall" navigation links across new games.
+### 🔧 Glitch Sorter (Previous)
+*   **Genre**: Arcade Sorting / Reaction.
+*   **Update**: Confirmed stability in sorting logic and particle system performance.
 
-## 3. Detailed Review: Glitch Sorter
+## 3. Detailed Review: Prism Pulse
 
 #### Pros
-*   **Intuitive Gameplay**: The drag-and-drop mechanic is instantly understood.
-*   **Satisfying Feedback**: Particle effects and screen shakes (simulated by flicker) provide strong positive/negative reinforcement.
-*   **Performance**: Lightweight rendering loop ensures 60 FPS even with multiple cores and particles on screen.
-*   **Visual Cohesion**: The cyberpunk theme is consistently applied across HTML, CSS, and Canvas elements.
+*   **High Polish**: The hexagonal tiles and glowing effects give the game a premium "Cyber-Gem" feel.
+*   **Recursive Efficiency**: The flood-fill algorithm for matching is efficient enough for instantaneous results on an 8x8 grid.
+*   **User Guidance**: The inclusion of a Hint system and an Instruction modal ensures accessibility for new players.
+*   **Responsive Layout**: The canvas dynamically resizes while maintaining square aspect ratios and tile proportions.
 
 #### Cons / Improvements
-*   **Input Conflict**: On some mobile browsers, dragging too fast near the edge might trigger "swipe back" navigation. A `touch-action: none` CSS rule was applied to mitigate this.
-*   **Power-Ups**: Could add "Freeze" or "Auto-Sort" items to deepen the gameplay.
-*   **Audio**: Currently lacks audio. Integration of synth-style sound effects is recommended for the next sprint.
+*   **Sound Effects**: Like many other modules, audio is currently absent. Adding "Chime" sounds for matches and "Pulse" sounds for level-ups would greatly enhance the experience.
+*   **Animation Sophistication**: The falling animation is currently a linear velocity move; adding easing (e.g., bounce) would improve the "juice" of the game.
+*   **State Persistence**: Current score and level are not saved in LocalStorage. Adding save states would encourage longer play sessions.
 
 ## 4. Project-Wide Status
 
@@ -53,14 +53,15 @@ The `web-casual-games` project has expanded to **11 unique games**. The latest a
 | Cat Café | Idle | ✅ | ❌ | Balanced |
 | Neon Snake | Arcade | ✅ | ❌ | Stable |
 | Space Invaders | Shooter | ✅ | ✅ | Stable |
-| Emoji Match | Puzzle | ✅ | ✅ | Timer Mode Added |
+| Emoji Match | Puzzle | ✅ | ✅ | Stable |
 | Gravity Switch | Runner | ✅ | ❌ | Balanced |
 | Quantum 2048 | Puzzle | ✅ | ❌ | Stable |
 | Zen Stack | Stacking | ✅ | ❌ | Stable |
 | Synth Flow | Rhythm | ✅ | ✅ | Stable |
-| Word Weaver | Word Puzzle | ✅ | ✅ | Idiom Mode Added |
+| Word Weaver | Word Puzzle | ✅ | ✅ | Stable |
 | Neon Drift | Arcade | ✅ | ❌ | Stable |
-| **Glitch Sorter** | **Sorting** | ✅ | ❌ | **New Release** |
+| Glitch Sorter | Sorting | ✅ | ❌ | Stable |
+| **Prism Pulse** | **Match-3** | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
 The collection now covers:
@@ -68,20 +69,20 @@ The collection now covers:
 | Category | Games |
 |----------|-------|
 | **Idle** | Cat Café |
-| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, **Glitch Sorter** |
-| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter |
+| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, **Prism Pulse** |
 | **Physics** | Zen Stack |
 | **Rhythm** | Synth Flow |
 
 **Next Target Genres:**
 - Strategy (Mini Tower Defense)
 - Physics Trajectory (Angry Birds style)
-- Card/Board (Casual Solitaire)
+- Simulation (Simple Life-Sim)
 
 ## 6. Maintenance Tasks
-- [ ] **Global Audio Manager**: Create a shared library for sound effects to standardize audio implementation.
-- [ ] **Asset Preloading**: Implement a unified loading screen for games with external assets.
-- [ ] **Achievements System**: Add a local storage-based achievement tracker.
+- [ ] **Universal Audio Framework**: Standardize audio loading and playback.
+- [ ] **Global Leaderboard**: Implement a simple backend or Firebase integration for high scores.
+- [ ] **Theme Switcher**: Allow users to toggle between "Pastel" and "Cyber" themes globally.
 
 ---
 *Report generated by OpenClaw 🦋*

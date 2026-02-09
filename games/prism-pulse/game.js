@@ -1,5 +1,5 @@
 /**
- * Prism Pulse - Match-3 Collapse Game
+ * Prism Pulse - Match-3 Swap Game
  * Author: OpenClaw (Xiaoxin)
  */
 
@@ -24,10 +24,9 @@ class PrismPulse {
         this.level = 1;
         this.target = 1000;
         this.isAnimating = false;
-        this.hintTimeout = null;
         this.combo = 0;
-        this.comboTimeout = null;
         this.selectedTile = null;
+        this.dragData = null; // { startRow, startCol, currentRow, currentCol, offsetX, offsetY }
         
         this.initAudio();
         this.init();
@@ -41,33 +40,41 @@ class PrismPulse {
         if (!this.audioCtx) return;
         const osc = this.audioCtx.createOscillator();
         const gain = this.audioCtx.createGain();
-        
         osc.type = 'sine';
         osc.frequency.setValueAtTime(440 * pitch, this.audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(10, this.audioCtx.currentTime + 0.2);
-        
         gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.2);
-        
         osc.connect(gain);
         gain.connect(this.audioCtx.destination);
-        
         osc.start();
         osc.stop(this.audioCtx.currentTime + 0.2);
+    }
+
+    playSpecialSound() {
+        if (!this.audioCtx) return;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(200, this.audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(800, this.audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.3);
     }
 
     init() {
         this.createGrid();
         this.resize();
         window.addEventListener('resize', () => this.resize());
-        
         this.setupEventListeners();
         this.updateUI();
         this.draw();
     }
 
-    // Removed handleClick since we use Drag & Drop
-    
     resize() {
         const container = document.getElementById('board-container');
         const size = Math.min(container.clientWidth, container.clientHeight);
@@ -86,25 +93,23 @@ class PrismPulse {
                     colorIndex: Math.floor(Math.random() * this.colors.length),
                     isPopping: false,
                     scale: 1,
-                    yOffset: 0
+                    yOffset: 0,
+                    type: 'normal' // 'normal', 'row', 'col', 'color'
                 };
             }
         }
-        // Ensure there's at least one move
-        if (!this.hasValidMove()) {
-            this.createGrid();
-        }
+        if (!this.hasValidMove()) this.createGrid();
     }
 
     setupEventListeners() {
-        let isDragging = false;
-        let startPos = null;
-
         const getPos = (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
             return {
+                x, y,
                 col: Math.floor(x / (this.tileSize + this.margin)),
                 row: Math.floor(y / (this.tileSize + this.margin))
             };
@@ -112,171 +117,195 @@ class PrismPulse {
 
         const handleStart = (e) => {
             if (this.isAnimating) return;
-            isDragging = true;
-            startPos = getPos(e);
-            
-            if (startPos.row >= 0 && startPos.row < this.rows && startPos.col >= 0 && startPos.col < this.cols) {
-                this.grid[startPos.row][startPos.col].scale = 1.1;
-                this.draw();
+            const pos = getPos(e);
+            if (pos.row >= 0 && pos.row < this.rows && pos.col >= 0 && pos.col < this.cols) {
+                const tile = this.grid[pos.row][pos.col];
+                if (tile.type !== 'normal') {
+                    this.triggerItem(pos.row, pos.col);
+                    return;
+                }
+                this.dragData = {
+                    startRow: pos.row,
+                    startCol: pos.col,
+                    startX: pos.x,
+                    startY: pos.y,
+                    offsetX: 0,
+                    offsetY: 0,
+                    targetRow: pos.row,
+                    targetCol: pos.col
+                };
             }
         };
 
-        const handleEnd = (e) => {
-            if (!isDragging || !startPos) return;
-            isDragging = false;
+        const handleMove = (e) => {
+            if (!this.dragData) return;
+            const pos = getPos(e);
+            let dx = pos.x - this.dragData.startX;
+            let dy = pos.y - this.dragData.startY;
 
-            const endPos = getPos(e.changedTouches ? e.changedTouches[0] : e);
-            
-            this.grid[startPos.row][startPos.col].scale = 1;
+            // Constrain to one axis and max tileSize
+            if (Math.abs(dx) > Math.abs(dy)) {
+                dy = 0;
+                dx = Math.max(-this.tileSize, Math.min(this.tileSize, dx));
+            } else {
+                dx = 0;
+                dy = Math.max(-this.tileSize, Math.min(this.tileSize, dy));
+            }
 
-            const r1 = startPos.row;
-            const c1 = startPos.col;
-            const r2 = endPos.row;
-            const c2 = endPos.col;
+            this.dragData.offsetX = dx;
+            this.dragData.offsetY = dy;
 
-            const isAdjacent = (Math.abs(r1 - r2) === 1 && c1 === c2) || (Math.abs(c1 - c2) === 1 && r1 === r2);
+            // Determine target neighbor
+            let tr = this.dragData.startRow;
+            let tc = this.dragData.startCol;
+            if (dx > this.tileSize * 0.5) tc++;
+            else if (dx < -this.tileSize * 0.5) tc--;
+            else if (dy > this.tileSize * 0.5) tr++;
+            else if (dy < -this.tileSize * 0.5) tr--;
 
-            if (isAdjacent && r2 >= 0 && r2 < this.rows && c2 >= 0 && c2 < this.cols) {
-                this.swapTiles(r1, c1, r2, c2);
+            if (tr >= 0 && tr < this.rows && tc >= 0 && tc < this.cols && (tr !== this.dragData.startRow || tc !== this.dragData.startCol)) {
+                this.dragData.targetRow = tr;
+                this.dragData.targetCol = tc;
+            } else {
+                this.dragData.targetRow = this.dragData.startRow;
+                this.dragData.targetCol = this.dragData.startCol;
+            }
+
+            this.draw();
+        };
+
+        const handleEnd = () => {
+            if (!this.dragData) return;
+            const { startRow, startCol, targetRow, targetCol } = this.dragData;
+            const dData = this.dragData;
+            this.dragData = null;
+
+            if (targetRow !== startRow || targetCol !== startCol) {
+                this.swapTiles(startRow, startCol, targetRow, targetCol);
             } else {
                 this.draw();
             }
-            startPos = null;
         };
 
         this.canvas.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
-        
-        this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            handleStart(e);
-        }, { passive: false });
+        this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(e); }, { passive: false });
+        window.addEventListener('touchmove', (e) => { handleMove(e); });
         window.addEventListener('touchend', handleEnd);
 
         document.getElementById('start-game-btn').onclick = () => {
             document.getElementById('instructions-modal').style.display = 'none';
         };
-
         document.getElementById('restart-btn').onclick = () => {
             this.resetGame();
             document.getElementById('game-over-modal').style.display = 'none';
         };
-
-        document.getElementById('back-btn').onclick = () => {
-            window.location.href = '../../index.html';
-        };
-
-        document.getElementById('hint-btn').onclick = () => {
-            this.showHint();
-        };
+        document.getElementById('back-btn').onclick = () => { window.location.href = '../../index.html'; };
+        document.getElementById('hint-btn').onclick = () => { this.showHint(); };
     }
 
-    swapTiles(r1, c1, r2, c2) {
-        if (this.isAnimating) return;
+    async swapTiles(r1, c1, r2, c2) {
         this.isAnimating = true;
-        
         const temp = this.grid[r1][c1];
         this.grid[r1][c1] = this.grid[r2][c2];
         this.grid[r2][c2] = temp;
-        
         this.draw();
+        await this.delay(150);
 
-        setTimeout(async () => {
-            const match1 = this.findMatch(r1, c1);
-            const match2 = this.findMatch(r2, c2);
-            
-            if (match1.length >= 3 || match2.length >= 3) {
-                this.combo = 1;
-                const fullMatch = [...new Set([...match1, ...match2].map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
-                this.processMatch(fullMatch);
-            } else {
-                await this.delay(100);
-                const tempBack = this.grid[r1][c1];
-                this.grid[r1][c1] = this.grid[r2][c2];
-                this.grid[r2][c2] = tempBack;
-                this.draw();
-                this.isAnimating = false;
+        const m1 = this.findMatch(r1, c1);
+        const m2 = this.findMatch(r2, c2);
+        if (m1.length >= 3 || m2.length >= 3) {
+            this.combo = 1;
+            const fullMatch = [...new Set([...m1, ...m2].map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
+            this.processMatch(fullMatch);
+        } else {
+            const tempBack = this.grid[r1][c1];
+            this.grid[r1][c1] = this.grid[r2][c2];
+            this.grid[r2][c2] = tempBack;
+            this.draw();
+            this.isAnimating = false;
+        }
+    }
+
+    async triggerItem(r, c) {
+        this.isAnimating = true;
+        const tile = this.grid[r][c];
+        let toPop = [];
+
+        if (tile.type === 'row') {
+            for (let i = 0; i < this.cols; i++) toPop.push([r, i]);
+        } else if (tile.type === 'col') {
+            for (let i = 0; i < this.rows; i++) toPop.push([i, c]);
+        } else if (tile.type === 'color') {
+            const color = tile.colorIndex;
+            for (let row = 0; row < this.rows; row++) {
+                for (let col = 0; col < this.cols; col++) {
+                    if (this.grid[row][col] && this.grid[row][col].colorIndex === color) toPop.push([row, col]);
+                }
             }
-        }, 100);
+        }
+        
+        this.playSpecialSound();
+        this.processMatch(toPop);
     }
 
     findMatch(row, col) {
         if (!this.grid[row][col]) return [];
         const colorIndex = this.grid[row][col].colorIndex;
-        
-        // Match-3 Style: Vertical and Horizontal check
-        let horizontalMatch = [[row, col]];
-        let verticalMatch = [[row, col]];
-
-        // Check horizontal
-        for (let c = col - 1; c >= 0; c--) {
-            if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) horizontalMatch.push([row, c]);
-            else break;
-        }
-        for (let c = col + 1; c < this.cols; c++) {
-            if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) horizontalMatch.push([row, c]);
-            else break;
-        }
-
-        // Check vertical
-        for (let r = row - 1; r >= 0; r--) {
-            if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) verticalMatch.push([r, col]);
-            else break;
-        }
-        for (let r = row + 1; r < this.rows; r++) {
-            if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) verticalMatch.push([r, col]);
-            else break;
-        }
-
-        let finalMatch = [];
-        if (horizontalMatch.length >= 3) finalMatch = finalMatch.concat(horizontalMatch);
-        if (verticalMatch.length >= 3) finalMatch = finalMatch.concat(verticalMatch);
-
-        // Remove duplicates if cross match
-        return [...new Set(finalMatch.map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
+        let h = [[row, col]], v = [[row, col]];
+        for (let c = col - 1; c >= 0; c--) { if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) h.push([row, c]); else break; }
+        for (let c = col + 1; c < this.cols; c++) { if (this.grid[row][c] && this.grid[row][c].colorIndex === colorIndex) h.push([row, c]); else break; }
+        for (let r = row - 1; r >= 0; r--) { if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) v.push([r, col]); else break; }
+        for (let r = row + 1; r < this.rows; r++) { if (this.grid[r][col] && this.grid[r][col].colorIndex === colorIndex) v.push([r, col]); else break; }
+        let res = [];
+        if (h.length >= 3) res = res.concat(h);
+        if (v.length >= 3) res = res.concat(v);
+        return [...new Set(res.map(p => JSON.stringify(p)))].map(s => JSON.parse(s));
     }
 
     async processMatch(match) {
         this.isAnimating = true;
+        let createdItem = null;
         
-        // 1. Pop animation
-        match.forEach(([r, c]) => {
-            this.grid[r][c].isPopping = true;
-        });
-        
-        const matchSize = match.length;
-        const comboBonus = this.combo > 1 ? this.combo : 1;
-        this.score += matchSize * matchSize * 10 * comboBonus;
-        
+        // Items logic: only if the match came from a user move or special case
+        if (this.combo === 1) {
+            if (match.length === 4) {
+                const [r, c] = match[0];
+                createdItem = { r, c, type: Math.random() > 0.5 ? 'row' : 'col' };
+            } else if (match.length >= 5) {
+                const [r, c] = match[0];
+                createdItem = { r, c, type: 'color' };
+            }
+        }
+
+        match.forEach(([r, c]) => { if (this.grid[r][c]) this.grid[r][c].isPopping = true; });
+        this.score += match.length * match.length * 10 * (this.combo || 1);
         this.playPopSound(0.5 + (this.combo * 0.2));
         this.updateUI();
-
         await this.delay(200);
 
-        // 2. Remove items and let others fall
         for (let c = 0; c < this.cols; c++) {
-            let emptySpaces = 0;
+            let empty = 0;
             for (let r = this.rows - 1; r >= 0; r--) {
                 if (this.grid[r][c] && this.grid[r][c].isPopping) {
-                    emptySpaces++;
+                    empty++;
                     this.grid[r][c] = null;
-                } else if (emptySpaces > 0 && this.grid[r][c]) {
-                    const tile = this.grid[r][c];
-                    this.grid[r + emptySpaces][c] = tile;
-                    tile.yOffset = -emptySpaces * (this.tileSize + this.margin);
+                } else if (empty > 0 && this.grid[r][c]) {
+                    this.grid[r + empty][c] = this.grid[r][c];
+                    this.grid[r + empty][c].yOffset = -empty * (this.tileSize + this.margin);
                     this.grid[r][c] = null;
                 }
             }
-            
-            // Fill new tiles
-            for (let r = 0; r < emptySpaces; r++) {
-                this.grid[r][c] = {
-                    colorIndex: Math.floor(Math.random() * this.colors.length),
-                    isPopping: false,
-                    scale: 1,
-                    yOffset: -emptySpaces * (this.tileSize + this.margin)
-                };
+            for (let r = 0; r < empty; r++) {
+                this.grid[r][c] = { colorIndex: Math.floor(Math.random() * this.colors.length), isPopping: false, scale: 1, yOffset: -empty * (this.tileSize + this.margin), type: 'normal' };
             }
+        }
+
+        if (createdItem) {
+            const { r, c, type } = createdItem;
+            this.grid[r][c].type = type;
+            this.grid[r][c].isPopping = false;
         }
 
         this.animateFall();
@@ -287,226 +316,155 @@ class PrismPulse {
             let finished = true;
             for (let r = 0; r < this.rows; r++) {
                 for (let c = 0; c < this.cols; c++) {
-                    const tile = this.grid[r][c];
-                    if (tile && tile.yOffset < 0) {
-                        tile.yOffset += 15;
-                        if (tile.yOffset > 0) tile.yOffset = 0;
-                        finished = false;
-                    }
+                    const t = this.grid[r][c];
+                    if (t && t.yOffset < 0) { t.yOffset += 15; if (t.yOffset > 0) t.yOffset = 0; finished = false; }
                 }
             }
             this.draw();
-            if (!finished) {
-                requestAnimationFrame(step);
-            } else {
-                this.checkAutoMatch();
-            }
+            if (!finished) requestAnimationFrame(step);
+            else this.checkAutoMatch();
         };
         requestAnimationFrame(step);
     }
 
     async checkAutoMatch() {
         let hasMatch = false;
-
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                if (!this.grid[r][c]) continue;
-                const match = this.findMatch(r, c);
-                if (match.length >= 3) {
-                    this.combo++;
-                    await this.processMatch(match);
-                    hasMatch = true;
-                    return; 
-                }
+                if (!this.grid[r][c] || this.grid[r][c].type !== 'normal') continue;
+                const m = this.findMatch(r, c);
+                if (m.length >= 3) { this.combo++; await this.processMatch(m); hasMatch = true; return; }
             }
         }
-
         if (!hasMatch) {
             this.isAnimating = false;
             this.combo = 0;
             this.updateUI();
             this.checkLevelUp();
-            if (!this.hasValidMove()) {
-                this.reshuffle();
-            }
+            if (!this.hasValidMove()) this.reshuffle();
         }
     }
 
     reshuffle() {
-        // Simple reshuffle by recreating grid until a move exists
-        this.createGrid();
-        this.draw();
-        // Show a brief message
-        const comboEl = document.getElementById('combo-display');
-        comboEl.innerText = "REFRESHING!";
-        comboEl.style.opacity = '1';
-        setTimeout(() => comboEl.style.opacity = '0', 1000);
+        this.createGrid(); this.draw();
+        const el = document.getElementById('combo-display');
+        el.innerText = "REFRESHING!"; el.style.opacity = '1';
+        setTimeout(() => el.style.opacity = '0', 1000);
     }
 
     hasValidMove() {
-        // For Match-3 Swap: Check if any swap results in a match
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                // Try swap right
-                if (c < this.cols - 1) {
-                    if (this.testSwap(r, c, r, c + 1)) return true;
-                }
-                // Try swap down
-                if (r < this.rows - 1) {
-                    if (this.testSwap(r, c, r + 1, c)) return true;
-                }
+                if (c < this.cols - 1 && this.testSwap(r, c, r, c + 1)) return true;
+                if (r < this.rows - 1 && this.testSwap(r, c, r + 1, c)) return true;
             }
         }
         return false;
     }
 
     testSwap(r1, c1, r2, c2) {
-        // Temporary swap
-        const temp = this.grid[r1][c1];
-        this.grid[r1][c1] = this.grid[r2][c2];
-        this.grid[r2][c2] = temp;
-
-        const isMatch = this.findMatch(r1, c1).length >= 3 || this.findMatch(r2, c2).length >= 3;
-
-        // Swap back
-        const tempBack = this.grid[r1][c1];
-        this.grid[r1][c1] = this.grid[r2][c2];
-        this.grid[r2][c2] = tempBack;
-
-        return isMatch;
+        const temp = this.grid[r1][c1]; this.grid[r1][c1] = this.grid[r2][c2]; this.grid[r2][c2] = temp;
+        const res = this.findMatch(r1, c1).length >= 3 || this.findMatch(r2, c2).length >= 3;
+        const tempB = this.grid[r1][c1]; this.grid[r1][c1] = this.grid[r2][c2]; this.grid[r2][c2] = tempB;
+        return res;
     }
 
-    checkLevelUp() {
-        if (this.score >= this.target) {
-            this.level++;
-            this.target += 2000 + (this.level * 1000);
-            this.updateUI();
-            // Optional: level up animation
-        }
-    }
-
-    gameOver() {
-        document.getElementById('final-score').innerText = this.score;
-        document.getElementById('final-level').innerText = this.level;
-        document.getElementById('game-over-modal').style.display = 'flex';
-    }
-
-    resetGame() {
-        this.score = 0;
-        this.level = 1;
-        this.target = 1000;
-        this.createGrid();
-        this.updateUI();
-        this.draw();
-    }
+    checkLevelUp() { if (this.score >= this.target) { this.level++; this.target += 2000 + (this.level * 1000); this.updateUI(); } }
+    gameOver() { document.getElementById('final-score').innerText = this.score; document.getElementById('final-level').innerText = this.level; document.getElementById('game-over-modal').style.display = 'flex'; }
+    resetGame() { this.score = 0; this.level = 1; this.target = 1000; this.createGrid(); this.updateUI(); this.draw(); }
 
     showHint() {
         if (this.isAnimating) return;
-        
-        let bestMatch = [];
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                const match = this.findMatch(r, c);
-                if (match.length > bestMatch.length) {
-                    bestMatch = match;
-                }
+                if (c < this.cols - 1 && this.testSwap(r, c, r, c + 1)) { this.flash(r, c, r, c + 1); return; }
+                if (r < this.rows - 1 && this.testSwap(r, c, r + 1, c)) { this.flash(r, c, r + 1, c); return; }
             }
         }
+    }
 
-        if (bestMatch.length >= 3) {
-            bestMatch.forEach(([r, c]) => {
-                this.grid[r][c].scale = 1.1;
-            });
-            this.draw();
-            setTimeout(() => {
-                bestMatch.forEach(([r, c]) => {
-                    if (this.grid[r][c]) this.grid[r][c].scale = 1;
-                });
-                this.draw();
-            }, 500);
-        }
+    flash(r1, c1, r2, c2) {
+        this.grid[r1][c1].scale = 1.2; this.grid[r2][c2].scale = 1.2; this.draw();
+        setTimeout(() => { if (this.grid[r1][c1]) this.grid[r1][c1].scale = 1; if (this.grid[r2][c2]) this.grid[r2][c2].scale = 1; this.draw(); }, 500);
     }
 
     updateUI() {
         this.scoreDisplay.innerText = this.score;
         this.levelDisplay.innerText = this.level;
         this.targetDisplay.innerText = this.target;
-        
-        const comboEl = document.getElementById('combo-display');
-        if (this.combo > 1) {
-            comboEl.innerText = `${this.combo} COMBO!`;
-            comboEl.style.opacity = '1';
-        } else {
-            comboEl.style.opacity = '0';
-        }
+        const el = document.getElementById('combo-display');
+        if (this.combo > 1) { el.innerText = `${this.combo} COMBO!`; el.style.opacity = '1'; }
+        else el.style.opacity = '0';
     }
 
     draw() {
-        if (!this.grid || this.grid.length === 0) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                const tile = this.grid[r][c];
-                if (!tile) continue;
-
-                const x = c * (this.tileSize + this.margin) + this.margin;
-                const y = r * (this.tileSize + this.margin) + this.margin + tile.yOffset;
+                const t = this.grid[r][c];
+                if (!t || (this.dragData && this.dragData.startRow === r && this.dragData.startCol === c)) continue;
                 
-                if (tile.isPopping) {
-                    tile.scale -= 0.1;
-                    if (tile.scale < 0) tile.scale = 0;
+                // If it's the target of a swap, shift it
+                let ox = 0, oy = 0;
+                if (this.dragData && this.dragData.targetRow === r && this.dragData.targetCol === c) {
+                    ox = -this.dragData.offsetX;
+                    oy = -this.dragData.offsetY;
                 }
 
-                this.drawTile(x, y, tile.colorIndex, tile.scale);
+                this.drawTile(c * (this.tileSize + this.margin) + this.margin + ox, r * (this.tileSize + this.margin) + this.margin + t.yOffset + oy, t);
             }
+        }
+        // Draw dragging tile last
+        if (this.dragData) {
+            const t = this.grid[this.dragData.startRow][this.dragData.startCol];
+            this.drawTile(this.dragData.startCol * (this.tileSize + this.margin) + this.margin + this.dragData.offsetX, this.dragData.startRow * (this.tileSize + this.margin) + this.margin + this.dragData.offsetY, t);
         }
     }
 
-    drawTile(x, y, colorIndex, scale) {
-        const size = this.tileSize * scale;
-        const offset = (this.tileSize - size) / 2;
-        
-        const color = this.colors[colorIndex];
-        
+    drawTile(x, y, tile) {
+        const size = this.tileSize * tile.scale;
+        const color = this.colors[tile.colorIndex];
         this.ctx.save();
-        this.ctx.translate(x + offset, y + offset);
-        
-        // Draw main body
+        this.ctx.translate(x + (this.tileSize - size) / 2, y + (this.tileSize - size) / 2);
         this.ctx.fillStyle = color;
         this.ctx.shadowBlur = 10;
         this.ctx.shadowColor = color;
         
-        // Hexagon shape
+        // Draw Hexagon
         this.ctx.beginPath();
         for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i;
-            const px = (size / 2) + (size / 2) * Math.cos(angle);
-            const py = (size / 2) + (size / 2) * Math.sin(angle);
-            if (i === 0) this.ctx.moveTo(px, py);
-            else this.ctx.lineTo(px, py);
+            const a = (Math.PI / 3) * i;
+            const px = (size / 2) + (size / 2) * Math.cos(a);
+            const py = (size / 2) + (size / 2) * Math.sin(a);
+            if (i === 0) this.ctx.moveTo(px, py); else this.ctx.lineTo(px, py);
         }
         this.ctx.closePath();
         this.ctx.fill();
-        
-        // Shine effect
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+
+        // Icon for special items
+        if (tile.type !== 'normal') {
+            this.ctx.fillStyle = 'white';
+            this.ctx.font = `bold ${size * 0.5}px Arial`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            let icon = '';
+            if (tile.type === 'row') icon = '↔';
+            else if (tile.type === 'col') icon = '↕';
+            else if (tile.type === 'color') icon = '★';
+            this.ctx.fillText(icon, size / 2, size / 2);
+        }
+
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         this.ctx.beginPath();
         this.ctx.moveTo(size * 0.2, size * 0.3);
         this.ctx.lineTo(size * 0.5, size * 0.2);
         this.ctx.lineTo(size * 0.3, size * 0.5);
         this.ctx.closePath();
         this.ctx.fill();
-        
         this.ctx.restore();
     }
 
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 }
 
-// Start game
-window.onload = () => {
-    new PrismPulse();
-};
+window.onload = () => { new PrismPulse(); };

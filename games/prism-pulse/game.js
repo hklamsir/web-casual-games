@@ -246,21 +246,28 @@ class PrismPulse {
 
     async checkAutoMatch() {
         let hasMatch = false;
+        const processed = new Set();
+
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
+                if (processed.has(`${r},${c}`)) continue;
+                
                 const match = this.findMatch(r, c);
                 if (match.length >= 3) {
                     this.combo++;
                     await this.processMatch(match);
                     hasMatch = true;
-                    return; // Process one match at a time for chain effect
+                    return; 
                 }
+                
+                match.forEach(([mr, mc]) => processed.add(`${mr},${mc}`));
             }
         }
 
         if (!hasMatch) {
             this.isAnimating = false;
             this.combo = 0;
+            this.updateUI();
             this.checkLevelUp();
             if (!this.hasValidMove()) {
                 this.gameOver();

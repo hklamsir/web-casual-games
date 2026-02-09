@@ -14,7 +14,7 @@ class PrismPulse {
         // Game Settings
         this.rows = 8;
         this.cols = 8;
-        this.colors = ['#00f2ff', '#bc13fe', '#ff00ff', '#39ff14', '#fff200'];
+        this.colors = ['#00f2ff', '#bc13fe', '#ff00ff', '#39ff14', '#fff200', '#ff4d4d'];
         this.tileSize = 0;
         this.margin = 4;
         
@@ -251,9 +251,11 @@ class PrismPulse {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 if (processed.has(`${r},${c}`)) continue;
+                if (!this.grid[r][c]) continue;
                 
                 const match = this.findMatch(r, c);
-                if (match.length >= 3) {
+                // Auto-match only triggers for 4 or more to leave moves for player
+                if (match.length >= 4) {
                     this.combo++;
                     await this.processMatch(match);
                     hasMatch = true;
@@ -270,9 +272,20 @@ class PrismPulse {
             this.updateUI();
             this.checkLevelUp();
             if (!this.hasValidMove()) {
-                this.gameOver();
+                this.reshuffle();
             }
         }
+    }
+
+    reshuffle() {
+        // Simple reshuffle by recreating grid until a move exists
+        this.createGrid();
+        this.draw();
+        // Show a brief message
+        const comboEl = document.getElementById('combo-display');
+        comboEl.innerText = "REFRESHING!";
+        comboEl.style.opacity = '1';
+        setTimeout(() => comboEl.style.opacity = '0', 1000);
     }
 
     hasValidMove() {

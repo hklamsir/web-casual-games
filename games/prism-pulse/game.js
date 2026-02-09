@@ -30,10 +30,10 @@ class PrismPulse {
     }
 
     init() {
+        this.createGrid();
         this.resize();
         window.addEventListener('resize', () => this.resize());
         
-        this.createGrid();
         this.setupEventListeners();
         this.updateUI();
         this.draw();
@@ -108,6 +108,7 @@ class PrismPulse {
     }
 
     handleClick(row, col) {
+        if (!this.grid[row][col]) return;
         const match = this.findMatch(row, col);
         if (match.length >= 3) {
             this.processMatch(match);
@@ -120,6 +121,7 @@ class PrismPulse {
     }
 
     findMatch(row, col) {
+        if (!this.grid[row][col]) return [];
         const colorIndex = this.grid[row][col].colorIndex;
         const queue = [[row, col]];
         const match = [];
@@ -219,6 +221,7 @@ class PrismPulse {
     hasValidMove() {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
+                if (!this.grid[r][c]) continue;
                 const match = this.findMatch(r, c);
                 if (match.length >= 3) return true;
             }
@@ -284,6 +287,7 @@ class PrismPulse {
     }
 
     draw() {
+        if (!this.grid || this.grid.length === 0) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         for (let r = 0; r < this.rows; r++) {

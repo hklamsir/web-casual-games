@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>電幻修復師 Glitch Sorter | Web Casual Games</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui-layer">
+            <div class="top-bar">
+                <div class="stat">
+                    <span class="label">LEVEL</span>
+                    <span id="level-val" class="value">1</span>
+                </div>
+                <div class="stat">
+                    <span class="label">SCORE</span>
+                    <span id="score-val" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">POWER</span>
+                    <div class="energy-bar"><div id="energy-fill"></div></div>
+                </div>
+            </div>
+
+            <div id="start-screen" class="overlay">
+                <h1 class="glitch-text" data-text="GLITCH SORTER">GLITCH SORTER</h1>
+                <p class="subtitle">電幻修復師</p>
+                <div class="instructions">
+                    <p>網路空間正在崩潰！</p>
+                    <p>拖動核心並對準對應的傳輸口。</p>
+                    <div class="how-to">
+                        <div class="tip"><span class="icon red"></span> <span>紅色 → 左側</span></div>
+                        <div class="tip"><span class="icon blue"></span> <span>藍色 → 右側</span></div>
+                    </div>
+                    <p class="warning">⚠️ 不要讓核心接觸邊界或混亂代碼！</p>
+                </div>
+                <button id="start-btn" class="cyber-btn">初始化系統</button>
+            </div>
+
+            <div id="game-over-screen" class="overlay hidden">
+                <h2 class="glitch-text" data-text="CONNECTION LOST">CONNECTION LOST</h2>
+                <div class="final-stats">
+                    <p>修復等級: <span id="final-level">1</span></p>
+                    <p>數據吞吐: <span id="final-score">0</span></p>
+                </div>
+                <button id="restart-btn" class="cyber-btn">重連網路</button>
+                <button id="back-btn" class="cyber-btn secondary">回到大廳</button>
+            </div>
+        </div>
+
+        <div id="controls-hint">按住並拖動核心</div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

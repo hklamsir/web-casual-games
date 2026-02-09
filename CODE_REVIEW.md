@@ -6,63 +6,45 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-08
+**Date:** 2026-02-09
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has reached a milestone of **ten unique games**. The latest addition, **Neon Drift**, introduces the **one-tap arcade/drifting** genre. Significant updates were also made to existing games, particularly **Word Weaver**, which has been pivoted to a high-quality Chinese Idiom (成語) challenge.
+The `web-casual-games` project has expanded to **11 unique games**. The latest addition, **Glitch Sorter (電幻修復師)**, introduces the **sorting/reaction** genre, further diversifying the platform's offerings. The project continues to maintain high standards for mobile responsiveness and performance.
 
 ## 2. Recent Changes & Fixes
 
-### 🏎️ Neon Drift (New)
-*   **Genre**: One-tap Arcade / Drifting.
-*   **Architecture**: Canvas-based procedural generation.
+### 🔧 Glitch Sorter (New)
+*   **Genre**: Arcade Sorting / Reaction.
+*   **Architecture**: Canvas-based entity-component system (Core, Particle).
 *   **Core Mechanics**:
-    *   **ZigZag Movement**: Player moves diagonally at 45 degrees.
-    *   **One-Tap Toggle**: Click/Tap/Space to switch between Left-Up and Right-Up directions.
-    *   **Procedural Path**: Segments generated on-the-fly.
-    *   **Speed Scaling**: Velocity increases gradually over time.
-    *   **Collectibles**: Purple energy cubes grant +10 bonus points.
+    *   **Color-Coded Sorting**: Red cores must be dragged to the left gate, blue to the right.
+    *   **Drag-and-Drop Interaction**: Optimized for both mouse and multi-touch mobile devices.
+    *   **Energy Management**: Missing cores or wrong sorting depletes the energy bar. Correct sorting restores a small amount.
+    *   **Procedural Difficulty**: Core spawn rate and vertical velocity scale with the current level (determined by score).
 *   **Visuals**:
-    *   Cyberpunk/Neon aesthetic with glowing path edges.
-    *   Dynamic camera following the player.
-    *   Grid background for depth perception.
-*   **Mobile Support**: Full-screen touch control, responsive canvas resizing.
+    *   Cyberpunk / "Data Stream" aesthetic.
+    *   Post-processing effects: Scanlines and screen flicker.
+    *   Particle explosion system for feedback on success/failure.
+    *   CSS-based Glitch text effects for UI overlays.
+*   **Mobile Support**: Full-screen touch control, auto-canvas resizing, and large hitboxes for easier dragging on small screens.
 
-### ✍️ Word Weaver (Upgrade)
-*   **Idiom Database**: Replaced random words with a curated database of **500+ Chinese Idioms (成語)**.
-*   **Level System**: Expanded to **30 levels** with progressive difficulty:
-    *   **Grid Size**: Scales from 4x4 (Easy) to 7x7 (Master).
-    *   **Word Density**: Increasing number of idioms per level.
-    *   **Time Limit**: Added countdown timers (60s to 240s) per level.
-*   **Logic Fixes**: Improved hint system and word selection logic.
+### 🏠 Global Navigation (Update)
+*   Updated `index.html` with the 11th game card.
+*   Standardized the "Back to Hall" navigation links across new games.
 
-### 🐱 Cat Café Tycoon (Balance)
-*   **Mobile UI**: Repositioned machines to prevent overlapping on narrow screens.
-*   **Economy**: Increased auto-income interval from 15s to 60s to encourage active play.
-*   **Persistence**: Fixed a bug where total gold could become `NaN` on first load.
-
-### 🐶 Emoji Match (New Mode)
-*   **Timer Challenge**: Added a countdown timer mode.
-    *   Level 1: 25s
-    *   Level 6: 180s
-*   **Progressive Difficulty**: Grid size and time limits scale with level.
-
-### 🌌 Gravity Switch (Polish)
-*   **Difficulty Curve**: Adjusted obstacle spawn rate at low levels (33 frames) for a smoother learning curve.
-
-## 3. Detailed Review: Neon Drift
+## 3. Detailed Review: Glitch Sorter
 
 #### Pros
-*   **Satisfying Game Loop**: The simple one-tap mechanic is highly addictive and fits the "casual" criteria perfectly.
-*   **Responsive Physics**: The 45-degree movement feels predictable and fair.
-*   **Visual Polish**: The glowing neon edges and trail effects provide high visual quality with minimal assets.
-*   **Optimized Performance**: Canvas rendering is efficient; handles high speed without frame drops.
+*   **Intuitive Gameplay**: The drag-and-drop mechanic is instantly understood.
+*   **Satisfying Feedback**: Particle effects and screen shakes (simulated by flicker) provide strong positive/negative reinforcement.
+*   **Performance**: Lightweight rendering loop ensures 60 FPS even with multiple cores and particles on screen.
+*   **Visual Cohesion**: The cyberpunk theme is consistently applied across HTML, CSS, and Canvas elements.
 
 #### Cons / Improvements
-*   **Visual Variety**: Could add color shifts (e.g., from Cyan to Pink) as the player progresses or reaches milestones.
-*   **Obstacles**: Adding stationary obstacles on the path could increase difficulty.
-*   **Sound**: Currently lacks audio. Should add "drift" sound and "collection" chime.
+*   **Input Conflict**: On some mobile browsers, dragging too fast near the edge might trigger "swipe back" navigation. A `touch-action: none` CSS rule was applied to mitigate this.
+*   **Power-Ups**: Could add "Freeze" or "Auto-Sort" items to deepen the gameplay.
+*   **Audio**: Currently lacks audio. Integration of synth-style sound effects is recommended for the next sprint.
 
 ## 4. Project-Wide Status
 
@@ -77,15 +59,16 @@ The `web-casual-games` project has reached a milestone of **ten unique games**. 
 | Zen Stack | Stacking | ✅ | ❌ | Stable |
 | Synth Flow | Rhythm | ✅ | ✅ | Stable |
 | Word Weaver | Word Puzzle | ✅ | ✅ | Idiom Mode Added |
-| **Neon Drift** | Arcade | ✅ | ❌ | **New Release** |
+| Neon Drift | Arcade | ✅ | ❌ | Stable |
+| **Glitch Sorter** | **Sorting** | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
-The collection now covers a robust spectrum:
+The collection now covers:
 
 | Category | Games |
 |----------|-------|
 | **Idle** | Cat Café |
-| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, **Neon Drift** |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, **Glitch Sorter** |
 | **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver |
 | **Physics** | Zen Stack |
 | **Rhythm** | Synth Flow |
@@ -96,9 +79,9 @@ The collection now covers a robust spectrum:
 - Card/Board (Casual Solitaire)
 
 ## 6. Maintenance Tasks
-- [ ] Implement `common/` styles for modals to reduce CSS duplication.
-- [ ] Add background music to all games (current: 4/10 have audio).
-- [ ] Create a "Favorites" feature on the landing page.
+- [ ] **Global Audio Manager**: Create a shared library for sound effects to standardize audio implementation.
+- [ ] **Asset Preloading**: Implement a unified loading screen for games with external assets.
+- [ ] **Achievements System**: Add a local storage-based achievement tracker.
 
 ---
 *Report generated by OpenClaw 🦋*

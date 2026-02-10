@@ -6,45 +6,38 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-09
+**Date:** 2026-02-10
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has reached a major milestone with **12 unique games**. The latest additions, **Glitch Sorter (電幻修復師)** and **Prism Pulse (棱鏡脈衝)**, have significantly broadened the variety of gameplay mechanics. The platform now features a healthy mix of arcade, puzzle, rhythm, and idle genres.
+The `web-casual-games` project has reached **13 unique games**. The latest addition, **Neon Angler (霓虹釣客)**, introduces a timing-based arcade mechanic (Fishing), further diversifying the collection. The platform remains stable and performs well on both desktop and mobile devices.
 
 ## 2. Recent Changes & Fixes
 
-### 💎 Prism Pulse (New)
-*   **Genre**: Match-3 / Collapse Puzzle.
-*   **Architecture**: Canvas-based grid rendering with a recursive flood-fill algorithm for match detection.
+### 🎣 Neon Angler (New)
+*   **Genre**: Timing / Arcade Fishing.
+*   **Architecture**: Pure Canvas (2D) for both entities and background.
 *   **Core Mechanics**:
-    *   **Collapse Logic**: Click any group of 3 or more connected identical prisms to clear them.
-    *   **Chain Reactions**: Gravity-based falling tiles and automatic refill from the top.
-    *   **Score Scaling**: Quadratic scoring (size * size * 10) encourages players to build larger clusters.
-    *   **Progression**: Level-up system with increasing score targets.
-    *   **Hint System**: Automated search for the largest available match to assist players.
+    *   **Oscillating Hook**: The hook moves horizontally at the top, and the player chooses when to drop it.
+    *   **Energy System**: Passive energy drain over time, replenished by catching fish, and penalized by hitting viruses.
+    *   **Entity Management**: Pool-based reset logic for fish and viruses to maintain performance.
+    *   **Particle System**: Simple physics-based particles for feedback upon catching items.
 *   **Visuals**:
-    *   Neon/Glassmorphism aesthetic with high-contrast glowing colors.
-    *   Procedural Hexagonal tile rendering on Canvas.
-    *   Scale-based animations for "popping" and "falling" effects.
-*   **Mobile Support**: Full touch-screen compatibility with `touchstart` event optimization.
+    *   Cyberpunk "Data Sea" aesthetic.
+    *   Glow effects and pulsing animations for entities.
+*   **Mobile Support**: One-tap control optimized for mobile interaction.
 
-### 🔧 Glitch Sorter (Previous)
-*   **Genre**: Arcade Sorting / Reaction.
-*   **Update**: Confirmed stability in sorting logic and particle system performance.
-
-## 3. Detailed Review: Prism Pulse
+## 3. Detailed Review: Neon Angler
 
 #### Pros
-*   **High Polish**: The hexagonal tiles and glowing effects give the game a premium "Cyber-Gem" feel.
-*   **Recursive Efficiency**: The flood-fill algorithm for matching is efficient enough for instantaneous results on an 8x8 grid.
-*   **User Guidance**: The inclusion of a Hint system and an Instruction modal ensures accessibility for new players.
-*   **Responsive Layout**: The canvas dynamically resizes while maintaining square aspect ratios and tile proportions.
+*   **Unique Interaction**: Different from existing "swipe" or "WASD" games, the "drop and retract" mechanic is intuitive and satisfying.
+*   **Dynamic Difficulty**: The combination of passive energy drain and obstacle avoidance creates a natural difficulty curve.
+*   **Visual Feedback**: Particle explosions and score updates provide immediate gratification.
 
 #### Cons / Improvements
-*   **Sound Effects**: Like many other modules, audio is currently absent. Adding "Chime" sounds for matches and "Pulse" sounds for level-ups would greatly enhance the experience.
-*   **Animation Sophistication**: The falling animation is currently a linear velocity move; adding easing (e.g., bounce) would improve the "juice" of the game.
-*   **State Persistence**: Current score and level are not saved in LocalStorage. Adding save states would encourage longer play sessions.
+*   **Sound Effects**: Currently lacks audio. "Splash" and "Beep" sounds would improve immersion.
+*   **Variety**: Currently only one type of fish. Adding rare fish with special abilities (e.g., time slow) would add depth.
+*   **Level System**: The game currently uses a score-based survival model without discrete levels.
 
 ## 4. Project-Wide Status
 
@@ -61,7 +54,8 @@ The `web-casual-games` project has reached a major milestone with **12 unique ga
 | Word Weaver | Word Puzzle | ✅ | ✅ | Stable |
 | Neon Drift | Arcade | ✅ | ❌ | Stable |
 | Glitch Sorter | Sorting | ✅ | ❌ | Stable |
-| **Prism Pulse** | **Match-3** | ✅ | ❌ | **New Release** |
+| Prism Pulse | Match-3 | ✅ | ❌ | Stable |
+| **Neon Angler** | **Fishing** | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
 The collection now covers:
@@ -69,20 +63,20 @@ The collection now covers:
 | Category | Games |
 |----------|-------|
 | **Idle** | Cat Café |
-| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter |
-| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, **Prism Pulse** |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter, **Neon Angler** |
+| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, Prism Pulse |
 | **Physics** | Zen Stack |
 | **Rhythm** | Synth Flow |
 
 **Next Target Genres:**
 - Strategy (Mini Tower Defense)
-- Physics Trajectory (Angry Birds style)
-- Simulation (Simple Life-Sim)
+- Logic (Sudoku/Nonogram)
+- Physics Trajectory
 
 ## 6. Maintenance Tasks
 - [ ] **Universal Audio Framework**: Standardize audio loading and playback.
 - [ ] **Global Leaderboard**: Implement a simple backend or Firebase integration for high scores.
-- [ ] **Theme Switcher**: Allow users to toggle between "Pastel" and "Cyber" themes globally.
+- [ ] **Save Progress**: Implement LocalStorage for high scores across all games.
 
 ---
 *Report generated by OpenClaw 🦋*

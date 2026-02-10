@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Angler (霓虹釣客) - Web Casual Games</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui-layer">
+            <div id="top-bar">
+                <div id="score-container">SCORE: <span id="score">0</span></div>
+                <div id="energy-container">ENERGY: <span id="energy">100</span>%</div>
+            </div>
+            
+            <div id="start-screen" class="modal">
+                <div class="modal-content">
+                    <h1>NEON ANGLER</h1>
+                    <p class="subtitle">霓虹釣客</p>
+                    <div class="instructions">
+                        <p>在賽博空間的數據海中垂釣</p>
+                        <ul>
+                            <li>點擊或觸摸螢幕放下魚鉤</li>
+                            <li>捕捉發光的數據魚 (Data Fish) 以獲得分數</li>
+                            <li>避開紅色病毒 (Virus) 和障礙物</li>
+                            <li>能量耗盡則遊戲結束</li>
+                        </ul>
+                    </div>
+                    <button id="start-btn">開始垂釣</button>
+                    <button id="back-btn" onclick="window.location.href='../../index.html'">返回大廳</button>
+                </div>
+            </div>
+
+            <div id="game-over-screen" class="modal hidden">
+                <div class="modal-content">
+                    <h1>系統中斷</h1>
+                    <p>數據擷取完成</p>
+                    <div class="final-stats">
+                        <p>最終分數: <span id="final-score">0</span></p>
+                    </div>
+                    <button id="restart-btn">重新連接</button>
+                    <button id="home-btn" onclick="window.location.href='../../index.html'">返回大廳</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

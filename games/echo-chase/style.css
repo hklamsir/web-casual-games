@@ -1,0 +1,173 @@
+:root {
+    --neon-gold: #ffcc00;
+    --neon-blue: #00f2ff;
+    --bg-dark: #050505;
+    --text-light: #e0e0e0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: var(--bg-dark);
+    font-family: 'Noto Sans TC', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    background: #000;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
+}
+
+#game-canvas {
+    display: block;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#hud {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    font-size: 1.2rem;
+}
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    padding: 30px;
+    background: rgba(10, 10, 10, 0.9);
+    border: 1px solid var(--neon-blue);
+    border-radius: 15px;
+    text-align: center;
+    color: var(--text-light);
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.hidden {
+    display: none;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+h1 small {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.description {
+    margin-bottom: 20px;
+    font-weight: 300;
+}
+
+.instructions {
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 0.9rem;
+}
+
+.instructions h3 {
+    color: var(--neon-gold);
+    margin-bottom: 10px;
+}
+
+.instructions ul {
+    list-style: none;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 15px;
+}
+
+.instructions li::before {
+    content: "•";
+    color: var(--neon-blue);
+    position: absolute;
+    left: 0;
+}
+
+.highlight {
+    color: var(--neon-gold);
+    font-weight: bold;
+}
+
+.glow-button {
+    background: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 12px 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+
+.glow-button:active {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 30px var(--neon-blue);
+}
+
+.secondary-button {
+    background: transparent;
+    border: none;
+    color: #888;
+    margin-top: 15px;
+    cursor: pointer;
+    text-decoration: underline;
+    display: block;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    #hud {
+        font-size: 1rem;
+        padding: 15px;
+    }
+}

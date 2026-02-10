@@ -6,38 +6,37 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-10
+**Date:** 2026-02-10 (Post-Release: Echo Chase)
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has reached **13 unique games**. The latest addition, **Neon Angler (霓虹釣客)**, introduces a timing-based arcade mechanic (Fishing), further diversifying the collection. The platform remains stable and performs well on both desktop and mobile devices.
+The `web-casual-games` project has expanded to **14 unique games**. The latest addition, **Echo Chase (回聲獵人)**, introduces a "visual echolocation" mechanic, providing a unique sensory-based arcade experience. This genre differs significantly from previous entries, focusing on perception and rapid response in a minimalist environment.
 
 ## 2. Recent Changes & Fixes
 
-### 🎣 Neon Angler (New)
-*   **Genre**: Timing / Arcade Fishing.
-*   **Architecture**: Pure Canvas (2D) for both entities and background.
+### 🦇 Echo Chase (New)
+*   **Genre**: Sensory Arcade / Perception.
+*   **Architecture**: Canvas (2D) for ripple effects and target rendering.
 *   **Core Mechanics**:
-    *   **Oscillating Hook**: The hook moves horizontally at the top, and the player chooses when to drop it.
-    *   **Energy System**: Passive energy drain over time, replenished by catching fish, and penalized by hitting viruses.
-    *   **Entity Management**: Pool-based reset logic for fish and viruses to maintain performance.
-    *   **Particle System**: Simple physics-based particles for feedback upon catching items.
+    *   **Visual Echolocation**: Targets are invisible in the "dark" (black background) and only revealed when the wavefront of a player-generated ripple (circle) passes over them.
+    *   **Ephemeral Visibility**: Targets fade out quickly once revealed, requiring precise and fast clicks.
+    *   **Dynamic Difficulty**: Target lifespan and spawn intervals scale with the player's level (every 100 points).
 *   **Visuals**:
-    *   Cyberpunk "Data Sea" aesthetic.
-    *   Glow effects and pulsing animations for entities.
-*   **Mobile Support**: One-tap control optimized for mobile interaction.
+    *   High-contrast minimalist aesthetic (Neon Blue ripples, Gold targets).
+    *   Glow/Bloom effects using `shadowBlur` for targets.
+*   **Mobile Support**: Fully touch-responsive; taps generate ripples and check for hits simultaneously.
 
-## 3. Detailed Review: Neon Angler
+## 3. Detailed Review: Echo Chase
 
 #### Pros
-*   **Unique Interaction**: Different from existing "swipe" or "WASD" games, the "drop and retract" mechanic is intuitive and satisfying.
-*   **Dynamic Difficulty**: The combination of passive energy drain and obstacle avoidance creates a natural difficulty curve.
-*   **Visual Feedback**: Particle explosions and score updates provide immediate gratification.
+*   **Innovative Mechanic**: The "reveal-and-fade" system creates a satisfying tension between curiosity (generating ripples) and accuracy (hitting revealed targets).
+*   **Minimalist Performance**: Low overhead due to simple geometric shapes, ensuring 60fps even on low-end mobile devices.
+*   **Accessibility**: High contrast helps in focus, though it heavily relies on visual timing.
 
 #### Cons / Improvements
-*   **Sound Effects**: Currently lacks audio. "Splash" and "Beep" sounds would improve immersion.
-*   **Variety**: Currently only one type of fish. Adding rare fish with special abilities (e.g., time slow) would add depth.
-*   **Level System**: The game currently uses a score-based survival model without discrete levels.
+*   **Visual Overload**: Multiple ripples at once can make the screen cluttered. A limit on active ripples or a cooldown could be considered.
+*   **Target Logic**: Currently, targets only reveal at the *frontier* of the ripple. Expanding the reveal zone to a small thickness around the radius improves the "feel" of the wave.
+*   **Feedback**: Adding a subtle haptic feedback (for mobile) or a specific "sonar" sound effect would greatly enhance the theme.
 
 ## 4. Project-Wide Status
 
@@ -55,7 +54,8 @@ The `web-casual-games` project has reached **13 unique games**. The latest addit
 | Neon Drift | Arcade | ✅ | ❌ | Stable |
 | Glitch Sorter | Sorting | ✅ | ❌ | Stable |
 | Prism Pulse | Match-3 | ✅ | ❌ | Stable |
-| **Neon Angler** | **Fishing** | ✅ | ❌ | **New Release** |
+| Neon Angler | Fishing | ✅ | ❌ | Stable |
+| **Echo Chase** | **Sensory** | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
 The collection now covers:
@@ -63,20 +63,20 @@ The collection now covers:
 | Category | Games |
 |----------|-------|
 | **Idle** | Cat Café |
-| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter, **Neon Angler** |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter, Neon Angler |
 | **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, Prism Pulse |
+| **Sensory/Perception**| **Echo Chase** |
 | **Physics** | Zen Stack |
 | **Rhythm** | Synth Flow |
 
 **Next Target Genres:**
-- Strategy (Mini Tower Defense)
-- Logic (Sudoku/Nonogram)
-- Physics Trajectory
+- Strategy (Tower Defense / Resource Management)
+- Physics Trajectory (Angry Birds-style)
 
 ## 6. Maintenance Tasks
 - [ ] **Universal Audio Framework**: Standardize audio loading and playback.
-- [ ] **Global Leaderboard**: Implement a simple backend or Firebase integration for high scores.
-- [ ] **Save Progress**: Implement LocalStorage for high scores across all games.
+- [ ] **High Score Persistence**: Implement LocalStorage for all games to track personal bests.
+- [ ] **Visual Polish**: Add transition animations between the lobby and games.
 
 ---
 *Report generated by OpenClaw 🦋*

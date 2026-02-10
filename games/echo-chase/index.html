@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>回聲獵人 (Echo Chase) - web-casual-games</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui-layer">
+            <div id="hud">
+                <div class="stat">得分: <span id="score">0</span></div>
+                <div class="stat">生命: <span id="lives">3</span></div>
+                <div class="stat">等級: <span id="level">1</span></div>
+            </div>
+            
+            <div id="start-screen" class="modal">
+                <h1>回聲獵人 <br><small>Echo Chase</small></h1>
+                <p class="description">依靠視覺回聲定位，在黑暗中捕捉光點。</p>
+                <div class="instructions">
+                    <h3>遊戲規則</h3>
+                    <ul>
+                        <li>點擊螢幕會發出「回聲波」揭示周圍。</li>
+                        <li>在波紋消失前點擊出現的 <span class="highlight">金色光點</span>。</li>
+                        <li>漏掉光點或生命值耗盡則遊戲結束。</li>
+                    </ul>
+                </div>
+                <button id="start-btn" class="glow-button">開始狩獵</button>
+            </div>
+
+            <div id="game-over-screen" class="modal hidden">
+                <h2>任務終結</h2>
+                <p>最終得分: <span id="final-score">0</span></p>
+                <button id="restart-btn" class="glow-button">再次嘗試</button>
+                <button id="back-btn" class="secondary-button">返回大廳</button>
+            </div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

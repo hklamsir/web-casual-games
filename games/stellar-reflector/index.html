@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>星際反射 (Stellar Reflector) - 霓虹射擊謎題</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <div class="stats">
+                <div class="stat-item">關卡: <span id="level-display">1</span></div>
+                <div class="stat-item">分數: <span id="score-display">0</span></div>
+                <div class="stat-item">能量: <span id="energy-display">100</span>%</div>
+            </div>
+            <button id="back-btn" class="nav-btn">返回大廳</button>
+        </header>
+
+        <div id="canvas-wrapper">
+            <canvas id="game-canvas"></canvas>
+            
+            <div id="instruction-modal" class="modal">
+                <div class="modal-content">
+                    <h2>星際反射 (Stellar Reflector)</h2>
+                    <p>利用引力反射板引導能量球擊中目標星核！</p>
+                    <ul>
+                        <li><strong>目標：</strong> 讓球擊中綠色的星核。</li>
+                        <li><strong>操作：</strong> 點擊並拖動反射板（藍色）來旋轉它們。</li>
+                        <li><strong>發射：</strong> 點擊下方按鈕或球體本身發射能量。</li>
+                        <li><strong>注意：</strong> 避開紅色黑洞，否則會損失能量。</li>
+                    </ul>
+                    <button id="start-btn" class="primary-btn">開始任務</button>
+                </div>
+            </div>
+
+            <div id="game-over-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2 id="result-title">任務失敗</h2>
+                    <p id="result-message">能量耗盡...</p>
+                    <div class="final-stats">
+                        <p>最終關卡: <span id="final-level">1</span></p>
+                        <p>最終分數: <span id="final-score">0</span></p>
+                    </div>
+                    <button id="restart-btn" class="primary-btn">再次挑戰</button>
+                </div>
+            </div>
+
+            <div id="controls-overlay">
+                <button id="launch-btn" class="launch-btn">發射能量</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

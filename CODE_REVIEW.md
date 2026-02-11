@@ -6,37 +6,39 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-10 (Post-Release: Echo Chase)
+**Date:** 2026-02-11 (Scheduled Auto-Creation)
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has expanded to **14 unique games**. The latest addition, **Echo Chase (回聲獵人)**, introduces a "visual echolocation" mechanic, providing a unique sensory-based arcade experience. This genre differs significantly from previous entries, focusing on perception and rapid response in a minimalist environment.
+The `web-casual-games` project has reached **15 games**. The latest addition, **Stellar Reflector (星際反射)**, introduces a physics-based puzzle shooter mechanic. This fulfills the "Physics Trajectory" target identified in the previous review.
 
 ## 2. Recent Changes & Fixes
 
-### 🦇 Echo Chase (New)
-*   **Genre**: Sensory Arcade / Perception.
-*   **Architecture**: Canvas (2D) for ripple effects and target rendering.
+### ☄️ Stellar Reflector (New)
+*   **Genre**: Physics Shooter / Puzzle.
+*   **Architecture**: HTML5 Canvas (2D) with vector-based reflection logic.
 *   **Core Mechanics**:
-    *   **Visual Echolocation**: Targets are invisible in the "dark" (black background) and only revealed when the wavefront of a player-generated ripple (circle) passes over them.
-    *   **Ephemeral Visibility**: Targets fade out quickly once revealed, requiring precise and fast clicks.
-    *   **Dynamic Difficulty**: Target lifespan and spawn intervals scale with the player's level (every 100 points).
+    *   **Vector Reflection**: Implemented `v' = v - 2(v·n)n` for bouncing the energy ball off rotatable reflectors.
+    *   **Rotatable Elements**: Players can drag to rotate reflectors, allowing for precise path planning.
+    *   **Obstacle Logic**: Black holes act as "lose-state" zones that subtract energy, requiring careful navigation.
+    *   **Energy Management**: Fixed cost per shot + reward per win ensures a "fail-state" loop and encourages efficiency.
 *   **Visuals**:
-    *   High-contrast minimalist aesthetic (Neon Blue ripples, Gold targets).
-    *   Glow/Bloom effects using `shadowBlur` for targets.
-*   **Mobile Support**: Fully touch-responsive; taps generate ripples and check for hits simultaneously.
+    *   Glow/Neon aesthetics consistent with the "Neon" series.
+    *   Radial gradients for celestial bodies (Star Core, Black Holes).
+    *   Particle system for collisions and wins.
+*   **Mobile Support**: Drag-to-rotate interaction optimized for touch screens.
 
-## 3. Detailed Review: Echo Chase
+## 3. Detailed Review: Stellar Reflector
 
 #### Pros
-*   **Innovative Mechanic**: The "reveal-and-fade" system creates a satisfying tension between curiosity (generating ripples) and accuracy (hitting revealed targets).
-*   **Minimalist Performance**: Low overhead due to simple geometric shapes, ensuring 60fps even on low-end mobile devices.
-*   **Accessibility**: High contrast helps in focus, though it heavily relies on visual timing.
+*   **Math Accuracy**: The reflection logic correctly handles varying incident angles and pushes the ball out of collision to prevent sticking.
+*   **Visual Consistency**: The "Stellar/Space" theme fits perfectly with the existing "Neon/Cyberpunk" sub-theme of the platform.
+*   **Level Scaling**: Procedural placement of targets and obstacles ensures replayability without hardcoded levels.
 
 #### Cons / Improvements
-*   **Visual Overload**: Multiple ripples at once can make the screen cluttered. A limit on active ripples or a cooldown could be considered.
-*   **Target Logic**: Currently, targets only reveal at the *frontier* of the ripple. Expanding the reveal zone to a small thickness around the radius improves the "feel" of the wave.
-*   **Feedback**: Adding a subtle haptic feedback (for mobile) or a specific "sonar" sound effect would greatly enhance the theme.
+*   **Prediction**: A dotted trajectory line for the *first* reflection would help players plan complex shots.
+*   **Sound**: Lacks sound effects for reflections and black hole impacts.
+*   **Level Design**: Currently, reflectors are placed randomly; manually designed layouts for later levels would provide better difficulty curves.
 
 ## 4. Project-Wide Status
 
@@ -55,28 +57,28 @@ The `web-casual-games` project has expanded to **14 unique games**. The latest a
 | Glitch Sorter | Sorting | ✅ | ❌ | Stable |
 | Prism Pulse | Match-3 | ✅ | ❌ | Stable |
 | Neon Angler | Fishing | ✅ | ❌ | Stable |
-| **Echo Chase** | **Sensory** | ✅ | ❌ | **New Release** |
+| Echo Chase | Sensory | ✅ | ❌ | Stable |
+| **Stellar Reflector**| **Physics** | ✅ | ❌ | **New Release** |
 
 ## 5. Genre Coverage Analysis
-The collection now covers:
+The collection is becoming very diverse:
 
 | Category | Games |
 |----------|-------|
 | **Idle** | Cat Café |
-| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter, Neon Angler |
-| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, Prism Pulse |
-| **Sensory/Perception**| **Echo Chase** |
-| **Physics** | Zen Stack |
+| **Action/Arcade** | Neon Snake, Space Invaders, Gravity Switch, Neon Drift, Glitch Sorter, Neon Angler, Echo Chase |
+| **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, Prism Pulse, Stellar Reflector |
+| **Physics** | Zen Stack, Stellar Reflector |
 | **Rhythm** | Synth Flow |
 
 **Next Target Genres:**
 - Strategy (Tower Defense / Resource Management)
-- Physics Trajectory (Angry Birds-style)
+- Turn-based Card Game / Board Game
 
 ## 6. Maintenance Tasks
-- [ ] **Universal Audio Framework**: Standardize audio loading and playback.
-- [ ] **High Score Persistence**: Implement LocalStorage for all games to track personal bests.
-- [ ] **Visual Polish**: Add transition animations between the lobby and games.
+- [ ] **Global Sound Toggle**: Implement a mute/unmute button on the main index page.
+- [ ] **PWA Support**: Add a manifest.json and service worker to make the platform installable on mobile.
+- [ ] **High Score Persistence**: Still pending for several games.
 
 ---
 *Report generated by OpenClaw 🦋*

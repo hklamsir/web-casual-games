@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro-Gardener</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body { background-color: #1a1a2e; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        canvas { border: 2px solid #0f3460; display: block; margin: 20px auto; background-color: #000; }
+        .game-info { text-align: center; margin-top: 20px; }
+        .controls { text-align: center; margin-top: 15px; }
+        button {
+            background-color: #e94560;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover { background-color: #ff6f91; }
+        #game-log {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            height: 150px;
+            overflow-y: scroll;
+            border: 1px solid #444;
+            padding: 10px;
+            background-color: #2a2a3e;
+            font-size: 14px;
+            white-space: pre-wrap; /* Preserve formatting */
+        }
+        .status-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .status-box {
+            background-color: #2a2a3e;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: left;
+        }
+        .status-box h3 { margin-top: 0; color: #e94560;}
+        .status-box ul { list-style: none; padding: 0; }
+        .status-box li { margin-bottom: 5px; }
+        .status-box li span { font-weight: bold; color: #ff6f91; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Astro-Gardener</h1>
+        <nav>
+            <a href="../index.html">Back to Game List</a>
+        </nav>
+    </header>
+
+    <div class="game-info">
+        <p>Cultivate alien plants, manage resources, and survive unpredictable cosmic weather!</p>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <div class="game-info status-section">
+        <div class="status-box">
+            <h3>Environment</h3>
+            <ul>
+                <li>Weather: <span id="weather">Clear</span></li>
+                <li>Temperature: <span id="temperature">20°C</span></li>
+                <li>Light: <span id="light">60%</span></li>
+            </ul>
+        </div>
+        <div class="status-box">
+            <h3>Resources</h3>
+            <ul>
+                <li>Water: <span id="water">100</span></li>
+                <li>Nutrients: <span id="nutrients">50</span></li>
+                <li>Energy: <span id="energy">75</span></li>
+                <li>Credits: <span id="credits">0</span></li>
+            </ul>
+        </div>
+        <div class="status-box">
+            <h3>Plants</h3>
+            <ul id="plant-list">
+                <li>None planted yet.</li>
+            </ul>
+        </div>
+         <div class="status-box">
+            <h3>Day</h3>
+            <ul>
+                <li>Current Day: <span id="day">1</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="next-day-btn">Next Day</button>
+        <button id="plant-seed-btn">Plant Seed (Sunpetal)</button>
+        <!-- Add more buttons for planting other seeds, research, etc. -->
+    </div>
+
+    <div id="game-log"></div>
+
+    <script>
+        // --- DOM Elements ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameLog = document.getElementById('game-log');
+
+        // Status elements
+        const weatherEl = document.getElementById('weather');
+        const temperatureEl = document.getElementById('temperature');
+        const lightEl = document.getElementById('light');
+        const waterEl = document.getElementById('water');
+        const nutrientsEl = document.getElementById('nutrients');
+        const energyEl = document.getElementById('energy');
+        const creditsEl = document.getElementById('credits');
+        const dayEl = document.getElementById('day');
+        const plantListEl = document.getElementById('plant-list');
+
+        // Control buttons
+        const nextDayBtn = document.getElementById('next-day-btn');
+        const plantSeedBtn = document.getElementById('plant-seed-btn');
+
+        // --- Game Logic (from game.js) ---
+        let gameState = {
+            day: 1,
+            resources: { water: 100, nutrients: 50, energy: 75, credits: 0 },
+            plants: [],
+            environment: { temperature: 20, light: 60, weather: 'clear' },
+            research: { level: 1, available: ['advanced_hydroponics'] }
+        };
+
+        let simulationLog = []; // To store log messages for display
+
+        function log(message) {
+            simulationLog.push(`[Day ${gameState.day}] ${message}`);
+            updateLogDisplay();
+        }
+
+        function updateLogDisplay() {
+            gameLog.innerHTML = simulationLog.slice(-20).join('\n'); // Show last 20 messages
+            gameLog.scrollTop = gameLog.scrollHeight; // Auto-scroll
+        }
+        
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function updateEnvironment() {
+            const weatherTypes = ['clear', 'rain', 'solar_flare', 'dust_storm', 'windy'];
+            gameState.environment.weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+
+            switch (gameState.environment.weather) {
+                case 'clear':
+                    gameState.environment.temperature = 20 + getRandom(-2, 5);
+                    gameState.environment.light = 70 + getRandom(0, 20);
+                    break;
+                case 'rain':
+                    gameState.environment.temperature = 18 + getRandom(-3, 4);
+                    gameState.environment.light = 50 + getRandom(0, 10);
+                    gameState.resources.water += 20; // More water from rain
+                    break;
+                case 'solar_flare':
+                    gameState.environment.temperature = 30 + getRandom(5, 15);
+                    gameState.environment.light = 90 + getRandom(5, 10);
+                    // Damages unprotected plants
+                    break;
+                case 'dust_storm':
+                    gameState.environment.temperature = 22 + getRandom(0, 3);
+                    gameState.environment.light = 30 + getRandom(5, 15);
+                    // Reduces visibility, consumes more water
+                    break;
+                case 'windy':
+                    gameState.environment.temperature = 21 + getRandom(-3, 3);
+                    gameState.environment.light = 75 + getRandom(-10, 10);
+                    // Slight damage to fragile plants
+                    break;
+            }
+             gameState.environment.temperature = Math.max(5, Math.min(45, gameState.environment.temperature));
+             gameState.environment.light = Math.max(10, Math.min(100, gameState.environment.light));
+        }
+
+        function processPlantGrowth() {
+            const tempThreshold = 10;
+            const lightThreshold = 20;
+            const waterThreshold = 5;
+
+            gameState.plants.forEach((plant, index) => {
+                let growthModifier = 1;
+                let waterEff = 1;
+                let lightEff = 1;
+                let tempEff = 1;
+
+                // Water check
+                const waterNeeded = plant.needs.water;
+                if (gameState.resources.water >= waterNeeded) {
+                    gameState.resources.water -= waterNeeded;
+                    waterEff = 1.2; // Bonus for adequate water
+                } else {
+                    waterEff = 0.6; // Penalty for lack of water
+                    log(`ALERT: ${plant.species} is lacking water!`);
+                }
+
+                // Light check
+                if (gameState.environment.light >= plant.needs.light) {
+                    lightEff = 1.3; // Bonus for optimal light
+                } else if (gameState.environment.light < plant.needs.light / 2) {
+                    lightEff = 0.7; // Penalty for low light
+                    log(`INFO: ${plant.species} has low light.`);
+                }
+
+                // Temperature check
+                const tempDiff = Math.abs(gameState.environment.temperature - plant.needs.temp);
+                tempEff = Math.max(0.3, 1 - tempDiff / 15); // Growth penalty for temperature difference
+                if (tempDiff > 10) {
+                     log(`WARN: ${plant.species} is experiencing suboptimal temperature!`);
+                }
+
+                // Weather effects
+                if (gameState.environment.weather === 'solar_flare') {
+                    growthModifier *= 0.5; // Damage from solar flare
+                    log(`HAZARD: Solar flare detected! ${plant.species} is taking damage.`);
+                } else if (gameState.environment.weather === 'dust_storm') {
+                    growthModifier *= 0.8;
+                    plant.needs.water *= 1.3; // Dust storms consume more water
+                    log(`HAZARD: Dust storm impacting ${plant.species}.`);
+                } else if (gameState.environment.weather === 'windy' && tempDiff > 5) {
+                    growthModifier *= 0.9; // Windy conditions can increase temp differences
+                }
+
+                const effectiveGrowthRate = (0.3 + Math.random() * 0.4) * growthModifier * waterEff * lightEff * tempEff; // Base growth (0.3-0.7) + modifiers
+                plant.growth += effectiveGrowthRate;
+
+                if (plant.growth >= plant.maxGrowth) {
+                    plant.growth = plant.maxGrowth;
+                    if (plant.stage === 'seedling') {
+                        plant.stage = 'mature';
+                        log(`\${plant.species} has matured!`);
+                        const creditsEarned = Math.floor(getRandom(50, 150));
+                        gameState.resources.credits += creditsEarned;
+                        log(`Earned ${creditsEarned} credits from mature \${plant.species}.`);
+
+                        // Check for mutation chance on maturation
+                        if (Math.random() < plant.mutationChance) {
+                            log(`MUTATION! \${plant.species} has mutated!`);
+                            plant.species = `Mutated \${plant.species}`;
+                            plant.maxGrowth *= 1.2; // Harder to grow
+                            plant.mutationChance *= 0.8; // Less chance of further mutation
+                            plant.needs.water *= 1.1;
+                            plant.needs.temp = Math.max(15, plant.needs.temp + getRandom(-5, 5));
+                            plant.growth = plant.maxGrowth * 0.2; // Start new mutation at a decent growth level
+                            log(`New variant: \${plant.species} requires different conditions.`);
+                        }
+                    } else if (plant.stage === 'mature') {
+                        // Plant is ready for harvest or can reproduce
+                        log(`\${plant.species} is ready for harvest or further propagation.`);
+                    }
+                } else if (plant.growth < 0) { // Prevent negative growth
+                    plant.growth = 0;
+                }
+            });
+        }
+
+        function addPlant(speciesName, needs) {
+            if (gameState.resources.water < needs.water || gameState.resources.nutrients < needs.nutrients) {
+                log(`Not enough resources to plant ${speciesName}.`);
+                return;
+            }
+            gameState.resources.water -= needs.water;
+            gameState.resources.nutrients -= needs.nutrients;
+            
+            const baseGrowth = Math.random() * 10; // Start with some initial growth
+            const initialMutationChance = 0.1 + Math.random() * 0.1; // Base mutation chance
+
+            gameState.plants.push({
+                species: speciesName,
+                stage: 'seedling',
+                needs: needs,
+                growth: baseGrowth,
+                maxGrowth: 100 + Math.random() * 50, // Varied max growth
+                mutationChance: initialMutationChance
+            });
+            log(`Planted a ${speciesName} seedling.`);
+        }
+
+        function startGameDay(dayNum) {
+            gameState.day = dayNum;
+            updateEnvironment();
+            processPlantGrowth();
+            updateStatusDisplay();
+            log(`Day ${gameState.day} starts. Weather: ${gameState.environment.weather} (Temp: ${gameState.environment.temperature.toFixed(1)}°C, Light: ${gameState.environment.light.toFixed(0)}%)`);
+        }
+
+        function updateStatusDisplay() {
+            weatherEl.textContent = gameState.environment.weather;
+            temperatureEl.textContent = `${gameState.environment.temperature.toFixed(1)}°C`;
+            lightEl.textContent = `${gameState.environment.light.toFixed(0)}%`;
+            waterEl.textContent = gameState.resources.water;
+            nutrientsEl.textContent = gameState.resources.nutrients;
+            energyEl.textContent = gameState.resources.energy;
+            creditsEl.textContent = gameState.resources.credits;
+            dayEl.textContent = gameState.day;
+
+            plantListEl.innerHTML = ''; // Clear previous list
+            if (gameState.plants.length === 0) {
+                plantListEl.innerHTML = '<li>None planted yet.</li>';
+            } else {
+                gameState.plants.forEach(plant => {
+                    const li = document.createElement('li');
+                    li.textContent = `${plant.species} (Stage: ${plant.stage}) | Growth: ${plant.growth.toFixed(1)}/${plant.maxGrowth.toFixed(0)} | Needs: W:${plant.needs.water}, L:${plant.needs.light}, T:${plant.needs.temp}`;
+                    // Add indicators for low resources/temp/light
+                    if (plant.growth < plant.maxGrowth * 0.3) li.style.color = '#ffcc00'; // Yellow for early stage
+                    if (plant.growth > plant.maxGrowth * 0.8) li.style.color = '#90ee90'; // Light green for near mature
+                    if (
+                        gameState.resources.water < plant.needs.water ||
+                        gameState.environment.light < plant.needs.light ||
+                        Math.abs(gameState.environment.temperature - plant.needs.temp) > 10
+                    ) {
+                         li.style.color = '#ff6347'; // Red for critical conditions
+                    }
+                    plantListEl.appendChild(li);
+                });
+            }
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background elements (e.g., greenhouse structure)
+            ctx.fillStyle = '#2a2a3e'; // Darker background for greenhouse
+            ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+            // Draw environment effects (simplified)
+            ctx.fillStyle = 'rgba(0, 150, 255, 0.2)'; // Water/Rain effect
+            if(gameState.environment.weather === 'rain') ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+            ctx.fillStyle = 'rgba(255, 165, 0, 0.1)'; // Light/Sun effect
+            ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+
+            // Draw plants
+            const plotSize = 80;
+            const plotPadding = 20;
+            const startX = 80;
+            const startY = 100;
+            const plotsPerRow = Math.floor((canvas.width - 100) / (plotSize + plotPadding));
+
+            gameState.plants.forEach((plant, index) => {
+                const row = Math.floor(index / plotsPerRow);
+                const col = index % plotsPerRow;
+                const plotX = startX + col * (plotSize + plotPadding);
+                const plotY = startY + row * (plotSize + plotPadding);
+
+                // Draw plot
+                ctx.fillStyle = '#4d4d61';
+                ctx.fillRect(plotX, plotY, plotSize, plotSize);
+
+                // Draw plant representation (simplified)
+                ctx.fillStyle = '#90ee90'; // Default green for health
+                const relativeGrowth = plant.growth / plant.maxGrowth;
+                const plantHeight = plotSize * 0.8 * relativeGrowth;
+                const plantBaseY = plotY + plotSize * 0.9; // Base of the plant
+
+                // Adjust color based on health/stage
+                if (plant.stage === 'seedling') ctx.fillStyle = '#7cfc00'; // Lawn green for seedlings
+                else if (plant.stage === 'mature') ctx.fillStyle = '#32cd32'; // Lime green for mature
+                else if (plant.species.startsWith('Mutated')) ctx.fillStyle = '#ffa07a'; // Light salmon for mutated
+
+                if (plant.growth < plant.maxGrowth * 0.3) ctx.fillStyle = '#ffeb3b'; // Yellow for early growth
+                else if (plant.growth > plant.maxGrowth * 0.8) ctx.fillStyle = '#8fbc8f'; // Dark sea green for near mature
+
+                // Draw stalk/body
+                ctx.fillRect(plotX + plotSize / 2 - 10, plantBaseY - plantHeight, 20, plantHeight);
+
+                // Draw leaves/flowers (simple circles)
+                const leafRadius = 10 * relativeGrowth;
+                ctx.fillStyle = plant.species.startsWith('Mutated') ? '#ff4500' : '#3cb371'; // Tomato red for mutated, medium sea green otherwise
+                ctx.beginPath();
+                ctx.arc(plotX + plotSize / 2, plantBaseY - plantHeight - leafRadius, leafRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw species name
+                ctx.fillStyle = '#e0e0e0';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(plant.species, plotX + plotSize / 2, plantBaseY + 15);
+
+            });
+        }
+
+        // --- Event Listeners ---
+        nextDayBtn.addEventListener('click', () => {
+            // Get current day from display, increment, and pass to startGameDay
+            const currentDay = parseInt(dayEl.textContent);
+            startGameDay(currentDay + 1);
+        });
+
+        plantSeedBtn.addEventListener('click', () => {
+            // Example: Plant "Sunpetal" which requires specific resources and conditions
+            const sunpetalNeeds = { water: 15, nutrients: 10, energy: 5, light: 65, temp: 22 };
+            addPlant('Sunpetal', sunpetalNeeds);
+            updateStatusDisplay(); // Update resources display immediately
+        });
+
+        // --- Initialization ---
+        function initGame() {
+            updateStatusDisplay();
+            render();
+            log("Astro-Gardener initialized. Start by planting some seeds!");
+            // You can pre-plant some seeds for the first day if needed:
+            // addPlant('Sunpetal', { water: 15, nutrients: 10, energy: 5, light: 65, temp: 22 });
+            // addPlant('GlowMoss', { water: 10, nutrients: 8, energy: 4, light: 40, temp: 18 });
+            // startGameDay(1); // Start the game on Day 1 if pre-planted
+            updateLogDisplay();
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

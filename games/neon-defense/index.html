@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霓虹防線 | Neon Defense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 頂部 HUD -->
+        <div id="hud">
+            <div class="hud-section">
+                <div class="stat">
+                    <span class="stat-icon">💎</span>
+                    <span id="energy-display">150</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">❤️</span>
+                    <span id="lives-display">20</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">🌊</span>
+                    <span id="wave-display">1</span>
+                </div>
+            </div>
+            <div class="hud-section">
+                <button id="start-wave-btn" class="neon-btn">開始波次</button>
+                <button id="menu-btn" class="neon-btn secondary">說明</button>
+            </div>
+        </div>
+
+        <!-- 遊戲畫布區域 -->
+        <div id="canvas-wrapper">
+            <canvas id="game-canvas"></canvas>
+            
+            <!-- 遊戲訊息覆蓋層 -->
+            <div id="message-overlay" class="hidden">
+                <div class="message-content">
+                    <h2 id="message-title">遊戲開始</h2>
+                    <p id="message-text">放置防禦塔，保護核心數據庫！</p>
+                    <button id="message-btn" class="neon-btn">開始遊戲</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部塔選擇區 -->
+        <div id="tower-panel">
+            <div class="tower-card" data-tower="laser">
+                <div class="tower-icon">🔫</div>
+                <div class="tower-info">
+                    <div class="tower-name">雷射塔</div>
+                    <div class="tower-cost">💎 50</div>
+                </div>
+                <div class="tower-stats">快速 / 單體</div>
+            </div>
+            <div class="tower-card" data-tower="blaster">
+                <div class="tower-icon">💥</div>
+                <div class="tower-info">
+                    <div class="tower-name">爆破塔</div>
+                    <div class="tower-cost">💎 100</div>
+                </div>
+                <div class="tower-stats">範圍 / 濺射</div>
+            </div>
+            <div class="tower-card" data-tower="slow">
+                <div class="tower-icon">❄️</div>
+                <div class="tower-info">
+                    <div class="tower-name">減速塔</div>
+                    <div class="tower-cost">💎 75</div>
+                </div>
+                <div class="tower-stats">減速 / 無傷害</div>
+            </div>
+            <div class="tower-card" data-tower="sniper">
+                <div class="tower-icon">🎯</div>
+                <div class="tower-info">
+                    <div class="tower-name">狙擊塔</div>
+                    <div class="tower-cost">💎 150</div>
+                </div>
+                <div class="tower-stats">超遠 / 高傷</div>
+            </div>
+        </div>
+
+        <!-- 升級面板 (動態顯示) -->
+        <div id="upgrade-panel" class="hidden">
+            <div class="upgrade-content">
+                <h3>升級防禦塔</h3>
+                <div id="upgrade-info"></div>
+                <div class="upgrade-buttons">
+                    <button id="upgrade-btn" class="neon-btn">升級</button>
+                    <button id="sell-btn" class="neon-btn danger">出售</button>
+                    <button id="close-upgrade-btn" class="neon-btn secondary">關閉</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 說明模態框 -->
+        <div id="instruction-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>🎮 遊戲說明</h2>
+                <div class="instruction-section">
+                    <h3>目標</h3>
+                    <p>放置防禦塔阻止敵人到達核心數據庫。敵人通過會扣除生命值，生命值歸零則遊戲結束。</p>
+                </div>
+                <div class="instruction-section">
+                    <h3>操作方式</h3>
+                    <ul>
+                        <li>🖱️ <strong>點擊下方卡片</strong> 選擇防禦塔類型</li>
+                        <li>🖱️ <strong>點擊網格</strong> 放置防禦塔（不能放在路徑上）</li>
+                        <li>🖱️ <strong>點擊已放置的塔</strong> 升級或出售</li>
+                        <li>▶️ <strong>開始波次</strong> 按鈕召喚敵人</li>
+                    </ul>
+                </div>
+                <div class="instruction-section">
+                    <h3>防禦塔介紹</h3>
+                    <div class="tower-list">
+                        <div class="tower-desc">
+                            <span class="tower-emoji">🔫</span>
+                            <div>
+                                <strong>雷射塔 (50💎)</strong><br>
+                                快速射擊，適合對付普通敵人
+                            </div>
+                        </div>
+                        <div class="tower-desc">
+                            <span class="tower-emoji">💥</span>
+                            <div>
+                                <strong>爆破塔 (100💎)</strong><br>
+                                範圍傷害，對付群體敵人效果好
+                            </div>
+                        </div>
+                        <div class="tower-desc">
+                            <span class="tower-emoji">❄️</span>
+                            <div>
+                                <strong>減速塔 (75💎)</strong><br>
+                                減慢敵人速度，無傷害但輔助性強
+                            </div>
+                        </div>
+                        <div class="tower-desc">
+                            <span class="tower-emoji">🎯</span>
+                            <div>
+                                <strong>狙擊塔 (150💎)</strong><br>
+                                超遠射程，高單體傷害
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="instruction-section">
+                    <h3>敵人類型</h3>
+                    <div class="enemy-list">
+                        <div class="enemy-desc"><span class="enemy-dot" style="background:#00ff88"></span> <strong>普通單位</strong> - 均衡的敵人</div>
+                        <div class="enemy-desc"><span class="enemy-dot" style="background:#ff4444"></span> <strong>快速單位</strong> - 速度快但生命值低</div>
+                        <div class="enemy-desc"><span class="enemy-dot" style="background:#ffaa00"></span> <strong>裝甲單位</strong> - 速度慢但生命值高</div>
+                        <div class="enemy-desc"><span class="enemy-dot" style="background:#aa00ff"></span> <strong>精英單位</strong> - 高生命值高速度</div>
+                    </div>
+                </div>
+                <button id="close-instruction-btn" class="neon-btn">開始遊戲</button>
+            </div>
+        </div>
+
+        <!-- 返回大廳按鈕 -->
+        <a href="../../index.html" id="back-btn">← 返回大廳</a>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

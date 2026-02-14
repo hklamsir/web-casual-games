@@ -6,15 +6,35 @@ fontSize: 12
 ---
 
 # Code Review Report: Web Casual Games
-**Date:** 2026-02-11 (Scheduled Auto-Creation)
+**Date:** 2026-02-14 (Scheduled Auto-Creation)
 **Reviewer:** AI Assistant (OpenClaw)
 
 ## 1. Executive Summary
-The `web-casual-games` project has reached **15 games**. The latest addition, **Stellar Reflector (星際反射)**, introduces a physics-based puzzle shooter mechanic. This fulfills the "Physics Trajectory" target identified in the previous review.
+The `web-casual-games` project has reached **16 games**. The latest addition, **Neon Defense (霓虹防線)**, is the collection's first **Tower Defense** game, fulfilling the "Strategy" target identified in the previous review. It features a complete grid-based tower placement system, four unique tower types, and a 10-wave progression system.
 
 ## 2. Recent Changes & Fixes
 
-### ☄️ Stellar Reflector (New)
+### 🛡️ Neon Defense (New)
+*   **Genre**: Tower Defense / Strategy.
+*   **Architecture**: HTML5 Canvas with grid-based spatial mapping (12×12 cells).
+*   **Core Mechanics**:
+    *   **Grid System**: 12×12 grid with predefined enemy path. Towers cannot be placed on path cells.
+    *   **Four Tower Types**:
+        *   **Laser**: Fast fire rate, single target, low cost (50 energy).
+        *   **Blaster**: Splash damage, moderate cost (100 energy).
+        *   **Slow**: No damage, applies slow debuff to enemies (75 energy).
+        *   **Sniper**: Long range, high damage, high cost (150 energy).
+    *   **Wave System**: 10 predefined waves with escalating difficulty (enemy HP scales with wave number).
+    *   **Enemy Types**: Normal, Fast, Tank (high HP), Elite (combination).
+    *   **Upgrade System**: Towers can be upgraded (damage +50%, range +10%, fire rate -10%) or sold (50% refund).
+*   **Visuals**:
+    *   Cyberpunk neon aesthetic with cyan/pink/purple color scheme.
+    *   Glow effects on towers and projectiles.
+    *   Particle explosions on enemy death.
+    *   Health bars above enemies.
+*   **Mobile Support**: Touch-optimized tower selection and placement. Responsive canvas sizing.
+
+### ☄️ Stellar Reflector
 *   **Genre**: Physics Shooter / Puzzle.
 *   **Architecture**: HTML5 Canvas (2D) with vector-based reflection logic.
 *   **Core Mechanics**:
@@ -28,7 +48,22 @@ The `web-casual-games` project has reached **15 games**. The latest addition, **
     *   Particle system for collisions and wins.
 *   **Mobile Support**: Drag-to-rotate interaction optimized for touch screens.
 
-## 3. Detailed Review: Stellar Reflector
+## 3. Detailed Review: Neon Defense
+
+#### Pros
+*   **Strategic Depth**: Four distinct tower types create meaningful choices. The interplay between damage dealers and support (slow) towers rewards thoughtful placement.
+*   **Progressive Difficulty**: Wave 1 starts gentle (5 normal enemies), while Wave 10 throws elite enemies mixed with tanks. HP scaling (20% per wave) ensures sustained challenge.
+*   **Code Architecture**: Clean separation of concerns—`updateTowers()`, `updateEnemies()`, `updateProjectiles()` run independently. Grid-to-pixel conversion utilities are reusable.
+*   **Visual Feedback**: Glow effects, particle explosions, and slow-effect indicators provide immediate gameplay feedback.
+*   **Economy Balance**: Tower costs (50-150) and sell values (50%) create meaningful decisions about resource allocation.
+
+#### Cons / Improvements
+*   **Path Visibility**: The enemy path could benefit from animated flow indicators to make direction clearer.
+*   **Tower Preview**: When selecting a tower type, highlighting valid placement cells would improve UX.
+*   **Sound**: No audio cues for tower firing, enemy death, or wave completion.
+*   **Save System**: Progress is not persisted across sessions.
+
+## 4. Detailed Review: Stellar Reflector
 
 #### Pros
 *   **Math Accuracy**: The reflection logic correctly handles varying incident angles and pushes the ball out of collision to prevent sticking.
@@ -40,7 +75,7 @@ The `web-casual-games` project has reached **15 games**. The latest addition, **
 *   **Sound**: Lacks sound effects for reflections and black hole impacts.
 *   **Level Design**: Currently, reflectors are placed randomly; manually designed layouts for later levels would provide better difficulty curves.
 
-## 4. Project-Wide Status
+## 5. Project-Wide Status
 
 | Game | Genre | Mobile | Audio | Status |
 |------|-------|--------|-------|--------|
@@ -58,10 +93,11 @@ The `web-casual-games` project has reached **15 games**. The latest addition, **
 | Prism Pulse | Match-3 | ✅ | ❌ | Stable |
 | Neon Angler | Fishing | ✅ | ❌ | Stable |
 | Echo Chase | Sensory | ✅ | ❌ | Stable |
-| **Stellar Reflector**| **Physics** | ✅ | ❌ | **New Release** |
+| Stellar Reflector | Physics | ✅ | ❌ | Stable |
+| **Neon Defense**| **Tower Defense** | ✅ | ❌ | **New Release** |
 
-## 5. Genre Coverage Analysis
-The collection is becoming very diverse:
+## 6. Genre Coverage Analysis
+The collection is now highly diverse with **16 unique games**:
 
 | Category | Games |
 |----------|-------|
@@ -70,15 +106,18 @@ The collection is becoming very diverse:
 | **Brain/Puzzle** | Emoji Match, Quantum 2048, Word Weaver, Prism Pulse, Stellar Reflector |
 | **Physics** | Zen Stack, Stellar Reflector |
 | **Rhythm** | Synth Flow |
+| **Strategy** | Neon Defense |
 
 **Next Target Genres:**
-- Strategy (Tower Defense / Resource Management)
-- Turn-based Card Game / Board Game
+- Turn-based Card Game / Deck Building
+- Roguelike / Procedural Dungeon
+- Drawing / Creative
 
-## 6. Maintenance Tasks
+## 7. Maintenance Tasks
 - [ ] **Global Sound Toggle**: Implement a mute/unmute button on the main index page.
 - [ ] **PWA Support**: Add a manifest.json and service worker to make the platform installable on mobile.
 - [ ] **High Score Persistence**: Still pending for several games.
+- [ ] **Neon Defense Enhancements**: Add path flow animation, tower placement preview, and sound effects.
 
 ---
-*Report generated by OpenClaw 🦋*
+*Report generated by OpenClaw 🦋 - February 14, 2026*

@@ -1,0 +1,507 @@
+/* ===== 霓虹防線 - 賽博龐克風格 ===== */
+
+:root {
+    --bg-dark: #0a0a0f;
+    --bg-panel: #12121a;
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff00ff;
+    --neon-purple: #b347e6;
+    --neon-green: #00ff88;
+    --neon-red: #ff3366;
+    --neon-yellow: #ffdd00;
+    --text-primary: #e0e0e0;
+    --text-secondary: #888;
+    --grid-line: #1a1a2e;
+    --path-color: #16213e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===== HUD 頂部欄 ===== */
+#hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(180deg, var(--bg-panel) 0%, rgba(18, 18, 26, 0.9) 100%);
+    border-bottom: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+}
+
+.hud-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.stat-icon {
+    font-size: 1.3rem;
+}
+
+#energy-display {
+    color: var(--neon-cyan);
+}
+
+#lives-display {
+    color: var(--neon-pink);
+}
+
+#wave-display {
+    color: var(--neon-yellow);
+}
+
+/* ===== 霓虹按鈕 ===== */
+.neon-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--neon-cyan);
+    background: transparent;
+    color: var(--neon-cyan);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.3), inset 0 0 10px rgba(0, 245, 255, 0.1);
+}
+
+.neon-btn:hover {
+    background: rgba(0, 245, 255, 0.15);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5), inset 0 0 20px rgba(0, 245, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.neon-btn:active {
+    transform: translateY(0);
+}
+
+.neon-btn.secondary {
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+    box-shadow: 0 0 10px rgba(179, 71, 230, 0.3), inset 0 0 10px rgba(179, 71, 230, 0.1);
+}
+
+.neon-btn.secondary:hover {
+    background: rgba(179, 71, 230, 0.15);
+    box-shadow: 0 0 20px rgba(179, 71, 230, 0.5), inset 0 0 20px rgba(179, 71, 230, 0.2);
+}
+
+.neon-btn.danger {
+    border-color: var(--neon-red);
+    color: var(--neon-red);
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.3), inset 0 0 10px rgba(255, 51, 102, 0.1);
+}
+
+.neon-btn.danger:hover {
+    background: rgba(255, 51, 102, 0.15);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.5), inset 0 0 20px rgba(255, 51, 102, 0.2);
+}
+
+.neon-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+    box-shadow: none;
+}
+
+/* ===== 遊戲畫布區域 ===== */
+#canvas-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(ellipse at center, #0f0f1a 0%, var(--bg-dark) 100%);
+    overflow: hidden;
+}
+
+#game-canvas {
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
+    border: 1px solid var(--grid-line);
+}
+
+/* ===== 訊息覆蓋層 ===== */
+#message-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 15, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#message-overlay.hidden {
+    display: none;
+}
+
+.message-content {
+    text-align: center;
+    padding: 40px;
+    background: var(--bg-panel);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+    max-width: 400px;
+}
+
+.message-content h2 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.message-content p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+/* ===== 底部塔選擇面板 ===== */
+#tower-panel {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-panel);
+    border-top: 2px solid var(--neon-purple);
+    box-shadow: 0 0 20px rgba(179, 71, 230, 0.2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tower-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--grid-line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.tower-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--neon-cyan);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 245, 255, 0.2);
+}
+
+.tower-card.selected {
+    border-color: var(--neon-green);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.tower-card.selected .tower-icon {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.tower-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.tower-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+}
+
+.tower-info {
+    text-align: center;
+}
+
+.tower-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tower-cost {
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    font-weight: 600;
+}
+
+.tower-stats {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* ===== 升級面板 ===== */
+#upgrade-panel {
+    position: absolute;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-panel);
+    border: 2px solid var(--neon-yellow);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 0 30px rgba(255, 221, 0, 0.3);
+    z-index: 20;
+    min-width: 250px;
+}
+
+#upgrade-panel.hidden {
+    display: none;
+}
+
+.upgrade-content h3 {
+    color: var(--neon-yellow);
+    margin-bottom: 12px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--neon-yellow);
+}
+
+#upgrade-info {
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.upgrade-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* ===== 說明模態框 ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px rgba(0, 245, 255, 0.3);
+}
+
+.modal-content h2 {
+    color: var(--neon-cyan);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.instruction-section {
+    margin-bottom: 20px;
+}
+
+.instruction-section h3 {
+    color: var(--neon-purple);
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.instruction-section p,
+.instruction-section ul {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.instruction-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.instruction-section li {
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+.tower-list,
+.enemy-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tower-desc,
+.enemy-desc {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+}
+
+.tower-emoji {
+    font-size: 1.5rem;
+}
+
+.enemy-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+}
+
+/* ===== 返回按鈕 ===== */
+#back-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border: 1px solid var(--grid-line);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+#back-btn:hover {
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+}
+
+/* ===== 響應式設計 ===== */
+@media (max-width: 600px) {
+    #hud {
+        padding: 8px 12px;
+    }
+    
+    .hud-section {
+        gap: 10px;
+    }
+    
+    .stat {
+        font-size: 0.95rem;
+    }
+    
+    .neon-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    #tower-panel {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .tower-card {
+        min-width: 70px;
+        padding: 8px;
+    }
+    
+    .tower-icon {
+        font-size: 1.6rem;
+    }
+    
+    .tower-name {
+        font-size: 0.75rem;
+    }
+    
+    .tower-cost {
+        font-size: 0.7rem;
+    }
+    
+    .tower-stats {
+        font-size: 0.6rem;
+    }
+    
+    #upgrade-panel {
+        bottom: 120px;
+        min-width: 200px;
+        padding: 12px;
+    }
+    
+    .modal-content {
+        padding: 16px;
+        max-height: 85vh;
+    }
+    
+    .instruction-section h3 {
+        font-size: 1rem;
+    }
+    
+    .instruction-section p,
+    .instruction-section ul {
+        font-size: 0.85rem;
+    }
+}
+
+/* ===== 滾動條美化 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-purple);
+}
